@@ -1,6 +1,7 @@
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
+const webpack = require("webpack");
 
 const path = require("path");
 
@@ -15,6 +16,10 @@ module.exports = {
       filename: path.resolve(__dirname, `dist/index.html`),
     }),
     new MiniCssExtractPlugin(),
+    new webpack.ProvidePlugin({
+      process: "process/browser",
+      Buffer: ["buffer", "Buffer"],
+    }),
   ],
   externals: [],
   module: {
@@ -41,7 +46,15 @@ module.exports = {
   resolve: {
     modules: ["node_modules"],
     extensions: [".js", ".ts", ".tsx"],
-    fallback: { util: false },
+    fallback: {
+      crypto: require.resolve("crypto-browserify"),
+      stream: require.resolve("stream-browserify"),
+      assert: require.resolve("assert"),
+      http: require.resolve("stream-http"),
+      https: require.resolve("https-browserify"),
+      os: require.resolve("os-browserify"),
+      url: require.resolve("url"),
+    },
   },
   output: {
     path: path.resolve(__dirname, "dist"), //バンドルしたファイルの出力先のパスを指定
