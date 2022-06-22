@@ -1,0 +1,7 @@
+node_modules/
+
+# artifacts
+dist/
+
+# credentials
+.env
