@@ -4,6 +4,8 @@ const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
 const webpack = require("webpack");
 
 const path = require("path");
+const cssRegex = /\.css$/;
+const cssModuleRegex = /\.module\.css$/;
 
 module.exports = {
   target: "web",
@@ -30,8 +32,24 @@ module.exports = {
         exclude: /node_modules/,
       },
       {
-        test: /\.css$/,
+        test: cssRegex,
+        exclude: cssModuleRegex,
         use: [MiniCssExtractPlugin.loader, "css-loader"],
+      },
+      {
+        test: cssModuleRegex,
+        use: [
+          MiniCssExtractPlugin.loader,
+          {
+            loader: "css-loader",
+            options: {
+              importLoaders: 1,
+              modules: {
+                exportLocalsConvention: "camelCase",
+              },
+            },
+          },
+        ],
       },
       {
         test: /\.(png|jpe?g|gif|svg)$/i,
