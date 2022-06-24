@@ -27,6 +27,9 @@
             "version": "detect"
         }
     },
-    "rules": {
-    }
+    "ignorePatterns": [
+        "dist/",
+        "node_modules/",
+        "webpack.*.js"
+    ]
 }

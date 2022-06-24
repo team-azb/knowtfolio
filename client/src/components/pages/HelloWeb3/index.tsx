@@ -1,4 +1,4 @@
-import "./style.css";
+import styles from "./style.module.css";
 import { greeting } from "./helper";
 import { useCallback, useEffect, useState } from "react";
 import detectEthereumProvider from "@metamask/detect-provider";
@@ -49,7 +49,7 @@ const HelloWeb3 = () => {
 
   return (
     <div>
-      <h1 className="title">hello web3!!</h1>
+      <h1 className={styles.title}>hello web3!!</h1>
       {isConnected ? (
         <>
           <p>your account: {account}</p>
