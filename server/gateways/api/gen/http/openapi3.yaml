@@ -1,0 +1,308 @@
+openapi: 3.0.3
+info:
+    title: Knowtfolio Backend
+    description: Blogging platform that leverages NFT to grow, buy and sell articles.
+    version: "1.0"
+servers:
+    - url: http://localhost:8080
+paths:
+    /api/article:
+        post:
+            tags:
+                - article
+            summary: Create article
+            description: Create new article.
+            operationId: article#Create
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/CreateRequestBody'
+                        example:
+                            content: <h1> Hello World! </h1>
+                            title: My Awesome Article
+            responses:
+                "200":
+                    description: OK response.
+                    content:
+                        application/json:
+                            schema:
+                                description: 'Response body may alternatively be #/components/schemas/CreateResponseBodyOnlyID'
+                                $ref: '#/components/schemas/ArticleResult'
+                            example:
+                                content: <h1> Hello World! </h1>
+                                id: exampleId01
+                                title: My Awesome Article
+    /api/article/{id}:
+        delete:
+            tags:
+                - article
+            summary: Delete article
+            description: Delete article by id.
+            operationId: article#Delete
+            parameters:
+                - name: id
+                  in: path
+                  description: 記事のID
+                  required: true
+                  schema:
+                    type: string
+                    description: 記事のID
+                    example: exampleId01
+                    pattern: ^[A-Za-z0-9_-]+$
+                    minLength: 11
+                    maxLength: 11
+                  example: exampleId01
+            responses:
+                "200":
+                    description: OK response.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/CreateResponseBodyOnlyID'
+                            example:
+                                id: exampleId01
+                "404":
+                    description: 'not_found: IDに対応する記事が見つからなかった場合。'
+                    content:
+                        application/vnd.goa.error+json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+        get:
+            tags:
+                - article
+            summary: Read article
+            description: Get article by id.
+            operationId: article#Read
+            parameters:
+                - name: id
+                  in: path
+                  description: 記事のID
+                  required: true
+                  schema:
+                    type: string
+                    description: 記事のID
+                    example: exampleId01
+                    pattern: ^[A-Za-z0-9_-]+$
+                    minLength: 11
+                    maxLength: 11
+                  example: exampleId01
+            responses:
+                "200":
+                    description: OK response.
+                    content:
+                        application/json:
+                            schema:
+                                description: 'Response body may alternatively be #/components/schemas/CreateResponseBodyOnlyID'
+                                $ref: '#/components/schemas/ArticleResult'
+                            example:
+                                content: <h1> Hello World! </h1>
+                                id: exampleId01
+                                title: My Awesome Article
+                "404":
+                    description: 'not_found: IDに対応する記事が見つからなかった場合。'
+                    content:
+                        application/vnd.goa.error+json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+        put:
+            tags:
+                - article
+            summary: Update article
+            description: Update an article.
+            operationId: article#Update
+            parameters:
+                - name: id
+                  in: path
+                  description: 記事のID
+                  required: true
+                  schema:
+                    type: string
+                    description: 記事のID
+                    example: exampleId01
+                    pattern: ^[A-Za-z0-9_-]+$
+                    minLength: 11
+                    maxLength: 11
+                  example: exampleId01
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/UpdateRequestBody'
+                        example:
+                            content: <h1> Hello World! </h1>
+                            title: My Awesome Article
+            responses:
+                "200":
+                    description: OK response.
+                    content:
+                        application/json:
+                            schema:
+                                description: 'Response body may alternatively be #/components/schemas/CreateResponseBodyOnlyID'
+                                $ref: '#/components/schemas/ArticleResult'
+                            example:
+                                content: <h1> Hello World! </h1>
+                                id: exampleId01
+                                title: My Awesome Article
+                "404":
+                    description: 'not_found: IDに対応する記事が見つからなかった場合。'
+                    content:
+                        application/vnd.goa.error+json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+    /article/{id}:
+        get:
+            tags:
+                - article-html
+            summary: Read HTML article-html
+            description: Get article's HTML by id.
+            operationId: article-html#Read HTML
+            parameters:
+                - name: id
+                  in: path
+                  description: 記事のID
+                  required: true
+                  schema:
+                    type: string
+                    description: 記事のID
+                    example: exampleId01
+                    pattern: ^[A-Za-z0-9_-]+$
+                    minLength: 11
+                    maxLength: 11
+                  example: exampleId01
+            responses:
+                "200":
+                    description: IDに対応する記事のHTMLのバイナリ
+                    content:
+                        text/html; charset=UTF-8:
+                            schema:
+                                type: string
+                                example: <h1> Hello World! </h1>
+                                format: binary
+                            example: <h1> Hello World! </h1>
+                "404":
+                    description: 'not_found: IDに対応する記事が見つからなかった場合。'
+                    content:
+                        application/vnd.goa.error+json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+components:
+    schemas:
+        ArticleResult:
+            type: object
+            properties:
+                content:
+                    type: string
+                    description: 本文のHTML
+                    example: <h1> Hello World! </h1>
+                id:
+                    type: string
+                    description: 記事のID
+                    example: exampleId01
+                    pattern: ^[A-Za-z0-9_-]+$
+                    minLength: 11
+                    maxLength: 11
+                title:
+                    type: string
+                    example: My Awesome Article
+            example:
+                content: <h1> Hello World! </h1>
+                id: exampleId01
+                title: My Awesome Article
+            required:
+                - id
+                - title
+                - content
+        CreateRequestBody:
+            type: object
+            properties:
+                content:
+                    type: string
+                    description: 本文のHTML
+                    example: <h1> Hello World! </h1>
+                title:
+                    type: string
+                    example: My Awesome Article
+            description: 作成したい記事の情報
+            example:
+                content: <h1> Hello World! </h1>
+                title: My Awesome Article
+            required:
+                - title
+                - content
+        CreateResponseBodyOnlyID:
+            type: object
+            properties:
+                id:
+                    type: string
+                    description: 記事のID
+                    example: exampleId01
+                    pattern: ^[A-Za-z0-9_-]+$
+                    minLength: 11
+                    maxLength: 11
+            description: CreateResponseBody result type (only-id view)
+            example:
+                id: exampleId01
+            required:
+                - id
+        Error:
+            type: object
+            properties:
+                fault:
+                    type: boolean
+                    description: Is the error a server-side fault?
+                    example: true
+                id:
+                    type: string
+                    description: ID is a unique identifier for this particular occurrence of the problem.
+                    example: 123abc
+                message:
+                    type: string
+                    description: Message is a human-readable explanation specific to this occurrence of the problem.
+                    example: parameter 'p' must be an integer
+                name:
+                    type: string
+                    description: Name is the name of this class of errors.
+                    example: bad_request
+                temporary:
+                    type: boolean
+                    description: Is the error temporary?
+                    example: true
+                timeout:
+                    type: boolean
+                    description: Is the error a timeout?
+                    example: true
+            example:
+                id: 3F1FKVRR
+                message: Value of ID must be an integer
+                name: bad_request
+            required:
+                - name
+                - id
+                - message
+                - temporary
+                - timeout
+                - fault
+        UpdateRequestBody:
+            type: object
+            properties:
+                content:
+                    type: string
+                    description: 本文のHTML
+                    example: <h1> Hello World! </h1>
+                title:
+                    type: string
+                    example: My Awesome Article
+            description: |-
+                記事の更新内容
+                リクエストに含まれるフィールドだけ更新される。
+            example:
+                content: <h1> Hello World! </h1>
+                title: My Awesome Article
+tags:
+    - name: article
+      description: 記事サービス
+    - name: article-html
+      description: SEO対策で、記事の表示だけ直接HTMLで返すためのサービス
