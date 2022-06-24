@@ -1,0 +1,4 @@
+gen/*
+!gen/http
+gen/http/*
+!gen/http/openapi3.yaml
