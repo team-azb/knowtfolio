@@ -1,6 +1,7 @@
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
+const Dotenv = require("dotenv-webpack");
 const webpack = require("webpack");
 
 const path = require("path");
@@ -22,6 +23,7 @@ module.exports = {
       process: "process/browser",
       Buffer: ["buffer", "Buffer"],
     }),
+    new Dotenv(),
   ],
   externals: [],
   module: {
@@ -72,6 +74,8 @@ module.exports = {
       https: require.resolve("https-browserify"),
       os: require.resolve("os-browserify"),
       url: require.resolve("url"),
+      // path: require.resolve("path-browserify"),
+      // buffer: require.resolve("buffer/")
     },
   },
   output: {
