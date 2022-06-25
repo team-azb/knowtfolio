@@ -74,8 +74,9 @@ module.exports = {
       https: require.resolve("https-browserify"),
       os: require.resolve("os-browserify"),
       url: require.resolve("url"),
-      // path: require.resolve("path-browserify"),
-      // buffer: require.resolve("buffer/")
+    },
+    alias: {
+      "~": path.resolve(__dirname, "src"),
     },
   },
   output: {

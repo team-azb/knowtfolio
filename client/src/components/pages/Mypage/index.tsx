@@ -1,5 +1,5 @@
 import { useCallback, useMemo } from "react";
-import { useAuth } from "../../contexts/AuthContext";
+import { useAuth } from "~/components/contexts/AuthContext";
 import { signOutCognito } from "./helper";
 
 const Mypage = () => {

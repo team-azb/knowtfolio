@@ -1,5 +1,5 @@
 import * as AmazonCognitoIdentity from "amazon-cognito-identity-js";
-import { userPool } from "../../../configs/cognito";
+import { userPool } from "~/configs/cognito";
 
 export type form = {
   email: string;

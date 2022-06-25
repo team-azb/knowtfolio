@@ -10,7 +10,7 @@ import React, {
   useEffect,
   useState,
 } from "react";
-import { userPool } from "../../../configs/cognito";
+import { userPool } from "~/configs/cognito";
 import { getAttributes, getSession } from "./helper";
 
 type authContext = {

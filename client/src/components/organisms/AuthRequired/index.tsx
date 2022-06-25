@@ -1,5 +1,7 @@
 import React from "react";
-import AuthProvider, { useOptionalAuth } from "../../contexts/AuthContext";
+import AuthProvider, {
+  useOptionalAuth,
+} from "~/components/contexts/AuthContext";
 
 type props = {
   children: React.ReactNode;
