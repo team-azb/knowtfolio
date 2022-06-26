@@ -20,7 +20,10 @@ const App = () => {
         <Route path="/signup" element={<SignUp />} />
         <Route path="/signin" element={<SignIn />} />
         <Route path="/mypage" element={<AuthRequired element={<Mypage />} />} />
-        <Route path="/image-upload" element={<ImageUpload />} />
+        <Route
+          path="/image-upload"
+          element={<AuthRequired element={<ImageUpload />} />}
+        />
       </Routes>
     </>
   );
