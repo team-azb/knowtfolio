@@ -1,7 +1,8 @@
 import { S3Client } from "@aws-sdk/client-s3";
 import { Credentials, Provider } from "@aws-sdk/types"; // ES6 import
 
-export const COGNITO_IDENTITY_ID = process.env.COGNITO_IDENTITY_ID || "";
+export const COGNITO_IDENTITY_POOL_ID =
+  process.env.COGNITO_IDENTITY_POOL_ID || "";
 
 export const getS3Client = (
   credentials: Credentials | Provider<Credentials>

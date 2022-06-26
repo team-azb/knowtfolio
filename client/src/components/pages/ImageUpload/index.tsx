@@ -3,14 +3,14 @@ import { fromCognitoIdentityPool } from "@aws-sdk/credential-providers";
 import { useCallback, useMemo } from "react";
 import { useAuth } from "~/components/contexts/AuthContext";
 import { COGNITO_USER_POOL_ID } from "~/configs/cognito";
-import { COGNITO_IDENTITY_ID, getS3Client } from "~/configs/s3";
+import { COGNITO_IDENTITY_POOL_ID, getS3Client } from "~/configs/s3";
 
 const ImageUpload = () => {
   const { session } = useAuth();
   const s3Client = useMemo(() => {
     return getS3Client(
       fromCognitoIdentityPool({
-        identityPoolId: COGNITO_IDENTITY_ID,
+        identityPoolId: COGNITO_IDENTITY_POOL_ID,
         logins: {
           [`cognito-idp.ap-northeast-1.amazonaws.com/${COGNITO_USER_POOL_ID}`]:
             session.getIdToken().getJwtToken(),
@@ -29,11 +29,11 @@ const ImageUpload = () => {
       Body: "sample",
     });
     try {
-        await s3Client.send(command);
-        alert("successfully uploaded file")
+      await s3Client.send(command);
+      alert("successfully uploaded file");
     } catch (error) {
-        console.error(error)
-        alert("uploading file failed...")
+      console.error(error);
+      alert("uploading file failed...");
     }
   }, [s3Client]);
 
