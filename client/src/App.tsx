@@ -5,6 +5,7 @@ import SignIn from "./components/pages/SignIn";
 import Mypage from "./components/pages/Mypage";
 import AuthProvider from "./components/contexts/AuthContext";
 import AuthRequired from "./components/organisms/AuthRequired";
+import ImageUpload from "./components/pages/ImageUpload";
 import Header from "./components/organisms/Header";
 
 const App = () => {
@@ -18,14 +19,8 @@ const App = () => {
         <Route path="/" element={<HelloWeb3 />} />
         <Route path="/signup" element={<SignUp />} />
         <Route path="/signin" element={<SignIn />} />
-        <Route
-          path="/mypage"
-          element={
-            <AuthRequired>
-              <Mypage />
-            </AuthRequired>
-          }
-        />
+        <Route path="/mypage" element={<AuthRequired element={<Mypage />} />} />
+        <Route path="/image-upload" element={<ImageUpload />} />
       </Routes>
     </>
   );

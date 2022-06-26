@@ -3,21 +3,25 @@ import AuthProvider, {
   useOptionalAuth,
 } from "~/components/contexts/AuthContext";
 
-type props = {
+type switcherProps = {
   children: React.ReactNode;
 };
 
-const Switcher = ({ children }: props) => {
+const Switcher = ({ children }: switcherProps) => {
   const auth = useOptionalAuth();
   return <>{auth ? children : <div>サインインが必要です</div>}</>;
 };
 
-const AuthRequired = ({ children }: props) => {
+type props = {
+  element: JSX.Element;
+};
+
+const AuthRequiredRoute = ({ element }: props) => {
   return (
     <AuthProvider>
-      <Switcher>{children}</Switcher>
+      <Switcher>{element}</Switcher>
     </AuthProvider>
   );
 };
 
-export default AuthRequired;
+export default AuthRequiredRoute;
