@@ -32,7 +32,6 @@ export const signUpCognito = (form: form) => {
         if (result) {
           const cognitoUser = result.user;
           res(cognitoUser);
-          console.log("user name is " + cognitoUser.getUsername());
         }
         rej("unexpected error");
       }

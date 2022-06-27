@@ -29,8 +29,7 @@ const SignIn = () => {
 
   const signIn = useCallback(async () => {
     try {
-      const res = await signInCognitoWithPassword(form);
-      console.log(res);
+      await signInCognitoWithPassword(form);
       alert("サインイン成功");
       window.location.reload();
     } catch (error) {

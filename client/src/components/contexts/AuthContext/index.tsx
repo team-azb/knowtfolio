@@ -29,7 +29,6 @@ const AuthProvider = ({ children }: props) => {
   const [auth, setAuth] = useState<authContext | null>(null);
 
   const setCurrentUser = useCallback(async () => {
-    console.log("set user!");
     const cognitoUser = userPool.getCurrentUser();
     if (cognitoUser) {
       const session = await getSession(cognitoUser);
