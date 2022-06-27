@@ -1,6 +1,7 @@
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
+const TerserPlugin = require("terser-webpack-plugin");
 const Dotenv = require("dotenv-webpack");
 const webpack = require("webpack");
 
@@ -84,7 +85,12 @@ module.exports = {
     filename: "main.js", //出力時のファイル名の指定
   },
   optimization: {
-    minimizer: [new CssMinimizerPlugin()],
+    minimizer: [
+      new CssMinimizerPlugin(),
+      new TerserPlugin({
+        parallel: true,
+      }),
+    ],
   },
   devServer: {
     historyApiFallback: {
