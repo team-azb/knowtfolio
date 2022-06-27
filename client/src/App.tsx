@@ -7,6 +7,7 @@ import AuthProvider from "./components/contexts/AuthContext";
 import AuthRequired from "./components/organisms/AuthRequired";
 import ImageUpload from "./components/pages/ImageUpload";
 import Header from "./components/organisms/Header";
+import NotFound from "./components/pages/NofFound";
 
 const App = () => {
   return (
@@ -24,6 +25,7 @@ const App = () => {
           path="/image-upload"
           element={<AuthRequired element={<ImageUpload />} />}
         />
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </>
   );
