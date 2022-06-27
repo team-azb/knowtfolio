@@ -33,7 +33,7 @@ const ImageUpload = () => {
     if (imageForm) {
       const command = new PutObjectCommand({
         Bucket: "knowtfolio-alpha",
-        Key: imageForm.name,
+        Key: `images/${imageForm.name}`,
         Body: imageForm.blob,
       });
       try {
