@@ -69,13 +69,13 @@ var articleResult = dsl.ResultType("application/json", "ArticleResult", func() {
 	})
 })
 
-var _ = dsl.Service("article", func() {
+var _ = dsl.Service("articles", func() {
 	dsl.Description("記事サービス")
 
 	dsl.Error("not_found")
 
 	dsl.HTTP(func() {
-		dsl.Path("/article")
+		dsl.Path("/articles")
 	})
 
 	dsl.Method("Create", func() {

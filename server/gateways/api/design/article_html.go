@@ -2,11 +2,11 @@ package design
 
 import "goa.design/goa/v3/dsl"
 
-var _ = dsl.Service("article-html", func() {
+var _ = dsl.Service("articles-html", func() {
 	dsl.Description("SEO対策で、記事の表示だけ直接HTMLで返すためのサービス")
 
 	dsl.HTTP(func() {
-		dsl.Path("//article")
+		dsl.Path("//articles")
 	})
 
 	dsl.Method("Read HTML", func() {
