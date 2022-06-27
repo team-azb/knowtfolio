@@ -18,3 +18,6 @@ clean:
 
 start-client:
 	cd client && npm start
+
+deploy-client:
+	cd client && npm run deploy
