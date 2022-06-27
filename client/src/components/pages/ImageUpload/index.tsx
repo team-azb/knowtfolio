@@ -1,11 +1,18 @@
 import { PutObjectCommand } from "@aws-sdk/client-s3";
 import { fromCognitoIdentityPool } from "@aws-sdk/credential-providers";
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { useAuth } from "~/components/contexts/AuthContext";
 import { COGNITO_USER_POOL_ID } from "~/configs/cognito";
 import { COGNITO_IDENTITY_POOL_ID, getS3Client } from "~/configs/s3";
 
+type imageForm = {
+  blob: Blob;
+  url: string;
+  name: string;
+};
+
 const ImageUpload = () => {
+  const [imageForm, setImageForm] = useState<imageForm | null>(null);
   const { session } = useAuth();
   const s3Client = useMemo(() => {
     return getS3Client(
@@ -22,29 +29,60 @@ const ImageUpload = () => {
     );
   }, [session]);
 
-  const uploadFile = useCallback(async () => {
-    const command = new PutObjectCommand({
-      Bucket: "knowtfolio-alpha",
-      Key: "sample.txt",
-      Body: "sample",
-    });
-    try {
-      await s3Client.send(command);
-      alert("successfully uploaded file");
-    } catch (error) {
-      console.error(error);
-      alert("uploading file failed...");
+  const uploadImage = useCallback(async () => {
+    if (imageForm) {
+      const command = new PutObjectCommand({
+        Bucket: "knowtfolio-alpha",
+        Key: imageForm.name,
+        Body: imageForm.blob,
+      });
+      try {
+        await s3Client.send(command);
+        alert("successfully uploaded file");
+      } catch (error) {
+        console.error(error);
+        alert("uploading file failed...");
+      }
+    } else {
+      alert("please input your image before");
     }
-  }, [s3Client]);
+  }, [imageForm, s3Client]);
+
+  const inputImage = useCallback<React.ChangeEventHandler<HTMLInputElement>>(
+    (event) => {
+      const files = event.target.files;
+      if (files?.length) {
+        const fr = new FileReader();
+        fr.readAsDataURL(files[0]);
+        fr.addEventListener("load", () => {
+          setImageForm({
+            blob: files[0],
+            url: String(fr.result),
+            name: files[0].name,
+          });
+        });
+      }
+    },
+    []
+  );
 
   return (
     <div>
       <div>
         input image
-        <input type="file" />
+        <input onChange={inputImage} accept="image/*" type="file" />
       </div>
+      {imageForm && (
+        <div>
+          preview
+          <div>
+            <img src={imageForm?.url} alt="preview image" />
+          </div>
+        </div>
+      )}
+
       <div>
-        <button onClick={uploadFile}>upload</button>
+        <button onClick={uploadImage}>upload</button>
       </div>
     </div>
   );
