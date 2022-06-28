@@ -11,13 +11,9 @@ const SignIn = () => {
     (event) => {
       switch (event.target.name) {
         case "username":
-          setForm((prev) => {
-            return { ...prev, username: event.target.value };
-          });
-          break;
         case "password":
           setForm((prev) => {
-            return { ...prev, password: event.target.value };
+            return { ...prev, [event.target.name]: event.target.value };
           });
           break;
         default:

@@ -15,23 +15,11 @@ const SignUp = () => {
     (event) => {
       switch (event.target.name) {
         case "email":
-          setForm((prev) => {
-            return { ...prev, email: event.target.value };
-          });
-          break;
         case "password":
-          setForm((prev) => {
-            return { ...prev, password: event.target.value };
-          });
-          break;
         case "username":
-          setForm((prev) => {
-            return { ...prev, username: event.target.value };
-          });
-          break;
         case "phonenumber":
           setForm((prev) => {
-            return { ...prev, phoneNumber: event.target.value };
+            return { ...prev, [event.target.name]: event.target.value };
           });
           break;
         default:
