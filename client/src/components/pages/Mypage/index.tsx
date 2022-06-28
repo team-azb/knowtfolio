@@ -1,6 +1,6 @@
 import { useCallback, useMemo } from "react";
 import { useAuth } from "~/components/contexts/AuthContext";
-import { signOutCognito } from "./helper";
+import { signOutFromCognito } from "~/apis/cognito";
 
 const Mypage = () => {
   const { user, attributes } = useAuth();
@@ -9,7 +9,7 @@ const Mypage = () => {
   }, [attributes]);
 
   const signOut = useCallback(async () => {
-    await signOutCognito(user);
+    await signOutFromCognito(user);
     window.location.reload();
   }, [user]);
 

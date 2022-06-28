@@ -1,8 +1,12 @@
 import { useCallback, useState } from "react";
-import { signUpCognito, form, confirmSignUpCognito } from "./helper";
+import {
+  signUpToCognito,
+  SignUpForm,
+  confirmSigningUpToCognito,
+} from "~/apis/cognito";
 
 const SignUp = () => {
-  const [form, setForm] = useState<form>({
+  const [form, setForm] = useState<SignUpForm>({
     email: "",
     password: "",
     username: "",
@@ -31,7 +35,7 @@ const SignUp = () => {
 
   const submitForm = useCallback(async () => {
     try {
-      await signUpCognito(form);
+      await signUpToCognito(form);
       alert("successfully signed up!");
       setHasSignUp(true);
     } catch (error) {
@@ -49,7 +53,7 @@ const SignUp = () => {
 
   const verifyCode = useCallback(async () => {
     try {
-      await confirmSignUpCognito(form.username, code);
+      await confirmSigningUpToCognito(form.username, code);
       alert("successfully verifyed code!");
     } catch (error) {
       alert("verification failed...");

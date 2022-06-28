@@ -1,8 +1,13 @@
 import { useCallback, useState } from "react";
-import { signInCognitoWithPassword, SignInWithPasswordForm } from "./helper";
+import { signInToCognitoWithPassword } from "~/apis/cognito";
+
+type signInWithPasswordForm = {
+  username: string;
+  password: string;
+};
 
 const SignIn = () => {
-  const [form, setForm] = useState<SignInWithPasswordForm>({
+  const [form, setForm] = useState<signInWithPasswordForm>({
     username: "",
     password: "",
   });
@@ -25,7 +30,7 @@ const SignIn = () => {
 
   const signIn = useCallback(async () => {
     try {
-      await signInCognitoWithPassword(form);
+      await signInToCognitoWithPassword(form.username, form.password);
       alert("サインイン成功");
       window.location.reload();
     } catch (error) {
