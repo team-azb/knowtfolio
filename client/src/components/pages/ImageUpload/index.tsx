@@ -48,29 +48,28 @@ const ImageUpload = () => {
     }
   }, [imageForm, s3Client]);
 
-  const inputImage = useCallback<React.ChangeEventHandler<HTMLInputElement>>(
-    (event) => {
-      const files = event.target.files;
-      if (files?.length) {
-        const fr = new FileReader();
-        fr.readAsDataURL(files[0]);
-        fr.addEventListener("load", () => {
-          setImageForm({
-            blob: files[0],
-            url: String(fr.result),
-            name: files[0].name,
-          });
+  const setImageOnForm = useCallback<
+    React.ChangeEventHandler<HTMLInputElement>
+  >((event) => {
+    const files = event.target.files;
+    if (files?.length) {
+      const fr = new FileReader();
+      fr.readAsDataURL(files[0]);
+      fr.addEventListener("load", () => {
+        setImageForm({
+          blob: files[0],
+          url: String(fr.result),
+          name: files[0].name,
         });
-      }
-    },
-    []
-  );
+      });
+    }
+  }, []);
 
   return (
     <div>
       <div>
         input image
-        <input onChange={inputImage} accept="image/*" type="file" />
+        <input onChange={setImageOnForm} accept="image/*" type="file" />
       </div>
       {imageForm && (
         <div>
