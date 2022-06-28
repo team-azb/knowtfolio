@@ -11,7 +11,7 @@ import React, {
   useState,
 } from "react";
 import { userPool } from "~/configs/cognito";
-import { getAttributes, getSession } from "./helper";
+import { loadAttributes, loadSession } from "~/apis/cognito";
 
 type authContext = {
   user: CognitoUser;
@@ -31,8 +31,8 @@ const AuthProvider = ({ children }: props) => {
   const setCurrentUser = useCallback(async () => {
     const cognitoUser = userPool.getCurrentUser();
     if (cognitoUser) {
-      const session = await getSession(cognitoUser);
-      const attributes = await getAttributes(cognitoUser);
+      const session = await loadSession(cognitoUser);
+      const attributes = await loadAttributes(cognitoUser);
       setAuth({
         user: cognitoUser,
         session: session,

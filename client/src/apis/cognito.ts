@@ -1,4 +1,8 @@
-import { CognitoUser } from "amazon-cognito-identity-js";
+import {
+  CognitoUser,
+  CognitoUserAttribute,
+  CognitoUserSession,
+} from "amazon-cognito-identity-js";
 import * as AmazonCognitoIdentity from "amazon-cognito-identity-js";
 import { userPool } from "~/configs/cognito";
 
@@ -90,6 +94,31 @@ export const confirmSigningUpToCognito = (userName: string, code: string) => {
         reject(err.message || JSON.stringify(err));
       }
       resolve("call result: " + result);
+    });
+  });
+};
+
+export const loadSession = (cognitoUser: CognitoUser) => {
+  return new Promise<CognitoUserSession>((resolve, reject) => {
+    cognitoUser.getSession((err: unknown, session: CognitoUserSession) => {
+      if (err instanceof Error) {
+        reject(err.message || JSON.stringify(err));
+      }
+      resolve(session);
+    });
+  });
+};
+
+export const loadAttributes = (cognitoUser: CognitoUser) => {
+  return new Promise<CognitoUserAttribute[]>((resolve, reject) => {
+    cognitoUser.getUserAttributes(function (err, result) {
+      if (err) {
+        reject(err.message || JSON.stringify(err));
+      }
+      if (result) {
+        resolve(result);
+      }
+      reject("no attributes");
     });
   });
 };
