@@ -1,4 +1,4 @@
-#!bin/bash
+#!/bin/bash
 set -e 
 S3_BUCKET_NAME_TO_DEPLOY=$(grep S3_BUCKET_NAME_TO_DEPLOY .env | cut -d '=' -f2)
 CLOUD_FRONT_DISTRIBUTION_ID=$(grep CLOUD_FRONT_DISTRIBUTION_ID .env | cut -d '=' -f2)
