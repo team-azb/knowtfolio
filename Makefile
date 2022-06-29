@@ -15,3 +15,6 @@ goa: $(GOA_GEN_DIR)
 
 clean:
 	rm -rf $(GOA_GEN_DIR)
+
+client-server:
+	cd client && npm start

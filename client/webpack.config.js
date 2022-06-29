@@ -1,6 +1,8 @@
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const CssMinimizerPlugin = require("css-minimizer-webpack-plugin");
+const TerserPlugin = require("terser-webpack-plugin");
+const Dotenv = require("dotenv-webpack");
 const webpack = require("webpack");
 
 const path = require("path");
@@ -22,6 +24,7 @@ module.exports = {
       process: "process/browser",
       Buffer: ["buffer", "Buffer"],
     }),
+    new Dotenv(),
   ],
   externals: [],
   module: {
@@ -73,13 +76,21 @@ module.exports = {
       os: require.resolve("os-browserify"),
       url: require.resolve("url"),
     },
+    alias: {
+      "~": path.resolve(__dirname, "src"),
+    },
   },
   output: {
     path: path.resolve(__dirname, "dist"), //バンドルしたファイルの出力先のパスを指定
     filename: "main.js", //出力時のファイル名の指定
   },
   optimization: {
-    minimizer: [new CssMinimizerPlugin()],
+    minimizer: [
+      new CssMinimizerPlugin(),
+      new TerserPlugin({
+        parallel: true,
+      }),
+    ],
   },
   devServer: {
     historyApiFallback: {

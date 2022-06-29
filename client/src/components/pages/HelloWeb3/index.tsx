@@ -1,6 +1,7 @@
 import styles from "./style.module.css";
 import { greeting } from "./helper";
 import { useCallback, useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import detectEthereumProvider from "@metamask/detect-provider";
 import Web3 from "web3";
 
@@ -45,7 +46,7 @@ const HelloWeb3 = () => {
   // Initialize connection with contract and wallet
   useEffect(() => {
     connectMetamask();
-  }, []);
+  }, [connectMetamask]);
 
   return (
     <div>
@@ -58,6 +59,9 @@ const HelloWeb3 = () => {
       ) : (
         "未接続"
       )}
+      <div>
+        <Link to="/signup">signup</Link>
+      </div>
     </div>
   );
 };
