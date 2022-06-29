@@ -6,13 +6,13 @@ info:
 servers:
     - url: http://localhost:8080
 paths:
-    /api/article:
+    /api/articles:
         post:
             tags:
-                - article
-            summary: Create article
+                - articles
+            summary: Create articles
             description: Create new article.
-            operationId: article#Create
+            operationId: articles#Create
             requestBody:
                 required: true
                 content:
@@ -34,13 +34,13 @@ paths:
                                 content: <h1> Hello World! </h1>
                                 id: exampleId01
                                 title: My Awesome Article
-    /api/article/{id}:
+    /api/articles/{id}:
         delete:
             tags:
-                - article
-            summary: Delete article
+                - articles
+            summary: Delete articles
             description: Delete article by id.
-            operationId: article#Delete
+            operationId: articles#Delete
             parameters:
                 - name: id
                   in: path
@@ -71,10 +71,10 @@ paths:
                                 $ref: '#/components/schemas/Error'
         get:
             tags:
-                - article
-            summary: Read article
+                - articles
+            summary: Read articles
             description: Get article by id.
-            operationId: article#Read
+            operationId: articles#Read
             parameters:
                 - name: id
                   in: path
@@ -108,10 +108,10 @@ paths:
                                 $ref: '#/components/schemas/Error'
         put:
             tags:
-                - article
-            summary: Update article
+                - articles
+            summary: Update articles
             description: Update an article.
-            operationId: article#Update
+            operationId: articles#Update
             parameters:
                 - name: id
                   in: path
@@ -152,13 +152,13 @@ paths:
                         application/vnd.goa.error+json:
                             schema:
                                 $ref: '#/components/schemas/Error'
-    /article/{id}:
+    /articles/{id}:
         get:
             tags:
-                - article-html
-            summary: Read HTML article-html
+                - articles-html
+            summary: Read HTML articles-html
             description: Get article's HTML by id.
-            operationId: article-html#Read HTML
+            operationId: articles-html#Read HTML
             parameters:
                 - name: id
                   in: path
@@ -302,7 +302,7 @@ components:
                 content: <h1> Hello World! </h1>
                 title: My Awesome Article
 tags:
-    - name: article
+    - name: articles
       description: 記事サービス
-    - name: article-html
+    - name: articles-html
       description: SEO対策で、記事の表示だけ直接HTMLで返すためのサービス

@@ -14,8 +14,8 @@ func main() {
 	db, err := gorm.Open(mysql.Open("root:password@tcp(localhost:3306)/knowtfolio-db?parseTime=true"))
 	logger.Err(err)
 
-	handler.AddService(services.NewArticleService(db, *handler), "article")
-	handler.AddService(services.NewArticleHtmlService(db, *handler), "article-html")
+	handler.AddService(services.NewArticlesService(db, *handler), "articles")
+	handler.AddService(services.NewArticlesHtmlService(db, *handler), "articles-html")
 
 	logger.Info().Msg("Starting backend server...")
 	err = http.ListenAndServe(":8080", handler)

@@ -3,8 +3,8 @@ package services
 import (
 	"context"
 	"errors"
-	articlehtml "github.com/team-azb/knowtfolio/server/gateways/api/gen/article_html"
-	"github.com/team-azb/knowtfolio/server/gateways/api/gen/http/article_html/server"
+	articleshtml "github.com/team-azb/knowtfolio/server/gateways/api/gen/articles_html"
+	"github.com/team-azb/knowtfolio/server/gateways/api/gen/http/articles_html/server"
 	"github.com/team-azb/knowtfolio/server/models"
 	goahttp "goa.design/goa/v3/http"
 	"gorm.io/gorm"
@@ -14,8 +14,8 @@ type articleHtmlService struct {
 	DB *gorm.DB
 }
 
-func NewArticleHtmlService(db *gorm.DB, handler HttpHandler) *server.Server {
-	endpoints := articlehtml.NewEndpoints(articleHtmlService{DB: db})
+func NewArticlesHtmlService(db *gorm.DB, handler HttpHandler) *server.Server {
+	endpoints := articleshtml.NewEndpoints(articleHtmlService{DB: db})
 	return server.New(
 		endpoints,
 		handler,
@@ -25,12 +25,12 @@ func NewArticleHtmlService(db *gorm.DB, handler HttpHandler) *server.Server {
 		nil)
 }
 
-func (a articleHtmlService) ReadHTML(_ context.Context, id *articlehtml.ArticleID) (res []byte, err error) {
+func (a articleHtmlService) ReadHTML(_ context.Context, id *articleshtml.ArticleID) (res []byte, err error) {
 	targetArticle := models.Article{ID: id.ID}
 
 	result := a.DB.First(&targetArticle)
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-		return nil, articlehtml.MakeNotFound(result.Error)
+		return nil, articleshtml.MakeNotFound(result.Error)
 	}
 	if result.Error != nil {
 		return nil, result.Error
