@@ -11,8 +11,7 @@ var _ = dsl.API("knowtfolio", func() {
 	dsl.Server("backend", func() {
 		dsl.Host("development", func() { dsl.URI("http://localhost:8080") })
 
-		dsl.Services("article")
-
+		dsl.Services("articles", "articles-html")
 	})
 
 	dsl.HTTP(func() {
