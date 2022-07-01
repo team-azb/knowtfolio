@@ -1,4 +1,4 @@
-import { useOptionalAuth } from "~/components/contexts/AuthContext";
+import { useOptionalAuth } from "~/components/organisms/OptionalAuthProvider";
 
 const Header = () => {
   const auth = useOptionalAuth();

@@ -13,20 +13,20 @@ import React, {
 import { userPool } from "~/configs/cognito";
 import { loadAttributes, loadSession } from "~/apis/cognito";
 
-type authContext = {
+export type AuthContext = {
   user: CognitoUser;
   session: CognitoUserSession;
   attributes: CognitoUserAttribute[];
 };
 
-const AuthContext = createContext<authContext | null>(null);
+const optionalAuthContext = createContext<AuthContext | null>(null);
 
 type props = {
   children: React.ReactNode;
 };
 
-const AuthProvider = ({ children }: props) => {
-  const [auth, setAuth] = useState<authContext | null>(null);
+const OptionalAuthProvider = ({ children }: props) => {
+  const [auth, setAuth] = useState<AuthContext | null>(null);
 
   const setCurrentUser = useCallback(async () => {
     const cognitoUser = userPool.getCurrentUser();
@@ -49,18 +49,14 @@ const AuthProvider = ({ children }: props) => {
     };
   }, [setCurrentUser]);
 
-  return <AuthContext.Provider value={auth}>{children}</AuthContext.Provider>;
+  return (
+    <optionalAuthContext.Provider value={auth}>
+      {children}
+    </optionalAuthContext.Provider>
+  );
 };
 
-export default AuthProvider;
+export default OptionalAuthProvider;
 export const useOptionalAuth = () => {
-  return useContext(AuthContext);
-};
-export const useAuth = () => {
-  const auth = useContext(AuthContext);
-  if (auth) {
-    return auth;
-  } else {
-    throw new Error("認証に失敗しています。");
-  }
+  return useContext(optionalAuthContext);
 };

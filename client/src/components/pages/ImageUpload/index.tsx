@@ -3,7 +3,7 @@ import {
   createPutImageObjectCommand,
   getS3ClientWithCognitoJwtToken,
 } from "~/apis/s3";
-import { useAuth } from "~/components/contexts/AuthContext";
+import { useAuth } from "~/components/organisms/AuthProvider";
 
 type imageForm = {
   blob: Blob;
