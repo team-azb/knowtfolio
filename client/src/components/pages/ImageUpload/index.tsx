@@ -1,9 +1,9 @@
-import { PutObjectCommand } from "@aws-sdk/client-s3";
-import { fromCognitoIdentityPool } from "@aws-sdk/credential-providers";
 import { useCallback, useMemo, useState } from "react";
+import {
+  createPutImageObjectCommand,
+  getS3ClientWithCognitoJwtToken,
+} from "~/apis/s3";
 import { useAuth } from "~/components/contexts/AuthContext";
-import { COGNITO_USER_POOL_ID } from "~/configs/cognito";
-import { COGNITO_IDENTITY_POOL_ID, getS3Client } from "~/configs/s3";
 
 type imageForm = {
   blob: Blob;
@@ -15,28 +15,18 @@ const ImageUpload = () => {
   const [imageForm, setImageForm] = useState<imageForm | null>(null);
   const { session } = useAuth();
   const s3Client = useMemo(() => {
-    return getS3Client(
-      fromCognitoIdentityPool({
-        identityPoolId: COGNITO_IDENTITY_POOL_ID,
-        logins: {
-          [`cognito-idp.ap-northeast-1.amazonaws.com/${COGNITO_USER_POOL_ID}`]:
-            session.getIdToken().getJwtToken(),
-        },
-        clientConfig: {
-          region: "ap-northeast-1",
-        },
-      })
+    return getS3ClientWithCognitoJwtToken(
+      session.getAccessToken().getJwtToken()
     );
   }, [session]);
 
   const uploadImage = useCallback(async () => {
     if (imageForm) {
-      const command = new PutObjectCommand({
-        Bucket: "knowtfolio-alpha",
-        Key: `images/${imageForm.name}`,
-        Body: imageForm.blob,
-      });
       try {
+        const command = createPutImageObjectCommand(
+          `images/${imageForm.name}`,
+          imageForm.blob
+        );
         await s3Client.send(command);
         alert("successfully uploaded file");
       } catch (error) {
