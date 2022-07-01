@@ -1,0 +1,12 @@
+version: '3.0'
+services:
+  db:
+    image: mysql:8.0.29
+    platform: linux/amd64 # For M1 mac...
+    environment:
+      MYSQL_DATABASE: 'knowtfolio-db'
+      MYSQL_ROOT_PASSWORD: 'password'
+      MYSQL_ROOT_HOST: '%'
+      TZ: 'Asia/Tokyo'
+    ports:
+      - "3306:3306"
