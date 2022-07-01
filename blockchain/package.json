@@ -1,7 +1,9 @@
 {
   "name": "hardhat-project",
   "scripts": {
-    "node": "npx hardhat node",
+    "node": "hardhat node",
+    "build": "hardhat compile",
+    "deploy-local": "hardhat --network localhost run scripts/deploy.ts",
     "format": "prettier --write ./contracts/*.sol ./scripts/*.ts"
   },
   "devDependencies": {
