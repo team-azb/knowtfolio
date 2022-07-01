@@ -35,6 +35,16 @@ export const signInToCognitoWithPassword = async (
     cognitoUser.authenticateUser(authenticationDetails, {
       onSuccess(session) {
         const accessToken = session.getAccessToken().getJwtToken();
+        try {
+          cacheTokens(
+            session.getIdToken().getJwtToken(),
+            accessToken,
+            session.getRefreshToken().getToken(),
+            username
+          );
+        } catch (error) {
+          reject(error);
+        }
         resolve(accessToken);
       },
       onFailure(err) {
@@ -121,4 +131,46 @@ export const loadAttributes = (cognitoUser: CognitoUser) => {
       reject("no attributes");
     });
   });
+};
+
+const decodeJwtPayload = (jwtToken: string) => {
+  const payload = jwtToken.split(".")[1];
+
+  try {
+    return JSON.parse(Buffer.from(payload, "base64").toString("utf8"));
+  } catch (err) {
+    return {};
+  }
+};
+
+const calculateClockDrift = (accessToken: string, idToken: string) => {
+  const decodedAccessToken = decodeJwtPayload(accessToken);
+  const decodedIdToken = decodeJwtPayload(idToken);
+  const now = Math.floor(Date.now() / 1000);
+  const iat = Math.min(decodedAccessToken.iat, decodedIdToken.iat);
+  if (isNaN(iat)) {
+    throw new Error("calculating clock drift failed");
+  } else {
+    return now - iat;
+  }
+};
+
+const cacheTokens = (
+  idToken: string,
+  accessToken: string,
+  refreshToken: string,
+  username: string
+) => {
+  const keyPrefix = "CognitoIdentityServiceProvider." + userPool.getClientId();
+  const idTokenKey = keyPrefix + "." + username + ".idToken";
+  const accessTokenKey = keyPrefix + "." + username + ".accessToken";
+  const refreshTokenKey = keyPrefix + "." + username + ".refreshToken";
+  const clockDriftKey = keyPrefix + "." + username + ".clockDrift";
+  const lastUserKey = keyPrefix + ".LastAuthUser";
+  const clockDrift = calculateClockDrift(accessToken, idToken);
+  window.localStorage.setItem(idTokenKey, idToken);
+  window.localStorage.setItem(accessTokenKey, accessToken);
+  window.localStorage.setItem(refreshTokenKey, refreshToken);
+  window.localStorage.setItem(clockDriftKey, "" + clockDrift);
+  window.localStorage.setItem(lastUserKey, username);
 };
