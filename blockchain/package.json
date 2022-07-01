@@ -1,6 +1,7 @@
 {
   "name": "hardhat-project",
   "scripts": {
+    "node": "npx hardhat node",
     "format": "prettier --write ./contracts/*.sol ./scripts/*.ts"
   },
   "devDependencies": {
