@@ -1,3 +1,18 @@
+# Knowtfolio
+## Quick start
+Start local node
+```shell
+npm run node
+```
+Build contracts
+```shell
+npm run build
+```
+Deploy to local network
+```shell
+npm run deploy
+```
+
 # Advanced Sample Hardhat Project
 
 This project demonstrates an advanced Hardhat use case, integrating other tools commonly used alongside Hardhat in the ecosystem.
