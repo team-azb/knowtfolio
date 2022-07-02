@@ -68,7 +68,7 @@ contract Knowtfolio is
         string memory _tokenURI,
         string memory _articleId
     ) public onlyOwner returns (uint256) {
-        require(bytes(_articleId).length > 0 && tokenIdOf[_articleId] != 0);
+        require(bytes(_articleId).length > 0 && tokenIdOf[_articleId] == 0);
         _tokenIds.increment();
 
         uint256 newItemId = _tokenIds.current();
