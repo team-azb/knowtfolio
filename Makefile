@@ -13,7 +13,7 @@ $(GOA_GEN_DIR): $(GOA_DESIGN_DIR) $(GOA_DOCKER_FILE) ./server/go.mod
 
 goa: $(GOA_GEN_DIR)
 
-server:
+server: goa
 	docker-compose up --build server
 
 clean:
