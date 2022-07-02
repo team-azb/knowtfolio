@@ -16,6 +16,8 @@ contract Knowtfolio is
     using CountersUpgradeable for CountersUpgradeable.Counter;
     CountersUpgradeable.Counter internal _tokenIds;
 
+    mapping(string => uint256) internal tokenIdOf;
+
     function _beforeTokenTransfer(
         address from,
         address to,
@@ -61,17 +63,31 @@ contract Knowtfolio is
         __Ownable_init();
     }
 
-    function mintNFT(address recipient, string memory _tokenURI)
-        public
-        onlyOwner
-        returns (uint256)
-    {
+    function mintNFT(
+        address recipient,
+        string memory _tokenURI,
+        string memory _articleId
+    ) public onlyOwner returns (uint256) {
+        require(bytes(_articleId).length > 0 && tokenIdOf[_articleId] == 0);
         _tokenIds.increment();
 
         uint256 newItemId = _tokenIds.current();
         _mint(recipient, newItemId);
         _setTokenURI(newItemId, _tokenURI);
+        tokenIdOf[_articleId] = newItemId;
 
         return newItemId;
+    }
+
+    function isOwnerOfArticle(address editor, string memory articleId)
+        public
+        view
+        onlyOwner
+        returns (bool)
+    {
+        uint256 _tokenId = tokenIdOf[articleId];
+        require(_tokenId != 0);
+        address owner = ownerOf(_tokenId);
+        return owner == editor;
     }
 }
