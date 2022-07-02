@@ -79,7 +79,7 @@ contract Knowtfolio is
         return newItemId;
     }
 
-    function isOwnerOf(address editor, string memory articleId)
+    function isOwnerOfArticle(address editor, string memory articleId)
         public
         view
         onlyOwner
