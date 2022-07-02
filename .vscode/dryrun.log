@@ -1,0 +1,8 @@
+make --dry-run --always-make --keep-going --print-directory
+make: Entering directory '/home/reibomaru/Desktop/knowtfolio'
+docker build -t knowtfolio/goa-gen -f ./server/goa.Dockerfile ./server
+docker run -v `pwd`/server/gateways/api:/server/gateways/api knowtfolio/goa-gen \
+	/go/bin/goa gen github.com/team-azb/knowtfolio/server/gateways/api/design \
+	-o /server/gateways/api
+make: Leaving directory '/home/reibomaru/Desktop/knowtfolio'
+ 
