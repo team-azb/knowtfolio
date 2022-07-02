@@ -22,7 +22,7 @@ paths:
                         example:
                             address: '''0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'''
                             content: <h1> Hello World! </h1>
-                            signature: Hic ipsam itaque voluptatum laborum.
+                            signature: Praesentium repellendus est esse assumenda.
                             title: My Awesome Article
             responses:
                 "200":
@@ -75,7 +75,7 @@ paths:
                             $ref: '#/components/schemas/DeleteRequestBody'
                         example:
                             address: '''0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'''
-                            signature: Veritatis praesentium repellendus est esse.
+                            signature: Atque veritatis et in explicabo.
             responses:
                 "200":
                     description: OK response.
@@ -167,7 +167,7 @@ paths:
                         example:
                             address: '''0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'''
                             content: <h1> Hello World! </h1>
-                            signature: Impedit tempora eveniet laudantium corporis et suscipit.
+                            signature: Et voluptates quis nulla pariatur optio reiciendis.
                             title: My Awesome Article
             responses:
                 "200":
@@ -180,6 +180,63 @@ paths:
                                 content: <h1> Hello World! </h1>
                                 id: exampleId01
                                 title: My Awesome Article
+                "401":
+                    description: 'unauthenticated: 認証に失敗した場合'
+                    content:
+                        application/vnd.goa.error+json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                "403":
+                    description: 'unauthorized: 操作を行う権限がない場合'
+                    content:
+                        application/vnd.goa.error+json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                "404":
+                    description: 'article_not_found: 記事IDに対応する記事が見つからなかった場合'
+                    content:
+                        application/vnd.goa.error+json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+    /api/articles/{id}/nft:
+        post:
+            tags:
+                - articles
+            summary: Tokenize articles
+            description: MINT an NFT of the article.
+            operationId: articles#Tokenize
+            parameters:
+                - name: id
+                  in: path
+                  description: 記事のID
+                  required: true
+                  schema:
+                    type: string
+                    description: 記事のID
+                    example: exampleId01
+                    pattern: ^[A-Za-z0-9_-]+$
+                    minLength: 11
+                    maxLength: 11
+                  example: exampleId01
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/DeleteRequestBody'
+                        example:
+                            address: '''0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'''
+                            signature: Tenetur animi.
+            responses:
+                "200":
+                    description: OK response.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ArticleTokenizeResult'
+                            example:
+                                cost: 5663578019026462848
+                                hash: Asperiores repellendus.
                 "401":
                     description: 'unauthenticated: 認証に失敗した場合'
                     content:
@@ -236,6 +293,24 @@ paths:
                                 $ref: '#/components/schemas/Error'
 components:
     schemas:
+        ArticleTokenizeResult:
+            type: object
+            properties:
+                cost:
+                    type: integer
+                    description: トークン発行にかかったコスト
+                    example: 5390535483770121101
+                    format: int64
+                hash:
+                    type: string
+                    description: トランザクションのハッシュ
+                    example: Distinctio consectetur doloremque.
+            example:
+                cost: 2727825414143066766
+                hash: Sapiente laboriosam veniam eos.
+            required:
+                - hash
+                - cost
         CreateRequestBody:
             type: object
             properties:
@@ -251,7 +326,7 @@ components:
                 signature:
                     type: string
                     description: '`address`のアカウントが行った署名'
-                    example: Doloribus quia reprehenderit qui.
+                    example: Expedita consequatur repellat ut.
                 title:
                     type: string
                     example: My Awesome Article
@@ -259,7 +334,7 @@ components:
             example:
                 address: '''0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'''
                 content: <h1> Hello World! </h1>
-                signature: Eaque dolore sit.
+                signature: Consequatur aut asperiores quam illo cupiditate.
                 title: My Awesome Article
             required:
                 - title
@@ -303,10 +378,10 @@ components:
                 signature:
                     type: string
                     description: '`address`のアカウントが行った署名'
-                    example: Rerum voluptatem.
+                    example: Ipsa quis incidunt alias libero saepe.
             example:
                 address: '''0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'''
-                signature: Fugit quia perspiciatis.
+                signature: Provident nobis qui itaque ipsum vel.
             required:
                 - address
                 - signature
@@ -331,7 +406,7 @@ components:
                 fault:
                     type: boolean
                     description: Is the error a server-side fault?
-                    example: true
+                    example: false
                 id:
                     type: string
                     description: ID is a unique identifier for this particular occurrence of the problem.
@@ -347,11 +422,11 @@ components:
                 temporary:
                     type: boolean
                     description: Is the error temporary?
-                    example: true
+                    example: false
                 timeout:
                     type: boolean
                     description: Is the error a timeout?
-                    example: false
+                    example: true
             example:
                 id: 3F1FKVRR
                 message: Value of ID must be an integer
@@ -378,7 +453,7 @@ components:
                 signature:
                     type: string
                     description: '`address`のアカウントが行った署名'
-                    example: Culpa minima sit voluptas doloribus qui.
+                    example: Qui assumenda accusantium mollitia magni maxime voluptates.
                 title:
                     type: string
                     example: My Awesome Article
@@ -388,7 +463,7 @@ components:
             example:
                 address: '''0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'''
                 content: <h1> Hello World! </h1>
-                signature: Tempora quia ad et.
+                signature: Odit dolorem eius.
                 title: My Awesome Article
             required:
                 - address
