@@ -25,12 +25,12 @@ func NewArticlesHtmlService(db *gorm.DB, handler HttpHandler) *server.Server {
 		nil)
 }
 
-func (a articleHtmlService) ReadHTML(_ context.Context, id *articleshtml.ArticleID) (res []byte, err error) {
-	targetArticle := models.Article{ID: id.ID}
+func (a articleHtmlService) ReadHTML(_ context.Context, request *articleshtml.ArticleReadRequest) (res []byte, err error) {
+	targetArticle := models.Article{ID: request.ID}
 
 	result := a.DB.First(&targetArticle)
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-		return nil, articleshtml.MakeNotFound(result.Error)
+		return nil, articleshtml.MakeArticleNotFound(result.Error)
 	}
 	if result.Error != nil {
 		return nil, result.Error

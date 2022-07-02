@@ -3,6 +3,8 @@ package services
 import (
 	"context"
 	"errors"
+	"github.com/ethereum/go-ethereum/common/hexutil"
+	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/team-azb/knowtfolio/server/gateways/api/gen/articles"
 	articlesviews "github.com/team-azb/knowtfolio/server/gateways/api/gen/articles/views"
 	"github.com/team-azb/knowtfolio/server/gateways/api/gen/http/articles/server"
@@ -31,22 +33,32 @@ func NewArticlesService(db *gorm.DB, handler HttpHandler) *server.Server {
 		nil)
 }
 
-func (a articleService) Create(_ context.Context, request *articles.ArticleCreateRequest) (res *articles.ArticleResult, view string, err error) {
+func (a articleService) Create(_ context.Context, request *articles.ArticleCreateRequest) (res *articles.ArticleResult, err error) {
+	err = a.VerifySignature(request.Address, request.Signature, "Create Article")
+	if err != nil {
+		return nil, articles.MakeUnauthenticated(err)
+	}
+
 	newArticle := models.NewArticle(request.Title, []byte(request.Content))
 	result := a.DB.Create(newArticle)
-	return articleToResult(*newArticle), "default", result.Error
+	return articleToResult(*newArticle), result.Error
 }
 
-func (a articleService) Read(_ context.Context, id *articles.ArticleID) (res *articles.ArticleResult, view string, err error) {
-	targetArticle := models.Article{ID: id.ID}
+func (a articleService) Read(_ context.Context, request *articles.ArticleReadRequest) (res *articles.ArticleResult, err error) {
+	targetArticle := models.Article{ID: request.ID}
 	result := a.DB.First(&targetArticle)
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-		return nil, "", articles.MakeNotFound(result.Error)
+		return nil, articles.MakeArticleNotFound(result.Error)
 	}
-	return articleToResult(targetArticle), "default", result.Error
+	return articleToResult(targetArticle), result.Error
 }
 
-func (a articleService) Update(_ context.Context, request *articles.ArticleUpdateRequest) (res *articles.ArticleResult, view string, err error) {
+func (a articleService) Update(_ context.Context, request *articles.ArticleUpdateRequest) (res *articles.ArticleResult, err error) {
+	err = a.VerifySignature(request.Address, request.Signature, "Update Article")
+	if err != nil {
+		return nil, articles.MakeUnauthenticated(err)
+	}
+
 	targetArticle := models.Article{ID: request.ID}
 
 	err = a.DB.Transaction(func(tx *gorm.DB) error {
@@ -62,15 +74,44 @@ func (a articleService) Update(_ context.Context, request *articles.ArticleUpdat
 		return result.Error
 	})
 
-	return articleToResult(targetArticle), "default", err
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, articles.MakeArticleNotFound(err)
+	}
+
+	return articleToResult(targetArticle), err
 }
 
-func (a articleService) Delete(_ context.Context, id *articles.ArticleID) (res *articles.ArticleResult, err error) {
-	result := a.DB.Delete(&models.Article{ID: id.ID})
-	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-		return nil, articles.MakeNotFound(result.Error)
+func (a articleService) Delete(_ context.Context, request *articles.ArticleDeleteRequest) (res *articles.ArticleResult, err error) {
+	err = a.VerifySignature(request.Address, request.Signature, "Delete Article")
+	if err != nil {
+		return nil, articles.MakeUnauthenticated(err)
 	}
-	return articleIdToResult(id.ID), result.Error
+
+	result := a.DB.Delete(&models.Article{ID: request.ID})
+	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+		return nil, articles.MakeArticleNotFound(result.Error)
+	}
+	return articleIdToResult(request.ID), result.Error
+}
+
+func (a articleService) VerifySignature(addr string, sign string, signedData string) error {
+	decodedSign, err := hexutil.Decode(sign)
+	if err != nil {
+		return err
+	}
+
+	hash := crypto.Keccak256Hash([]byte(signedData))
+	pubKey, err := crypto.SigToPub(hash.Bytes(), decodedSign)
+	if err != nil {
+		return err
+	}
+
+	signedAddr := crypto.PubkeyToAddress(*pubKey)
+	if addr != signedAddr.String() {
+		return errors.New("`address` didn't match the signer")
+	}
+
+	return nil
 }
 
 func articleToResult(src models.Article) *articles.ArticleResult {
