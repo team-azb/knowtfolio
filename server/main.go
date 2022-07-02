@@ -11,7 +11,7 @@ func main() {
 	logger := services.NewLogger("main", true)
 
 	handler := services.NewHttpHandler()
-	db, err := gorm.Open(mysql.Open("root:password@tcp(localhost:3306)/knowtfolio-db?parseTime=true"))
+	db, err := gorm.Open(mysql.Open("root:password@tcp(db:3306)/knowtfolio-db?parseTime=true"), &gorm.Config{})
 	logger.Err(err)
 
 	handler.AddService(services.NewArticlesService(db, *handler), "articles")
