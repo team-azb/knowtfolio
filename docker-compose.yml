@@ -7,12 +7,25 @@ services:
     command: bash -c "
       /scripts/wait-for-it.sh db:3306 --timeout=60 --strict &&
       go run main.go"
+    env_file:
+      - ./server/.env
     volumes:
       - type: bind
         source: ./server
         target: /server
     depends_on:
       - db
+      - hardhat
+
+  hardhat:
+    build: blockchain
+    ports:
+      - "8545:8545"
+    command: npm run node
+    volumes:
+      - type: bind
+        source: ./blockchain
+        target: /work
 
   db:
     image: mysql:8.0.29
