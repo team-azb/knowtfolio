@@ -27,3 +27,15 @@ export const updateArticle = async (form: updateArticleForm) => {
     title: form.title,
   });
 };
+
+type getArticleResponse = {
+  id: string;
+  content: string;
+  title: string;
+};
+export const getArticle = async (articleId: string) => {
+  const { data } = await axios.get<getArticleResponse>(
+    `/api/articles/${articleId}`
+  );
+  return data;
+};
