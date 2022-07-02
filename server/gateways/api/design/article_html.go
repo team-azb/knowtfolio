@@ -12,12 +12,12 @@ var _ = dsl.Service("articles-html", func() {
 	dsl.Method("Read HTML", func() {
 		dsl.Description("Get article's HTML by id.")
 
-		dsl.Payload(articleIdPayload)
+		dsl.Payload(articleReadRequest)
 
 		dsl.Result(dsl.Bytes, func() {
 			dsl.Example("<h1> Hello World! </h1>")
 		})
-		dsl.Error("not_found")
+		dsl.Error("article_not_found")
 
 		dsl.HTTP(func() {
 			dsl.GET("/{id}")
@@ -25,9 +25,6 @@ var _ = dsl.Service("articles-html", func() {
 			dsl.Response(dsl.StatusOK, func() {
 				dsl.Description("IDに対応する記事のHTMLのバイナリ")
 				dsl.ContentType("text/html; charset=UTF-8")
-			})
-			dsl.Response(dsl.StatusNotFound, "not_found", func() {
-				dsl.Description("IDに対応する記事が見つからなかった場合。")
 			})
 		})
 	})
