@@ -3,6 +3,11 @@ Blogging platform that leverages NFT to grow, buy and sell articles.
 
 ## Run
 
+### Start Backend Server & Database
+```bash
+make server
+```
+
 ### Generate OpenAPI docs
 ```bash
 make goa

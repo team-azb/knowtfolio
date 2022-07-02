@@ -17,14 +17,17 @@
     "@aws-sdk/client-s3": "^3.118.0",
     "@aws-sdk/credential-providers": "^3.118.0",
     "@metamask/detect-provider": "^1.2.0",
+    "@tinymce/tinymce-react": "^4.1.0",
     "amazon-cognito-identity-js": "^5.2.9",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.3.0",
+    "tinymce": "^6.1.0",
     "web3": "^1.7.4"
   },
   "devDependencies": {
     "@types/react-dom": "^18.0.5",
+    "@types/tinymce": "^4.6.5",
     "@typescript-eslint/eslint-plugin": "^5.29.0",
     "assert": "^2.0.0",
     "buffer": "^6.0.3",

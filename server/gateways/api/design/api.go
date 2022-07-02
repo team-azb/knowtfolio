@@ -14,8 +14,22 @@ var _ = dsl.API("knowtfolio", func() {
 		dsl.Services("articles", "articles-html")
 	})
 
+	dsl.Error("article_not_found")
+	dsl.Error("unauthenticated")
+	dsl.Error("unauthorized")
+
 	dsl.HTTP(func() {
 		dsl.Path("/api")
+
+		dsl.Response("article_not_found", dsl.StatusNotFound, func() {
+			dsl.Description("記事IDに対応する記事が見つからなかった場合")
+		})
+		dsl.Response("unauthenticated", dsl.StatusUnauthorized, func() {
+			dsl.Description("認証に失敗した場合")
+		})
+		dsl.Response("unauthorized", dsl.StatusForbidden, func() {
+			dsl.Description("操作を行う権限がない場合")
+		})
 	})
 })
 
