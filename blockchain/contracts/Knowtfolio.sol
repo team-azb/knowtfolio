@@ -78,4 +78,16 @@ contract Knowtfolio is
 
         return newItemId;
     }
+
+    function isOwnerOf(address editor, string memory articleId)
+        public
+        view
+        onlyOwner
+        returns (bool)
+    {
+        uint256 _tokenId = tokenIdOf[articleId];
+        require(_tokenId != 0);
+        address owner = ownerOf(_tokenId);
+        return owner == editor;
+    }
 }
