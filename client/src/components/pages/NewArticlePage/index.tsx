@@ -3,6 +3,7 @@ import { Editor as TinyMCEEditor } from "tinymce";
 import { TINY_MCE_API_KEY } from "~/configs/tinymce";
 import { useCallback, useState } from "react";
 import { mintArticleNft, postArticle } from "~/apis/knowtfolio";
+import { useNavigate } from "react-router-dom";
 import { useWeb3 } from "~/components/organisms/Web3Provider";
 
 const NewArticlePage = () => {
@@ -14,6 +15,7 @@ const NewArticlePage = () => {
   >((value) => {
     setContent(value);
   }, []);
+  const navigate = useNavigate();
 
   const changeTitleInput = useCallback<
     React.ChangeEventHandler<HTMLInputElement>
@@ -43,7 +45,8 @@ const NewArticlePage = () => {
       address: account,
       signature: signatureForMint,
     });
-  }, [account, content, titleInput, web3.eth]);
+    navigate(`/artcles/${id}`);
+  }, [account, content, navigate, titleInput, web3.eth.personal]);
 
   return (
     <>
