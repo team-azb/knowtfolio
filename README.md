@@ -14,7 +14,7 @@ Knowtfolio solves this problem by making it possible to transfer editing rights 
 * [Hardhat](https://hardhat.org): Contract Compilation
 
 ## Smart Contracts
-* https://mumbai.polygonscan.com/address/0xAA84102b3Ae46Db17C7264F0DC3F615Ce7DFB24B
+* https://mumbai.polygonscan.com/address/0xCd9554e90FCdC339F41F775c25b0EE00Add2b2ba
 
 ## Challenges We Faced
 * Authentication and authorization by Metamask signature on the server side.
