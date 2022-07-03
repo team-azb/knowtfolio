@@ -2,6 +2,7 @@ package services
 
 import (
 	"context"
+	"crypto/ecdsa"
 	"errors"
 	"fmt"
 	"github.com/ethereum/go-ethereum/accounts"
@@ -47,7 +48,7 @@ func (a articleService) Create(_ context.Context, request *articles.ArticleCreat
 		return nil, articles.MakeUnauthenticated(err)
 	}
 
-	newArticle := models.NewArticle(request.Title, []byte(request.Content))
+	newArticle := models.NewArticle(request.Title, []byte(request.Content), request.Address)
 	result := a.DB.Create(newArticle)
 	return articleToResult(*newArticle), result.Error
 }
@@ -75,6 +76,11 @@ func (a articleService) Update(_ context.Context, request *articles.ArticleUpdat
 			return result.Error
 		}
 
+		err = a.AuthorizeEdit(request.Address, targetArticle, true)
+		if err != nil {
+			return err
+		}
+
 		targetArticle.SetTitleIfPresent(request.Title)
 		targetArticle.SetContentIfPresent(request.Content)
 		result = tx.Save(&targetArticle)
@@ -95,10 +101,19 @@ func (a articleService) Delete(_ context.Context, request *articles.ArticleDelet
 		return nil, articles.MakeUnauthenticated(err)
 	}
 
-	result := a.DB.Delete(&models.Article{ID: request.ID})
+	target := models.Article{ID: request.ID}
+	result := a.DB.First(&target)
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 		return nil, articles.MakeArticleNotFound(result.Error)
 	}
+
+	err = a.AuthorizeEdit(request.Address, target, false)
+	if err != nil {
+		return nil, err
+	}
+
+	result = a.DB.Delete(&target)
+
 	return articleIdToResult(request.ID), result.Error
 }
 
@@ -112,6 +127,10 @@ func (a articleService) Tokenize(_ context.Context, request *articles.ArticleTok
 	result := a.DB.First(&targetArticle)
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 		return nil, articles.MakeArticleNotFound(result.Error)
+	}
+	if targetArticle.OriginalAuthorAddress != request.Address {
+		msg := fmt.Sprintf("Address %v is not the orignial owner of article %v.", request.Address, targetArticle.ID)
+		return nil, articles.MakeUnauthorized(errors.New(msg))
 	}
 
 	privateKey, _ := crypto.HexToECDSA(config.AdminPrivateKey)
@@ -136,6 +155,9 @@ func (a articleService) VerifySignature(addr string, sign string, signedData str
 	if err != nil {
 		return err
 	}
+	if decodedSign[crypto.RecoveryIDOffset] >= 27 {
+		decodedSign[crypto.RecoveryIDOffset] -= 27
+	}
 
 	hash := accounts.TextHash([]byte(signedData))
 	pubKey, err := crypto.SigToPub(hash, decodedSign)
@@ -149,6 +171,28 @@ func (a articleService) VerifySignature(addr string, sign string, signedData str
 	}
 
 	return nil
+}
+
+func (a articleService) AuthorizeEdit(editorAddr string, target models.Article, requireNFT bool) error {
+	privateKey, _ := crypto.HexToECDSA(config.AdminPrivateKey)
+	publicKey := privateKey.Public()
+	publicKeyECDSA, _ := publicKey.(*ecdsa.PublicKey)
+	address := crypto.PubkeyToAddress(*publicKeyECDSA)
+
+	isNftOwner, err := a.Contract.IsOwnerOfArticle(&bind.CallOpts{From: address}, common.HexToAddress(editorAddr), target.ID)
+	if err != nil {
+		// TODO: 現状NFTがない場合errが帰ってくる
+		isNftOwner = false
+		//return err
+	}
+	isOriginalAuthor := editorAddr == target.OriginalAuthorAddress
+
+	if isNftOwner || (!requireNFT && isOriginalAuthor) {
+		return nil
+	} else {
+		msg := fmt.Sprintf("Address %v is not the owner of article %v.", editorAddr, target.ID)
+		return articles.MakeUnauthorized(errors.New(msg))
+	}
 }
 
 func articleToResult(src models.Article) *articles.ArticleResult {
