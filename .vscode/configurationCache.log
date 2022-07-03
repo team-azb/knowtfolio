@@ -1,1 +1,1 @@
-{"buildTargets":["clean","client-server","goa","server/gateways/api/gen"],"launchTargets":[],"customConfigurationProvider":{"workspaceBrowse":{"browsePath":[],"compilerArgs":[]},"fileIndex":[]}}
+{"buildTargets":["clean","client-server","goa","server","server/gateways/api/gen"],"launchTargets":[],"customConfigurationProvider":{"workspaceBrowse":{"browsePath":[],"compilerArgs":[]},"fileIndex":[]}}

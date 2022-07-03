@@ -69,6 +69,12 @@ var articleDeleteRequest = dsl.Type("ArticleDeleteRequest", func() {
 	dsl.Required("id", "address", "signature")
 })
 
+var articleTokenizeRequest = dsl.Type("ArticleTokenizeRequest", func() {
+	articleIdAttribute("id")
+	smartWalletAuthAttributes("address", "signature")
+	dsl.Required("id", "address", "signature")
+})
+
 var article = dsl.Type("Article", func() {
 	articleIdAttribute("id")
 	articleTitleAttribute("title")
@@ -76,7 +82,7 @@ var article = dsl.Type("Article", func() {
 	dsl.Required("id", "title", "content")
 })
 
-var articleResult = dsl.ResultType("application/json", "ArticleResult", func() {
+var articleResult = dsl.ResultType("article-result", "ArticleResult", func() {
 	dsl.Extend(article)
 
 	dsl.View("default", func() {
@@ -87,6 +93,16 @@ var articleResult = dsl.ResultType("application/json", "ArticleResult", func() {
 	dsl.View("only-id", func() {
 		dsl.Attribute("id")
 	})
+})
+
+var articleTokenizeResult = dsl.ResultType("article-tokenize-result", "ArticleTokenizeResult", func() {
+	dsl.Attribute("hash", dsl.String, func() {
+		dsl.Description("トランザクションのハッシュ")
+	})
+	dsl.Attribute("cost", dsl.Int64, func() {
+		dsl.Description("トークン発行にかかったコスト")
+	})
+	dsl.Required("hash", "cost")
 })
 
 var _ = dsl.Service("articles", func() {
@@ -162,6 +178,22 @@ var _ = dsl.Service("articles", func() {
 
 		dsl.HTTP(func() {
 			dsl.DELETE("/{id}")
+
+			dsl.Response(dsl.StatusOK)
+		})
+	})
+
+	dsl.Method("Tokenize", func() {
+		dsl.Description("MINT an NFT of the article.")
+
+		dsl.Payload(articleTokenizeRequest)
+
+		dsl.Result(articleTokenizeResult)
+		dsl.Error("unauthenticated")
+		dsl.Error("unauthorized")
+
+		dsl.HTTP(func() {
+			dsl.POST("/{id}/nft")
 
 			dsl.Response(dsl.StatusOK)
 		})
