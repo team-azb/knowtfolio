@@ -2,7 +2,7 @@ import { Editor } from "@tinymce/tinymce-react";
 import { Editor as TinyMCEEditor } from "tinymce";
 import { TINY_MCE_API_KEY } from "~/configs/tinymce";
 import { useCallback, useState } from "react";
-import { postArticle } from "~/apis/knowtfolio";
+import { mintArticleNft, postArticle } from "~/apis/knowtfolio";
 import { useWeb3 } from "~/components/organisms/Web3Provider";
 
 const NewArticlePage = () => {
@@ -22,16 +22,26 @@ const NewArticlePage = () => {
   }, []);
 
   const handlePost = useCallback(async () => {
-    const signature = await web3.eth.personal.sign(
+    const signatureForCreate = await web3.eth.personal.sign(
       "Create Article",
       account,
       ""
     );
-    await postArticle({
+    const { id } = await postArticle({
       title: titleInput,
       address: account,
-      signature,
+      signature: signatureForCreate,
       content,
+    });
+    const signatureForMint = await web3.eth.personal.sign(
+      "MINT NFT",
+      account,
+      ""
+    );
+    await mintArticleNft({
+      articleId: id,
+      address: account,
+      signature: signatureForMint,
     });
   }, [account, content, titleInput, web3.eth]);
 
