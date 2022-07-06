@@ -77,6 +77,6 @@ const Web3Provider = ({
 };
 
 export default Web3Provider;
-export const useWeb3 = () => {
+export const useWeb3Context = () => {
   return useContext(web3Context);
 };

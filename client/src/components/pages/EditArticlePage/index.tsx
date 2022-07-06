@@ -4,7 +4,7 @@ import { Editor as TinyMCEEditor } from "tinymce";
 import { TINY_MCE_API_KEY } from "~/configs/tinymce";
 import { useCallback, useEffect, useState } from "react";
 import { getArticle, updateArticle } from "~/apis/knowtfolio";
-import { useWeb3 } from "~/components/organisms/providers/Web3Provider";
+import { useWeb3Context } from "~/components/organisms/providers/Web3Provider";
 
 const EditArticlePage = () => {
   const { articleId } = useParams();
@@ -15,7 +15,7 @@ const EditArticlePage = () => {
   >((value) => {
     setContent(value);
   }, []);
-  const { web3, account } = useWeb3();
+  const { web3, account } = useWeb3Context();
 
   useEffect(() => {
     (async () => {

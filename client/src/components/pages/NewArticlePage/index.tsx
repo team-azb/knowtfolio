@@ -4,12 +4,12 @@ import { TINY_MCE_API_KEY } from "~/configs/tinymce";
 import { useCallback, useState } from "react";
 import { mintArticleNft, postArticle } from "~/apis/knowtfolio";
 import { useNavigate } from "react-router-dom";
-import { useWeb3 } from "~/components/organisms/providers/Web3Provider";
+import { useWeb3Context } from "~/components/organisms/providers/Web3Provider";
 
 const NewArticlePage = () => {
   const [content, setContent] = useState("");
   const [titleInput, setTitleInput] = useState("");
-  const { web3, account } = useWeb3();
+  const { web3, account } = useWeb3Context();
   const handleEditorChange = useCallback<
     (value: string, editor: TinyMCEEditor) => void
   >((value) => {
