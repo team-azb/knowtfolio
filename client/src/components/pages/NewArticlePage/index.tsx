@@ -37,7 +37,7 @@ const NewArticlePage = () => {
         content,
       });
       const signatureForMint = await web3.eth.personal.sign(
-        "MINT NFT",
+        "Mint NFT",
         account,
         ""
       );
