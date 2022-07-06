@@ -11,7 +11,7 @@ CONTRACT_ABI_FILE = $(CONTRACT_JSON_FILE:.json=.abi)
 
 GO_ETH_BINDING_RELATIVE_PATH = server/gateways/ethereum/contract_client.go
 
-.PHONY: goa server go-eth-binding
+.PHONY: goa server go-eth-binding blockchain-node-modules
 
 $(GOA_GEN_DIR): $(GOA_DESIGN_DIR) $(GOA_DOCKER_FILE) ./server/go.mod
 	docker build -t knowtfolio/goa-gen -f $(GOA_DOCKER_FILE) ./server
@@ -19,7 +19,12 @@ $(GOA_GEN_DIR): $(GOA_DESIGN_DIR) $(GOA_DOCKER_FILE) ./server/go.mod
 		/go/bin/goa gen github.com/team-azb/knowtfolio/$(GOA_DESIGN_DIR) \
 		-o /$(GOA_DIR)
 
-$(CONTRACT_ABI_FILE): $(CONTRACT_SOL_FILE)
+blockchain-node-modules: ./blockchain/package.json ./blockchain/Dockerfile
+	docker build -t knowtfolio/hardhat ./blockchain
+	docker run -v `pwd`/blockchain:/work/blockchain knowtfolio/hardhat \
+	 	npm install --prefix ./blockchain
+
+$(CONTRACT_ABI_FILE): $(CONTRACT_SOL_FILE) blockchain-node-modules
 	docker build -t knowtfolio/hardhat ./blockchain
 	docker run -v `pwd`/blockchain:/work/blockchain knowtfolio/hardhat \
 		npm run --prefix ./blockchain build
