@@ -81,6 +81,7 @@ module.exports = {
     },
   },
   output: {
+    publicPath: "/",
     path: path.resolve(__dirname, "dist"), //バンドルしたファイルの出力先のパスを指定
     filename: "main.js", //出力時のファイル名の指定
   },
