@@ -42,7 +42,9 @@ contract Knowtfolio is OwnableUpgradeable, ERC721URIStorageUpgradeable {
         returns (bool)
     {
         uint256 _tokenId = tokenIdOf[articleId];
-        require(_tokenId != 0);
+        if (_tokenId == 0) {
+            return false;
+        }
         address owner = ownerOf(_tokenId);
         return owner == editor;
     }
