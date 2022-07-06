@@ -52,7 +52,7 @@ type mintArticleNftForm = {
   signature: string;
 };
 export const mintArticleNft = async (form: mintArticleNftForm) => {
-  await axios.post(`/api/articles/${form.articleId}/nft`, {
+  await axios.post(`/api/nfts/${form.articleId}`, {
     address: form.address,
     signature: form.signature,
   });
