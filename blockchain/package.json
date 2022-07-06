@@ -4,7 +4,7 @@
     "node": "hardhat node",
     "build": "hardhat compile",
     "deploy-local": "hardhat --network localhost run scripts/deploy.ts",
-    "format": "prettier --write ./contracts/*.sol ./scripts/*.ts"
+    "format": "prettier --write ./contracts/*.sol ./scripts/*.ts ./test/*.ts"
   },
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.6",
