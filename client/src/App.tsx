@@ -37,7 +37,9 @@ const App = () => {
               </AuthProvider>
             }
           />
+          {/* TODO: chenage endipoint to /articles/new */}
           <Route path="/new" element={<NewArticlePage />} />
+          {/* TODO: chenage endipoint to /articles/:articleId/edit */}
           <Route path="/edit/:articleId" element={<EditArticlePage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
