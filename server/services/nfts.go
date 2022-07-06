@@ -71,6 +71,9 @@ func VerifySignature(addr string, sign string, signedData string) error {
 	if err != nil {
 		return err
 	}
+
+	// NOTE: Some client generates 27/28 instead of 0/1 due to Legacy Ethereum
+	// ref) https://github.com/ethereum/go-ethereum/issues/19751#issuecomment-504900739
 	if decodedSign[crypto.RecoveryIDOffset] >= 27 {
 		decodedSign[crypto.RecoveryIDOffset] -= 27
 	}
