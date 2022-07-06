@@ -4,7 +4,7 @@ import { TINY_MCE_API_KEY } from "~/configs/tinymce";
 import { useCallback, useState } from "react";
 import { mintArticleNft, postArticle } from "~/apis/knowtfolio";
 import { useNavigate } from "react-router-dom";
-import { useWeb3 } from "~/components/organisms/Web3Provider";
+import { useWeb3 } from "~/components/organisms/providers/Web3Provider";
 
 const NewArticlePage = () => {
   const [content, setContent] = useState("");

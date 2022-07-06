@@ -9,7 +9,7 @@ import Header from "./components/organisms/Header";
 import NotFound from "./components/pages/NofFound";
 import NewArticlePage from "./components/pages/NewArticlePage";
 import EditArticlePage from "./components/pages/EditArticlePage";
-import Web3Provider from "./components/organisms/Web3Provider";
+import Web3Provider from "./components/organisms/providers/Web3Provider";
 
 const App = () => {
   return (

@@ -8,6 +8,8 @@ import {
 import detectEthereumProvider from "@metamask/detect-provider";
 import Web3 from "web3";
 
+const defaultContentOnUnconnected = <div>metamaskに接続してください</div>;
+
 type web3Context = {
   web3: Web3;
   account: string;
@@ -16,8 +18,12 @@ const web3Context = createContext<web3Context>({} as web3Context);
 
 type props = {
   children: React.ReactNode;
+  contentOnUnconnected?: React.ReactNode;
 };
-const Web3Provider = ({ children }: props) => {
+const Web3Provider = ({
+  children,
+  contentOnUnconnected = defaultContentOnUnconnected,
+}: props) => {
   const [web3Obj, setWeb3Obj] = useState<web3Context | null>(null);
 
   useEffect(() => {
@@ -61,7 +67,7 @@ const Web3Provider = ({ children }: props) => {
       {web3Obj ? (
         <web3Context.Provider value={web3Obj}>{children}</web3Context.Provider>
       ) : (
-        <div>metamaskに接続してください</div>
+        contentOnUnconnected
       )}
     </>
   );
