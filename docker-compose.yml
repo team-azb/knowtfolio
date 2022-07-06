@@ -1,5 +1,21 @@
 version: '3.0'
 services:
+  server:
+    build: server
+    ports:
+      - "8080:8080"
+    command: bash -c "
+      /scripts/wait-for-it.sh db:3306 --timeout=60 --strict &&
+      go run main.go"
+    env_file:
+      - ./server/.env
+    volumes:
+      - type: bind
+        source: ./server
+        target: /server
+    depends_on:
+      - db
+
   db:
     image: mysql:8.0.29
     platform: linux/amd64 # For M1 mac...
