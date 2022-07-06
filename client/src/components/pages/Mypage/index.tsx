@@ -1,9 +1,9 @@
 import { useCallback, useMemo } from "react";
-import { useAuth } from "~/components/contexts/AuthContext";
+import { useAuthContext } from "~/components/organisms/providers/AuthProvider";
 import { signOutFromCognito } from "~/apis/cognito";
 
 const Mypage = () => {
-  const { user, attributes } = useAuth();
+  const { user, attributes } = useAuthContext();
   const email = useMemo(() => {
     return attributes.find((atr) => atr.Name === "email")?.Value;
   }, [attributes]);

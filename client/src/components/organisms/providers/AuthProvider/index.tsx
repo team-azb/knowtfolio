@@ -8,25 +8,32 @@ import React, {
   useCallback,
   useContext,
   useEffect,
+  useMemo,
   useState,
 } from "react";
 import { userPool } from "~/configs/cognito";
 import { loadAttributes, loadSession } from "~/apis/cognito";
 
-type authContext = {
+export type AuthContext = {
   user: CognitoUser;
   session: CognitoUserSession;
   attributes: CognitoUserAttribute[];
 };
 
-const AuthContext = createContext<authContext | null>(null);
+const authContext = createContext<AuthContext>({} as AuthContext);
 
 type props = {
   children: React.ReactNode;
+  contentOnUnauthenticated?: React.ReactNode;
 };
 
-const AuthProvider = ({ children }: props) => {
-  const [auth, setAuth] = useState<authContext | null>(null);
+const defaultContentOnUnauthenticated = <div>サインインが必要です</div>;
+
+const AuthProvider = ({
+  children,
+  contentOnUnauthenticated = defaultContentOnUnauthenticated,
+}: props) => {
+  const [auth, setAuth] = useState<AuthContext | null>(null);
 
   const setCurrentUser = useCallback(async () => {
     const cognitoUser = userPool.getCurrentUser();
@@ -49,18 +56,20 @@ const AuthProvider = ({ children }: props) => {
     };
   }, [setCurrentUser]);
 
-  return <AuthContext.Provider value={auth}>{children}</AuthContext.Provider>;
+  const content = useMemo(() => {
+    if (auth) {
+      return (
+        <authContext.Provider value={auth}>{children}</authContext.Provider>
+      );
+    } else {
+      return contentOnUnauthenticated;
+    }
+  }, [auth, children, contentOnUnauthenticated]);
+
+  return <>{content}</>;
 };
 
 export default AuthProvider;
-export const useOptionalAuth = () => {
-  return useContext(AuthContext);
-};
-export const useAuth = () => {
-  const auth = useContext(AuthContext);
-  if (auth) {
-    return auth;
-  } else {
-    throw new Error("認証に失敗しています。");
-  }
+export const useAuthContext = () => {
+  return useContext(authContext);
 };
