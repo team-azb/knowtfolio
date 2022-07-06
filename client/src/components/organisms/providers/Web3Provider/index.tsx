@@ -3,6 +3,7 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useMemo,
   useState,
 } from "react";
 import detectEthereumProvider from "@metamask/detect-provider";
@@ -62,15 +63,17 @@ const Web3Provider = ({
     connectMetamask();
   }, [connectMetamask]);
 
-  return (
-    <>
-      {web3Obj ? (
+  const content = useMemo(() => {
+    if (web3Obj) {
+      return (
         <web3Context.Provider value={web3Obj}>{children}</web3Context.Provider>
-      ) : (
-        contentOnUnconnected
-      )}
-    </>
-  );
+      );
+    } else {
+      return contentOnUnconnected;
+    }
+  }, [children, contentOnUnconnected, web3Obj]);
+
+  return <>{content}</>;
 };
 
 export default Web3Provider;
