@@ -7,34 +7,43 @@ import AuthProvider from "./components/organisms/providers/AuthProvider";
 import ImageUpload from "./components/pages/ImageUpload";
 import Header from "./components/organisms/Header";
 import NotFound from "./components/pages/NofFound";
+import NewArticlePage from "./components/pages/NewArticlePage";
+import EditArticlePage from "./components/pages/EditArticlePage";
+import Web3Provider from "./components/organisms/providers/Web3Provider";
 
 const App = () => {
   return (
     <>
       <Header />
       <hr />
-      <Routes>
-        <Route path="/" element={<HelloWeb3 />} />
-        <Route path="/signup" element={<SignUp />} />
-        <Route path="/signin" element={<SignIn />} />
-        <Route
-          path="/mypage"
-          element={
-            <AuthProvider>
-              <Mypage />
-            </AuthProvider>
-          }
-        />
-        <Route
-          path="/image-upload"
-          element={
-            <AuthProvider>
-              <ImageUpload />
-            </AuthProvider>
-          }
-        />
-        <Route path="*" element={<NotFound />} />
-      </Routes>
+      <Web3Provider>
+        <Routes>
+          <Route path="/" element={<HelloWeb3 />} />
+          <Route path="/signup" element={<SignUp />} />
+          <Route path="/signin" element={<SignIn />} />
+          <Route
+            path="/mypage"
+            element={
+              <AuthProvider>
+                <Mypage />
+              </AuthProvider>
+            }
+          />
+          <Route
+            path="/image-upload"
+            element={
+              <AuthProvider>
+                <ImageUpload />
+              </AuthProvider>
+            }
+          />
+          {/* TODO: chenage endipoint to /articles/new */}
+          <Route path="/new" element={<NewArticlePage />} />
+          {/* TODO: chenage endipoint to /articles/:articleId/edit */}
+          <Route path="/edit/:articleId" element={<EditArticlePage />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </Web3Provider>
     </>
   );
 };
