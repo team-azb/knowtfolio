@@ -41,8 +41,8 @@ func (s nftsService) CreateForArticle(_ context.Context, request *nfts.CreateNft
 		return nil, nfts.MakeUnauthenticated(err)
 	}
 
-	targetArticle := models.Article{ID: request.ArticleID}
-	result := s.DB.First(&targetArticle)
+	target := models.Article{ID: request.ArticleID}
+	result := s.DB.First(&target)
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 		return nil, nfts.MakeArticleNotFound(result.Error)
 	}
@@ -53,8 +53,8 @@ func (s nftsService) CreateForArticle(_ context.Context, request *nfts.CreateNft
 	tx, err := s.Contract.MintNFT(
 		opts,
 		common.HexToAddress(request.Address),
-		fmt.Sprintf("https://knowtfolio.xyz/articles/%v", targetArticle.ID),
-		targetArticle.ID)
+		fmt.Sprintf("https://knowtfolio.xyz/articles/%v", target.ID),
+		target.ID)
 	if err != nil {
 		return nil, err
 	}
