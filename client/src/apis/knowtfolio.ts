@@ -25,7 +25,7 @@ export const postArticle = async (form: postArticleForm) => {
 export type updateArticleForm = {
   articleId: string;
 } & postArticleForm;
-export const updateArticle = async (form: updateArticleForm) => {
+export const putArticle = async (form: updateArticleForm) => {
   await axios.put(`/api/articles/${form.articleId}`, {
     address: form.address,
     content: form.content,

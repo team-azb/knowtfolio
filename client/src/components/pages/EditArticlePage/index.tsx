@@ -3,7 +3,7 @@ import { Editor } from "@tinymce/tinymce-react";
 import { Editor as TinyMCEEditor } from "tinymce";
 import { TINY_MCE_API_KEY } from "~/configs/tinymce";
 import { useCallback, useEffect, useState } from "react";
-import { getArticle, updateArticle } from "~/apis/knowtfolio";
+import { getArticle, putArticle } from "~/apis/knowtfolio";
 import { useWeb3Context } from "~/components/organisms/providers/Web3Provider";
 
 const EditArticlePage = () => {
@@ -39,7 +39,7 @@ const EditArticlePage = () => {
         account,
         ""
       );
-      await updateArticle({
+      await putArticle({
         articleId: articleId || "",
         title,
         content,
