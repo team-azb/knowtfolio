@@ -36,7 +36,7 @@ func main() {
 	}
 
 	handler := services.NewHttpHandler()
-	handler.AddService(services.NewArticlesService(db, *handler), "articles")
+	handler.AddService(services.NewArticlesService(db, contract, *handler), "articles")
 	handler.AddService(services.NewNftsService(db, contract, *handler), "nfts")
 	handler.AddService(services.NewArticlesHtmlService(db, *handler), "articles-html")
 

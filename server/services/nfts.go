@@ -46,6 +46,10 @@ func (s nftsService) CreateForArticle(_ context.Context, request *nfts.CreateNft
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 		return nil, nfts.MakeArticleNotFound(result.Error)
 	}
+	if target.OriginalAuthorAddress != request.Address {
+		msg := fmt.Sprintf("Address %v is not the orignial owner of article %v.", request.Address, target.ID)
+		return nil, nfts.MakeUnauthorized(errors.New(msg))
+	}
 
 	privateKey, _ := crypto.HexToECDSA(config.AdminPrivateKey)
 	// TODO: Support other chain ids.
