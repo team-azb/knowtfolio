@@ -1,5 +1,5 @@
 import { useCallback, useMemo } from "react";
-import { useAuth } from "~/components/organisms/AuthProvider";
+import { useAuth } from "~/components/organisms/providers/AuthProvider";
 import { signOutFromCognito } from "~/apis/cognito";
 
 const Mypage = () => {

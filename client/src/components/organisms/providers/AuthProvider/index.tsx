@@ -2,7 +2,7 @@ import React, { createContext, useContext } from "react";
 import OptionalAuthProvider, {
   AuthContext,
   useOptionalAuth,
-} from "~/components/organisms/OptionalAuthProvider";
+} from "~/components/organisms/providers/OptionalAuthProvider";
 
 type switcherProps = {
   children: React.ReactNode;
