@@ -20,7 +20,9 @@ paths:
                         schema:
                             $ref: '#/components/schemas/CreateRequestBody'
                         example:
+                            address: '''0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'''
                             content: <h1> Hello World! </h1>
+                            signature: Praesentium repellendus est esse assumenda.
                             title: My Awesome Article
             responses:
                 "200":
@@ -28,12 +30,23 @@ paths:
                     content:
                         application/json:
                             schema:
-                                description: 'Response body may alternatively be #/components/schemas/CreateResponseBodyOnlyID'
-                                $ref: '#/components/schemas/ArticleResult'
+                                $ref: '#/components/schemas/CreateResponseBody'
                             example:
                                 content: <h1> Hello World! </h1>
                                 id: exampleId01
                                 title: My Awesome Article
+                "401":
+                    description: 'unauthenticated: 認証に失敗した場合'
+                    content:
+                        application/vnd.goa.error+json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                "404":
+                    description: 'article_not_found: 記事IDに対応する記事が見つからなかった場合'
+                    content:
+                        application/vnd.goa.error+json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
     /api/articles/{id}:
         delete:
             tags:
@@ -54,17 +67,38 @@ paths:
                     minLength: 11
                     maxLength: 11
                   example: exampleId01
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/DeleteRequestBody'
+                        example:
+                            address: '''0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'''
+                            signature: Atque veritatis et in explicabo.
             responses:
                 "200":
                     description: OK response.
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/CreateResponseBodyOnlyID'
+                                $ref: '#/components/schemas/DeleteResponseBodyOnlyID'
                             example:
                                 id: exampleId01
+                "401":
+                    description: 'unauthenticated: 認証に失敗した場合'
+                    content:
+                        application/vnd.goa.error+json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                "403":
+                    description: 'unauthorized: 操作を行う権限がない場合'
+                    content:
+                        application/vnd.goa.error+json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
                 "404":
-                    description: 'not_found: IDに対応する記事が見つからなかった場合。'
+                    description: 'article_not_found: 記事IDに対応する記事が見つからなかった場合'
                     content:
                         application/vnd.goa.error+json:
                             schema:
@@ -94,14 +128,13 @@ paths:
                     content:
                         application/json:
                             schema:
-                                description: 'Response body may alternatively be #/components/schemas/CreateResponseBodyOnlyID'
-                                $ref: '#/components/schemas/ArticleResult'
+                                $ref: '#/components/schemas/CreateResponseBody'
                             example:
                                 content: <h1> Hello World! </h1>
                                 id: exampleId01
                                 title: My Awesome Article
                 "404":
-                    description: 'not_found: IDに対応する記事が見つからなかった場合。'
+                    description: 'article_not_found: 記事IDに対応する記事が見つからなかった場合'
                     content:
                         application/vnd.goa.error+json:
                             schema:
@@ -132,7 +165,9 @@ paths:
                         schema:
                             $ref: '#/components/schemas/UpdateRequestBody'
                         example:
+                            address: '''0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'''
                             content: <h1> Hello World! </h1>
+                            signature: Et voluptates quis nulla pariatur optio reiciendis.
                             title: My Awesome Article
             responses:
                 "200":
@@ -140,14 +175,82 @@ paths:
                     content:
                         application/json:
                             schema:
-                                description: 'Response body may alternatively be #/components/schemas/CreateResponseBodyOnlyID'
-                                $ref: '#/components/schemas/ArticleResult'
+                                $ref: '#/components/schemas/CreateResponseBody'
                             example:
                                 content: <h1> Hello World! </h1>
                                 id: exampleId01
                                 title: My Awesome Article
+                "401":
+                    description: 'unauthenticated: 認証に失敗した場合'
+                    content:
+                        application/vnd.goa.error+json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                "403":
+                    description: 'unauthorized: 操作を行う権限がない場合'
+                    content:
+                        application/vnd.goa.error+json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
                 "404":
-                    description: 'not_found: IDに対応する記事が見つからなかった場合。'
+                    description: 'article_not_found: 記事IDに対応する記事が見つからなかった場合'
+                    content:
+                        application/vnd.goa.error+json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+    /api/nfts/{article_id}:
+        post:
+            tags:
+                - nfts
+            summary: Create for Article nfts
+            description: MINT an NFT of the article.
+            operationId: nfts#Create for Article
+            parameters:
+                - name: article_id
+                  in: path
+                  description: 記事のID
+                  required: true
+                  schema:
+                    type: string
+                    description: 記事のID
+                    example: exampleId01
+                    pattern: ^[A-Za-z0-9_-]+$
+                    minLength: 11
+                    maxLength: 11
+                  example: exampleId01
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/DeleteRequestBody'
+                        example:
+                            address: '''0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'''
+                            signature: Tenetur animi.
+            responses:
+                "200":
+                    description: OK response.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/ArticleTokenizeResult'
+                            example:
+                                cost: 5663578019026462848
+                                hash: Asperiores repellendus.
+                "401":
+                    description: 'unauthenticated: 認証に失敗した場合'
+                    content:
+                        application/vnd.goa.error+json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                "403":
+                    description: 'unauthorized: 操作を行う権限がない場合'
+                    content:
+                        application/vnd.goa.error+json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                "404":
+                    description: 'article_not_found: 記事IDに対応する記事が見つからなかった場合'
                     content:
                         application/vnd.goa.error+json:
                             schema:
@@ -183,14 +286,62 @@ paths:
                                 format: binary
                             example: <h1> Hello World! </h1>
                 "404":
-                    description: 'not_found: IDに対応する記事が見つからなかった場合。'
+                    description: 'article_not_found: 記事IDに対応する記事が見つからなかった場合'
                     content:
                         application/vnd.goa.error+json:
                             schema:
                                 $ref: '#/components/schemas/Error'
 components:
     schemas:
-        ArticleResult:
+        ArticleTokenizeResult:
+            type: object
+            properties:
+                cost:
+                    type: integer
+                    description: トークン発行にかかったコスト
+                    example: 6202392799343861228
+                    format: int64
+                hash:
+                    type: string
+                    description: トランザクションのハッシュ
+                    example: Dolor sapiente laboriosam veniam eos eos.
+            example:
+                cost: 4471315468130594924
+                hash: Esse molestiae illum temporibus mollitia voluptatem.
+            required:
+                - hash
+                - cost
+        CreateRequestBody:
+            type: object
+            properties:
+                address:
+                    type: string
+                    description: ウォレットのアドレス
+                    example: '''0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'''
+                    pattern: ^0x[a-fA-F0-9]{40}$
+                content:
+                    type: string
+                    description: 本文のHTML
+                    example: <h1> Hello World! </h1>
+                signature:
+                    type: string
+                    description: '`address`のアカウントが行った署名'
+                    example: Asperiores quam.
+                title:
+                    type: string
+                    example: My Awesome Article
+            description: 作成したい記事の情報
+            example:
+                address: '''0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'''
+                content: <h1> Hello World! </h1>
+                signature: Cupiditate eos nobis.
+                title: My Awesome Article
+            required:
+                - title
+                - content
+                - address
+                - signature
+        CreateResponseBody:
             type: object
             properties:
                 content:
@@ -207,6 +358,7 @@ components:
                 title:
                     type: string
                     example: My Awesome Article
+            description: CreateResponseBody result type (default view)
             example:
                 content: <h1> Hello World! </h1>
                 id: exampleId01
@@ -215,24 +367,25 @@ components:
                 - id
                 - title
                 - content
-        CreateRequestBody:
+        DeleteRequestBody:
             type: object
             properties:
-                content:
+                address:
                     type: string
-                    description: 本文のHTML
-                    example: <h1> Hello World! </h1>
-                title:
+                    description: ウォレットのアドレス
+                    example: '''0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'''
+                    pattern: ^0x[a-fA-F0-9]{40}$
+                signature:
                     type: string
-                    example: My Awesome Article
-            description: 作成したい記事の情報
+                    description: '`address`のアカウントが行った署名'
+                    example: Saepe officiis provident nobis qui itaque.
             example:
-                content: <h1> Hello World! </h1>
-                title: My Awesome Article
+                address: '''0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'''
+                signature: Vel eligendi distinctio consectetur doloremque.
             required:
-                - title
-                - content
-        CreateResponseBodyOnlyID:
+                - address
+                - signature
+        DeleteResponseBodyOnlyID:
             type: object
             properties:
                 id:
@@ -242,7 +395,7 @@ components:
                     pattern: ^[A-Za-z0-9_-]+$
                     minLength: 11
                     maxLength: 11
-            description: CreateResponseBody result type (only-id view)
+            description: DeleteResponseBody result type (only-id view)
             example:
                 id: exampleId01
             required:
@@ -269,7 +422,7 @@ components:
                 temporary:
                     type: boolean
                     description: Is the error temporary?
-                    example: true
+                    example: false
                 timeout:
                     type: boolean
                     description: Is the error a timeout?
@@ -288,10 +441,19 @@ components:
         UpdateRequestBody:
             type: object
             properties:
+                address:
+                    type: string
+                    description: ウォレットのアドレス
+                    example: '''0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'''
+                    pattern: ^0x[a-fA-F0-9]{40}$
                 content:
                     type: string
                     description: 本文のHTML
                     example: <h1> Hello World! </h1>
+                signature:
+                    type: string
+                    description: '`address`のアカウントが行った署名'
+                    example: Accusantium mollitia magni maxime voluptates porro odit.
                 title:
                     type: string
                     example: My Awesome Article
@@ -299,10 +461,17 @@ components:
                 記事の更新内容
                 リクエストに含まれるフィールドだけ更新される。
             example:
+                address: '''0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'''
                 content: <h1> Hello World! </h1>
+                signature: Eius dolorum ipsa quis incidunt alias.
                 title: My Awesome Article
+            required:
+                - address
+                - signature
 tags:
     - name: articles
       description: 記事サービス
     - name: articles-html
       description: SEO対策で、記事の表示だけ直接HTMLで返すためのサービス
+    - name: nfts
+      description: NFTを管理するサービス
