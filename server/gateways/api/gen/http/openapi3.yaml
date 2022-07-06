@@ -233,7 +233,7 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/ArticleTokenizeResult'
+                                $ref: '#/components/schemas/CreateNftForArticleResult'
                             example:
                                 cost: 5663578019026462848
                                 hash: Asperiores repellendus.
@@ -293,7 +293,7 @@ paths:
                                 $ref: '#/components/schemas/Error'
 components:
     schemas:
-        ArticleTokenizeResult:
+        CreateNftForArticleResult:
             type: object
             properties:
                 cost:
