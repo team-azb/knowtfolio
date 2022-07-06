@@ -13,13 +13,13 @@ func smartWalletAuthAttributes(addressFieldName string, signatureFieldName strin
 	})
 }
 
-var articleTokenizeRequest = dsl.Type("ArticleTokenizeRequest", func() {
+var createNftForArticleRequest = dsl.Type("CreateNftForArticleRequest", func() {
 	articleIdAttribute("article_id")
 	smartWalletAuthAttributes("address", "signature")
 	dsl.Required("article_id", "address", "signature")
 })
 
-var articleTokenizeResult = dsl.ResultType("article-tokenize-result", "ArticleTokenizeResult", func() {
+var createNftForArticleResult = dsl.ResultType("create-nft-for-article-result", "CreateNftForArticleResult", func() {
 	dsl.Attribute("hash", dsl.String, func() {
 		dsl.Description("トランザクションのハッシュ")
 	})
@@ -39,9 +39,9 @@ var _ = dsl.Service("nfts", func() {
 	dsl.Method("Create for Article", func() {
 		dsl.Description("MINT an NFT of the article.")
 
-		dsl.Payload(articleTokenizeRequest)
+		dsl.Payload(createNftForArticleRequest)
 
-		dsl.Result(articleTokenizeResult)
+		dsl.Result(createNftForArticleResult)
 		dsl.Error("article_not_found")
 		dsl.Error("unauthenticated")
 		dsl.Error("unauthorized")
