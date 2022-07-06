@@ -24,10 +24,15 @@ const authContext = createContext<AuthContext>({} as AuthContext);
 
 type props = {
   children: React.ReactNode;
-  contentForUnauthorized?: React.ReactNode;
+  contentOnUnauthenticated?: React.ReactNode;
 };
 
-const AuthProvider = (props: props) => {
+const defaultContentOnUnauthenticated = <div>サインインが必要です</div>;
+
+const AuthProvider = ({
+  children,
+  contentOnUnauthenticated = defaultContentOnUnauthenticated,
+}: props) => {
   const [auth, setAuth] = useState<AuthContext | null>(null);
 
   const setCurrentUser = useCallback(async () => {
@@ -54,16 +59,12 @@ const AuthProvider = (props: props) => {
   const content = useMemo(() => {
     if (auth) {
       return (
-        <authContext.Provider value={auth}>
-          {props.children}
-        </authContext.Provider>
+        <authContext.Provider value={auth}>{children}</authContext.Provider>
       );
-    } else if (props.contentForUnauthorized) {
-      return props.contentForUnauthorized;
     } else {
-      return <div>サインインが必要です</div>;
+      return contentOnUnauthenticated;
     }
-  }, [auth, props.children, props.contentForUnauthorized]);
+  }, [auth, children, contentOnUnauthenticated]);
 
   return <>{content}</>;
 };

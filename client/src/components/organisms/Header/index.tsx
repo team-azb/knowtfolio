@@ -11,7 +11,7 @@ const Header = () => {
   return (
     <div>
       <h1>knowtfolio</h1>
-      <AuthProvider contentForUnauthorized={<p>未認証ユーザー</p>}>
+      <AuthProvider contentOnUnauthenticated={<p>未認証ユーザー</p>}>
         <AcountInfo />
       </AuthProvider>
     </div>
