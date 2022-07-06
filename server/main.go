@@ -12,7 +12,9 @@ func main() {
 
 	// Connect to DB
 	db, err := gorm.Open(mysql.Open("root:password@tcp(db:3306)/knowtfolio-db?parseTime=true"), &gorm.Config{})
-	logger.Err(err)
+	if err != nil {
+		logger.Fatal().Msgf("Failed to connect with DB: %v", err)
+	}
 
 	handler := services.NewHttpHandler()
 	handler.AddService(services.NewArticlesService(db, *handler), "articles")
