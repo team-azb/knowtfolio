@@ -11,7 +11,7 @@ const EditArticlePage = () => {
   const [content, setContent] = useState("");
   const [title, setTitle] = useState("");
   const handleEditorChange = useCallback<
-    (a: string, editor: TinyMCEEditor) => void
+    (value: string, editor: TinyMCEEditor) => void
   >((value) => {
     setContent(value);
   }, []);
@@ -19,27 +19,37 @@ const EditArticlePage = () => {
 
   useEffect(() => {
     (async () => {
-      if (articleId) {
-        const { title, content } = await getArticle(articleId);
-        setTitle(title);
-        setContent(content);
+      try {
+        if (articleId) {
+          const { title, content } = await getArticle(articleId);
+          setTitle(title);
+          setContent(content);
+        }
+      } catch (error) {
+        console.error(error);
+        alert("記事の取得に失敗しました。");
       }
     })();
   }, [articleId]);
 
   const handleUpdate = useCallback(async () => {
-    const signature = await web3.eth.personal.sign(
-      "Update Article",
-      account,
-      ""
-    );
-    updateArticle({
-      articleId: articleId || "",
-      title,
-      content,
-      address: account,
-      signature,
-    });
+    try {
+      const signature = await web3.eth.personal.sign(
+        "Update Article",
+        account,
+        ""
+      );
+      await updateArticle({
+        articleId: articleId || "",
+        title,
+        content,
+        address: account,
+        signature,
+      });
+    } catch (error) {
+      console.error(error);
+      alert("記事の更新に失敗しました。");
+    }
   }, [account, articleId, content, title, web3.eth.personal]);
   return (
     <>
