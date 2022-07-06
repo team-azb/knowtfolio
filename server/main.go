@@ -10,10 +10,13 @@ import (
 func main() {
 	logger := services.NewLogger("main", true)
 
-	handler := services.NewHttpHandler()
-	db, err := gorm.Open(mysql.Open("root:password@tcp(localhost:3306)/knowtfolio-db?parseTime=true"))
-	logger.Err(err)
+	// Connect to DB
+	db, err := gorm.Open(mysql.Open("root:password@tcp(db:3306)/knowtfolio-db?parseTime=true"), &gorm.Config{})
+	if err != nil {
+		logger.Fatal().Msgf("Failed to connect with DB: %v", err)
+	}
 
+	handler := services.NewHttpHandler()
 	handler.AddService(services.NewArticlesService(db, *handler), "articles")
 	handler.AddService(services.NewArticlesHtmlService(db, *handler), "articles-html")
 

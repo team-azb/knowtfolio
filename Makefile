@@ -3,7 +3,7 @@ GOA_DESIGN_DIR = $(GOA_DIR)/design
 GOA_GEN_DIR = $(GOA_DIR)/gen
 GOA_DOCKER_FILE = ./server/goa.Dockerfile
 
-.PHONY: goa
+.PHONY: goa server
 
 $(GOA_GEN_DIR): $(GOA_DESIGN_DIR) $(GOA_DOCKER_FILE) ./server/go.mod
 	docker build -t knowtfolio/goa-gen -f $(GOA_DOCKER_FILE) ./server
@@ -13,8 +13,8 @@ $(GOA_GEN_DIR): $(GOA_DESIGN_DIR) $(GOA_DOCKER_FILE) ./server/go.mod
 
 goa: $(GOA_GEN_DIR)
 
+server: goa
+	docker-compose up --build server
+
 clean:
 	rm -rf $(GOA_GEN_DIR)
-
-client-server:
-	cd client && npm start
