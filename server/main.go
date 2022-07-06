@@ -27,9 +27,13 @@ func main() {
 
 	// Connect to Ethereum network
 	client, err := ethclient.Dial(config.NetworkURI)
-	logger.Err(err)
+	if err != nil {
+		logger.Fatal().Msgf("Failed to connect with Ethereum Network: %v", err)
+	}
 	contract, err := ethereum.NewContractClient(common.HexToAddress(config.ContractAddress), client)
-	logger.Err(err)
+	if err != nil {
+		logger.Fatal().Msgf("Failed to initialize with Contract Client: %v", err)
+	}
 
 	handler := services.NewHttpHandler()
 	handler.AddService(services.NewArticlesService(db, *handler), "articles")
