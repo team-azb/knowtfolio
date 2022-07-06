@@ -53,7 +53,7 @@ const EditArticlePage = () => {
   }, [account, articleId, content, title, web3.eth.personal]);
   return (
     <>
-      <h1>Edit Articles: {articleId}</h1>
+      <h1>Edit Article: {articleId}</h1>
       <Editor
         onEditorChange={handleEditorChange}
         value={content}
