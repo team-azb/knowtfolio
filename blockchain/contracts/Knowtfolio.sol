@@ -19,9 +19,16 @@ contract Knowtfolio is OwnableUpgradeable, ERC721URIStorageUpgradeable {
         __ERC721URIStorage_init();
     }
 
+    /**
+     * @dev Base URI for computing {tokenURI}. If set, the resulting URI for each
+     * token will be the concatenation of the `baseURI` and the `tokenId`.
+     */
+    function _baseURI() internal view virtual override(ERC721Upgradeable) returns (string memory) {
+        return "https://knowtfolio.com/articles/";
+    }
+
     function mintNFT(
         address recipient,
-        string memory _tokenURI,
         string memory _articleId
     ) public onlyOwner returns (uint256) {
         require(bytes(_articleId).length > 0 && tokenIdOf[_articleId] == 0);
@@ -29,7 +36,7 @@ contract Knowtfolio is OwnableUpgradeable, ERC721URIStorageUpgradeable {
 
         uint256 newItemId = _tokenIds.current();
         _mint(recipient, newItemId);
-        _setTokenURI(newItemId, _tokenURI);
+        _setTokenURI(newItemId, _articleId);
         tokenIdOf[_articleId] = newItemId;
 
         return newItemId;
