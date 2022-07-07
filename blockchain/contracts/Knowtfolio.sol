@@ -5,9 +5,9 @@ import "hardhat/console.sol";
 import "@openzeppelin/contracts-upgradeable/token/ERC721/ERC721Upgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/utils/CountersUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721URIStorageUpgradeable.sol";
+import "./ERC721URIStorageEnumerableUpgradeable.sol";
 
-contract Knowtfolio is OwnableUpgradeable, ERC721URIStorageUpgradeable {
+contract Knowtfolio is OwnableUpgradeable, ERC721URIStorageEnumerableUpgradeable {
     using CountersUpgradeable for CountersUpgradeable.Counter;
     CountersUpgradeable.Counter internal _tokenIds;
 
@@ -57,5 +57,22 @@ contract Knowtfolio is OwnableUpgradeable, ERC721URIStorageUpgradeable {
         } else {
             return ownerOf(_tokenId);
         }
+    }
+
+    /**
+     * @dev Collects all article ids that is owned by `user`.
+     */
+    function getArticlesOwnedBy(address user)
+    public
+    view
+    returns (string[] memory)
+    {
+        uint256 numberOfTokens = balanceOf(user);
+        string[] memory articleIds = new string[](numberOfTokens);
+        for (uint256 index = 0; index < numberOfTokens; index++) {
+            uint256 token = tokenOfOwnerByIndex(user, index);
+            articleIds[index] = tokenURI(token);
+        }
+        return articleIds;
     }
 }
