@@ -14,7 +14,7 @@ contract Knowtfolio is OwnableUpgradeable, ERC721URIStorageEnumerableUpgradeable
     mapping(string => uint256) internal tokenIdOf;
 
     function initialize() public initializer {
-        __ERC721_init("Knowtfolio", "PON");
+        __ERC721_init("Knowtfolio", "FOLIO");
         __Ownable_init();
         __ERC721URIStorage_init();
     }
