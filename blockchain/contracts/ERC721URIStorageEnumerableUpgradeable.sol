@@ -7,7 +7,10 @@ import "@openzeppelin/contracts-upgradeable/token/ERC721/extensions/ERC721URISto
 /**
  * @dev Abstract contract to resolve function conflicts due to diamond inheritance.
  */
-abstract contract ERC721URIStorageEnumerableUpgradeable is ERC721URIStorageUpgradeable, ERC721EnumerableUpgradeable {
+abstract contract ERC721URIStorageEnumerableUpgradeable is
+    ERC721URIStorageUpgradeable,
+    ERC721EnumerableUpgradeable
+{
     function _beforeTokenTransfer(
         address from,
         address to,
