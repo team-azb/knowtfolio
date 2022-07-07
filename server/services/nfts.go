@@ -57,7 +57,6 @@ func (s nftsService) CreateForArticle(_ context.Context, request *nfts.CreateNft
 	tx, err := s.Contract.MintNFT(
 		opts,
 		common.HexToAddress(request.Address),
-		fmt.Sprintf("https://knowtfolio.xyz/articles/%v", target.ID),
 		target.ID)
 	if err != nil {
 		return nil, err

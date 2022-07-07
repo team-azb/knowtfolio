@@ -2,12 +2,10 @@ package services
 
 import (
 	"context"
-	"crypto/ecdsa"
 	"errors"
 	"fmt"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/team-azb/knowtfolio/server/config"
 	"github.com/team-azb/knowtfolio/server/gateways/api/gen/articles"
 	articlesviews "github.com/team-azb/knowtfolio/server/gateways/api/gen/articles/views"
@@ -16,6 +14,7 @@ import (
 	"github.com/team-azb/knowtfolio/server/models"
 	goahttp "goa.design/goa/v3/http"
 	"gorm.io/gorm"
+	"math/big"
 )
 
 type articleService struct {
@@ -115,18 +114,15 @@ func (a articleService) Delete(_ context.Context, request *articles.ArticleDelet
 }
 
 func (a articleService) AuthorizeEdit(editorAddr string, target models.Article, requireNFT bool) error {
-	privateKey, _ := crypto.HexToECDSA(config.AdminPrivateKey)
-	publicKey := privateKey.Public()
-	publicKeyECDSA, _ := publicKey.(*ecdsa.PublicKey)
-	adminAddr := crypto.PubkeyToAddress(*publicKeyECDSA)
-
-	isNftOwner, err := a.Contract.IsOwnerOfArticle(&bind.CallOpts{From: adminAddr}, common.HexToAddress(editorAddr), target.ID)
+	owner, err := a.Contract.GetOwnerOfArticle(&bind.CallOpts{}, target.ID)
 	if err != nil {
 		return err
 	}
+	nftExists := owner != common.BigToAddress(big.NewInt(0))
+	isNftOwner := editorAddr == owner.String()
 	isOriginalAuthor := editorAddr == target.OriginalAuthorAddress
 
-	if isNftOwner || (!requireNFT && isOriginalAuthor) {
+	if isNftOwner || (!nftExists && !requireNFT && isOriginalAuthor) {
 		return nil
 	} else {
 		msg := fmt.Sprintf("Address %v does not have the right to do the specified operation on article %v.", editorAddr, target.ID)
