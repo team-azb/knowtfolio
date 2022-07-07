@@ -34,4 +34,4 @@ make clean
 
 ## Smart Contracts
 * prod: https://mumbai.polygonscan.com/address/0xCd9554e90FCdC339F41F775c25b0EE00Add2b2ba
-* dev: https://mumbai.polygonscan.com/address/0xf96D4c65dcBDf94dAc757128eF9Ed31b8d3D7Cc9
+* dev: https://mumbai.polygonscan.com/address/0x1c63329065425B9FE585b14F48E6037795f52443
