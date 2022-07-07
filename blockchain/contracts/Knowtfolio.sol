@@ -35,7 +35,7 @@ contract Knowtfolio is OwnableUpgradeable, ERC721URIStorageEnumerableUpgradeable
         _tokenIds.increment();
 
         uint256 newItemId = _tokenIds.current();
-        _mint(recipient, newItemId);
+        _safeMint(recipient, newItemId);
         _setTokenURI(newItemId, _articleId);
         tokenIdOf[_articleId] = newItemId;
 
