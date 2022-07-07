@@ -42,17 +42,20 @@ contract Knowtfolio is OwnableUpgradeable, ERC721URIStorageUpgradeable {
         return newItemId;
     }
 
-    function isOwnerOfArticle(address editor, string memory articleId)
+    /**
+     * @dev Get owner of the Article NFT of `articleId`.
+     * If there's no NFT for `articleId`, the function returns an empty address.
+     */
+    function getOwnerOfArticle(string memory articleId)
         public
         view
-        onlyOwner
-        returns (bool)
+        returns (address)
     {
         uint256 _tokenId = tokenIdOf[articleId];
         if (_tokenId == 0) {
-            return false;
+            return address(0);
+        } else {
+            return ownerOf(_tokenId);
         }
-        address owner = ownerOf(_tokenId);
-        return owner == editor;
     }
 }
