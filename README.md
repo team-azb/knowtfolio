@@ -33,5 +33,5 @@ make clean
 * [Hardhat](https://hardhat.org): Contract Compilation
 
 ## Smart Contracts
-* https://mumbai.polygonscan.com/address/0xCd9554e90FCdC339F41F775c25b0EE00Add2b2ba
-
+* prod: https://mumbai.polygonscan.com/address/0xCd9554e90FCdC339F41F775c25b0EE00Add2b2ba
+* dev: https://mumbai.polygonscan.com/address/0x1c63329065425B9FE585b14F48E6037795f52443
