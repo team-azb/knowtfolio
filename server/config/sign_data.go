@@ -1,5 +1,8 @@
 package config
 
 var SignData = map[string]string{
-	"CreateNFT": "Mint NFT",
+	"CreateArticle": "Create Article",
+	"UpdateArticle": "Update Article",
+	"DeleteArticle": "Delete Article",
+	"CreateNFT":     "Mint NFT",
 }

@@ -2,26 +2,34 @@ package services
 
 import (
 	"context"
+	"crypto/ecdsa"
 	"errors"
+	"fmt"
+	"github.com/ethereum/go-ethereum/accounts/abi/bind"
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/team-azb/knowtfolio/server/config"
 	"github.com/team-azb/knowtfolio/server/gateways/api/gen/articles"
 	articlesviews "github.com/team-azb/knowtfolio/server/gateways/api/gen/articles/views"
 	"github.com/team-azb/knowtfolio/server/gateways/api/gen/http/articles/server"
+	"github.com/team-azb/knowtfolio/server/gateways/ethereum"
 	"github.com/team-azb/knowtfolio/server/models"
 	goahttp "goa.design/goa/v3/http"
 	"gorm.io/gorm"
 )
 
 type articleService struct {
-	DB *gorm.DB
+	DB       *gorm.DB
+	Contract *ethereum.ContractClient
 }
 
-func NewArticlesService(db *gorm.DB, handler HttpHandler) *server.Server {
+func NewArticlesService(db *gorm.DB, contract *ethereum.ContractClient, handler HttpHandler) *server.Server {
 	err := db.Migrator().AutoMigrate(models.Article{})
 	if err != nil {
 		panic(err.(any))
 	}
 
-	endpoints := articles.NewEndpoints(articleService{DB: db})
+	endpoints := articles.NewEndpoints(articleService{DB: db, Contract: contract})
 	return server.New(
 		endpoints,
 		handler,
@@ -31,28 +39,43 @@ func NewArticlesService(db *gorm.DB, handler HttpHandler) *server.Server {
 		nil)
 }
 
-func (a articleService) Create(_ context.Context, request *articles.ArticleCreateRequest) (res *articles.ArticleResult, view string, err error) {
-	newArticle := models.NewArticle(request.Title, []byte(request.Content))
+func (a articleService) Create(_ context.Context, request *articles.ArticleCreateRequest) (res *articles.ArticleResult, err error) {
+	err = VerifySignature(request.Address, request.Signature, config.SignData["CreateArticle"])
+	if err != nil {
+		return nil, articles.MakeUnauthenticated(err)
+	}
+
+	newArticle := models.NewArticle(request.Title, []byte(request.Content), request.Address)
 	result := a.DB.Create(newArticle)
-	return articleToResult(*newArticle), "default", result.Error
+	return articleToResult(*newArticle), result.Error
 }
 
-func (a articleService) Read(_ context.Context, id *articles.ArticleID) (res *articles.ArticleResult, view string, err error) {
-	targetArticle := models.Article{ID: id.ID}
+func (a articleService) Read(_ context.Context, request *articles.ArticleReadRequest) (res *articles.ArticleResult, err error) {
+	targetArticle := models.Article{ID: request.ID}
 	result := a.DB.First(&targetArticle)
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-		return nil, "", articles.MakeNotFound(result.Error)
+		return nil, articles.MakeArticleNotFound(result.Error)
 	}
-	return articleToResult(targetArticle), "default", result.Error
+	return articleToResult(targetArticle), result.Error
 }
 
-func (a articleService) Update(_ context.Context, request *articles.ArticleUpdateRequest) (res *articles.ArticleResult, view string, err error) {
+func (a articleService) Update(_ context.Context, request *articles.ArticleUpdateRequest) (res *articles.ArticleResult, err error) {
+	err = VerifySignature(request.Address, request.Signature, config.SignData["UpdateArticle"])
+	if err != nil {
+		return nil, articles.MakeUnauthenticated(err)
+	}
+
 	targetArticle := models.Article{ID: request.ID}
 
 	err = a.DB.Transaction(func(tx *gorm.DB) error {
 		result := tx.First(&targetArticle)
 		if result.Error != nil {
 			return result.Error
+		}
+
+		err = a.AuthorizeEdit(request.Address, targetArticle, true)
+		if err != nil {
+			return err
 		}
 
 		targetArticle.SetTitleIfPresent(request.Title)
@@ -62,15 +85,53 @@ func (a articleService) Update(_ context.Context, request *articles.ArticleUpdat
 		return result.Error
 	})
 
-	return articleToResult(targetArticle), "default", err
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		return nil, articles.MakeArticleNotFound(err)
+	}
+
+	return articleToResult(targetArticle), err
 }
 
-func (a articleService) Delete(_ context.Context, id *articles.ArticleID) (res *articles.ArticleResult, err error) {
-	result := a.DB.Delete(&models.Article{ID: id.ID})
-	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-		return nil, articles.MakeNotFound(result.Error)
+func (a articleService) Delete(_ context.Context, request *articles.ArticleDeleteRequest) (res *articles.ArticleResult, err error) {
+	err = VerifySignature(request.Address, request.Signature, config.SignData["DeleteArticle"])
+	if err != nil {
+		return nil, articles.MakeUnauthenticated(err)
 	}
-	return articleIdToResult(id.ID), result.Error
+
+	target := models.Article{ID: request.ID}
+	result := a.DB.First(&target)
+	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+		return nil, articles.MakeArticleNotFound(result.Error)
+	}
+
+	err = a.AuthorizeEdit(request.Address, target, false)
+	if err != nil {
+		return nil, err
+	}
+
+	result = a.DB.Delete(&target)
+
+	return articleIdToResult(request.ID), result.Error
+}
+
+func (a articleService) AuthorizeEdit(editorAddr string, target models.Article, requireNFT bool) error {
+	privateKey, _ := crypto.HexToECDSA(config.AdminPrivateKey)
+	publicKey := privateKey.Public()
+	publicKeyECDSA, _ := publicKey.(*ecdsa.PublicKey)
+	adminAddr := crypto.PubkeyToAddress(*publicKeyECDSA)
+
+	isNftOwner, err := a.Contract.IsOwnerOfArticle(&bind.CallOpts{From: adminAddr}, common.HexToAddress(editorAddr), target.ID)
+	if err != nil {
+		return err
+	}
+	isOriginalAuthor := editorAddr == target.OriginalAuthorAddress
+
+	if isNftOwner || (!requireNFT && isOriginalAuthor) {
+		return nil
+	} else {
+		msg := fmt.Sprintf("Address %v does not have the right to do the specified operation on article %v.", editorAddr, target.ID)
+		return articles.MakeUnauthorized(errors.New(msg))
+	}
 }
 
 func articleToResult(src models.Article) *articles.ArticleResult {
