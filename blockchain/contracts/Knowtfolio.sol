@@ -62,10 +62,10 @@ contract Knowtfolio is OwnableUpgradeable, ERC721URIStorageEnumerableUpgradeable
     /**
      * @dev Collects all article ids that is owned by `user`.
      */
-    function getArticlesOwnedBy(address user)
-    public
-    view
-    returns (string[] memory)
+    function getArticleIdsOwnedBy(address user)
+        public
+        view
+        returns (string[] memory)
     {
         uint256 numberOfTokens = balanceOf(user);
         string[] memory articleIds = new string[](numberOfTokens);
