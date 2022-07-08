@@ -10,10 +10,9 @@ BLOCKCHAIN_NODE_MODULES_DIR = blockchain/node_modules
 CONTRACT_SOL_FILE = blockchain/contracts/Knowtfolio.sol
 CONTRACT_JSON_FILE = blockchain/artifacts/contracts/Knowtfolio.sol/Knowtfolio.json
 CONTRACT_ABI_FILE = $(CONTRACT_JSON_FILE:.json=.abi)
+CONTRACT_BIN_FILE = $(CONTRACT_JSON_FILE:.json=.bin)
 
-GO_ETH_BINDING_PATH = server/gateways/ethereum/contract_client.go
-
-.PHONY: goa server go-eth-binding
+GO_ETH_BINDING_PATH = server/gateways/ethereum/binding.go
 
 $(GOA_GEN_DIR): $(GOA_DESIGN_DIR) $(GOA_DOCKER_FILE) ./server/go.mod
 	docker build -t knowtfolio/goa-gen -f $(GOA_DOCKER_FILE) ./server
@@ -31,12 +30,18 @@ $(CONTRACT_JSON_FILE): $(CONTRACT_SOL_FILE) $(BLOCKCHAIN_NODE_MODULES_DIR)
 $(CONTRACT_ABI_FILE): $(CONTRACT_JSON_FILE)
 	cat $(CONTRACT_JSON_FILE) | jq '.abi' > $(CONTRACT_ABI_FILE)
 
-$(GO_ETH_BINDING_PATH): $(CONTRACT_ABI_FILE)
+# Extract bytecode field from `$(CONTRACT_JSON_FILE)`.
+$(CONTRACT_BIN_FILE): $(CONTRACT_JSON_FILE)
+	cat $(CONTRACT_JSON_FILE) | jq -r '.bytecode' > $(CONTRACT_BIN_FILE)
+
+$(GO_ETH_BINDING_PATH): $(CONTRACT_ABI_FILE) $(CONTRACT_BIN_FILE)
 	docker run -v `pwd`/blockchain:/blockchain \
 		-v `pwd`/server:/server \
 		ethereum/client-go:alltools-v1.10.20 \
-		abigen --abi $(CONTRACT_ABI_FILE) --pkg ethereum \
-			--type ContractClient --out /$(GO_ETH_BINDING_PATH)
+		abigen --abi $(CONTRACT_ABI_FILE) --bin $(CONTRACT_BIN_FILE) --pkg ethereum \
+			--type ContractBinding --out /$(GO_ETH_BINDING_PATH)
+
+.PHONY: goa server test go-eth-binding
 
 go-eth-binding: $(GO_ETH_BINDING_PATH)
 
