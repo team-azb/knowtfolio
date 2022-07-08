@@ -45,5 +45,8 @@ goa: $(GOA_GEN_DIR)
 server: goa go-eth-binding
 	docker-compose up --build server
 
+test: goa go-eth-binding
+	docker-compose up --build test
+
 clean:
 	rm -rf $(GOA_GEN_DIR) $(HARDHAT_BUILD_DIRS) $(GO_ETH_BINDING_PATH) $(BLOCKCHAIN_NODE_MODULES_DIR)
