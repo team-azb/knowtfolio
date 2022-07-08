@@ -1,9 +1,15 @@
 package config
 
-import "os"
+import (
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/crypto"
+	"math/big"
+	"os"
+)
 
 var (
-	AdminPrivateKey = os.Getenv("ADMIN_PRIVATE_KEY")
-	ContractAddress = os.Getenv("CONTRACT_ADDRESS")
-	NetworkURI      = os.Getenv("NETWORK_URI")
+	AdminPrivateKey, _ = crypto.HexToECDSA(os.Getenv("ADMIN_PRIVATE_KEY"))
+	ContractAddress    = common.HexToAddress(os.Getenv("CONTRACT_ADDRESS"))
+	NetworkURI         = os.Getenv("NETWORK_URI")
+	ChainID, _         = big.NewInt(0).SetString(os.Getenv("CHAIN_ID"), 0)
 )
