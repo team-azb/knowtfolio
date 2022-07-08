@@ -22,15 +22,13 @@ $(GOA_GEN_DIR): $(GOA_DESIGN_DIR) $(GOA_DOCKER_FILE) ./server/go.mod
 		-o /$(GOA_DIR)
 
 $(BLOCKCHAIN_NODE_MODULES_DIR): ./blockchain/package.json ./blockchain/Dockerfile
-	docker build -t knowtfolio/hardhat ./blockchain
-	docker run -v `pwd`/blockchain:/work/blockchain knowtfolio/hardhat \
-	 	npm install --prefix ./blockchain
+	docker-compose run hardhat npm --prefix ./blockchain install
 
-$(CONTRACT_ABI_FILE): $(CONTRACT_SOL_FILE) $(BLOCKCHAIN_NODE_MODULES_DIR)
-	docker build -t knowtfolio/hardhat ./blockchain
-	docker run -v `pwd`/blockchain:/work/blockchain knowtfolio/hardhat \
-		npm run --prefix ./blockchain build
-	# Extract abi field from `$(CONTRACT_JSON_FILE)`.
+$(CONTRACT_JSON_FILE): $(CONTRACT_SOL_FILE) $(BLOCKCHAIN_NODE_MODULES_DIR)
+	docker-compose run hardhat npm --prefix ./blockchain run build
+
+# Extract abi field from `$(CONTRACT_JSON_FILE)`.
+$(CONTRACT_ABI_FILE): $(CONTRACT_JSON_FILE)
 	cat $(CONTRACT_JSON_FILE) | jq '.abi' > $(CONTRACT_ABI_FILE)
 
 $(GO_ETH_BINDING_PATH): $(CONTRACT_ABI_FILE)

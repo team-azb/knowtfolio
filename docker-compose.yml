@@ -26,3 +26,16 @@ services:
       TZ: 'Asia/Tokyo'
     ports:
       - "3306:3306"
+
+  hardhat:
+    build: blockchain
+    ports:
+      - "8545:8545"
+    command: npm --prefix ./blockchain run node
+    volumes:
+      - type: bind
+        source: ./blockchain
+        target: /work/blockchain
+      - type: bind
+        source: ./server
+        target: /work/server
