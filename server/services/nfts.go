@@ -16,7 +16,6 @@ import (
 	"github.com/team-azb/knowtfolio/server/models"
 	goahttp "goa.design/goa/v3/http"
 	"gorm.io/gorm"
-	"math/big"
 )
 
 type nftsService struct {
@@ -51,9 +50,7 @@ func (s nftsService) CreateForArticle(_ context.Context, request *nfts.CreateNft
 		return nil, nfts.MakeUnauthorized(errors.New(msg))
 	}
 
-	privateKey, _ := crypto.HexToECDSA(config.AdminPrivateKey)
-	// TODO: Support other chain ids.
-	opts, err := bind.NewKeyedTransactorWithChainID(privateKey, big.NewInt(80001))
+	opts, err := bind.NewKeyedTransactorWithChainID(config.AdminPrivateKey, config.ChainID)
 	tx, err := s.Contract.MintNFT(
 		opts,
 		common.HexToAddress(request.Address),

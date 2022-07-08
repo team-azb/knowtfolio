@@ -26,3 +26,34 @@ services:
       TZ: 'Asia/Tokyo'
     ports:
       - "3306:3306"
+
+  test:
+    build: server
+    command: bash -c "
+      /scripts/wait-for-it.sh db:3306 --timeout=60 --strict &&
+      go test -v -parallel 4 ./models/... ./services/..."
+    environment:
+      ADMIN_PRIVATE_KEY: ac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
+      CONTRACT_ADDRESS: will-be-set-in-the-program
+      NETWORK_URI: http://hardhat:8545
+      CHAIN_ID: 31337
+    volumes:
+      - type: bind
+        source: ./server
+        target: /server
+    depends_on:
+      - db
+      - hardhat
+
+  hardhat:
+    build: blockchain
+    ports:
+      - "8545:8545"
+    command: npm --prefix ./blockchain run node
+    volumes:
+      - type: bind
+        source: ./blockchain
+        target: /work/blockchain
+      - type: bind
+        source: ./server
+        target: /work/server

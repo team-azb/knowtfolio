@@ -1,7 +1,6 @@
 package main
 
 import (
-	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/joho/godotenv"
 	"github.com/team-azb/knowtfolio/server/config"
@@ -30,7 +29,7 @@ func main() {
 	if err != nil {
 		logger.Fatal().Msgf("Failed to connect with Ethereum Network: %v", err)
 	}
-	contract, err := ethereum.NewContractClient(common.HexToAddress(config.ContractAddress), client)
+	contract, err := ethereum.NewContractClient(config.ContractAddress, client)
 	if err != nil {
 		logger.Fatal().Msgf("Failed to initialize with Contract Client: %v", err)
 	}
