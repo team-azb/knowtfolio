@@ -8,11 +8,12 @@ terraform {
   }
 
   backend "s3" {
-    bucket  = "knowtfolio-terraform"
-    key     = "alpha/terraform.tfstate"
-    region  = "ap-northeast-1"
-    profile = "knowtfolio"
-    encrypt = true
+    bucket                  = "knowtfolio-terraform"
+    key                     = "alpha/terraform.tfstate"
+    region                  = "ap-northeast-1"
+    profile                 = "knowtfolio"
+    shared_credentials_file = "./.aws/credentials"
+    encrypt                 = true
   }
 
 }
@@ -20,14 +21,14 @@ terraform {
 provider "aws" {
   region                   = "ap-northeast-1"
   profile                  = "knowtfolio"
-  shared_credentials_files = ["$HOME/.aws/credentials"]
-  shared_config_files      = ["$HOME/.aws/config"]
+  shared_credentials_files = ["./.aws/credentials"]
+  shared_config_files      = ["./.aws/config"]
 }
 
 provider "aws" {
   region                   = "us-east-1"
   alias                    = "virginia"
   profile                  = "knowtfolio"
-  shared_credentials_files = ["$HOME/.aws/credentials"]
-  shared_config_files      = ["$HOME/.aws/config"]
+  shared_credentials_files = ["./.aws/credentials"]
+  shared_config_files      = ["./.aws/config"]
 }
