@@ -8,6 +8,7 @@ resource "aws_cloudfront_distribution" "knowtfolio" {
     }
   }
 
+  comment             = "CDN for knowtfolio static files hosting"
   enabled             = true
   is_ipv6_enabled     = false
   default_root_object = "index.html"
