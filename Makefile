@@ -22,7 +22,7 @@ $(GOA_GEN_DIR): $(GOA_DESIGN_DIR) $(GOA_DOCKER_FILE) ./server/go.mod
 		-v `pwd`/entrypoint.sh:/server/entrypoint.sh \
 		-v `pwd`/$(GOA_DIR):/$(GOA_DIR) \
 		knowtfolio/goa-gen \
-		/go/bin/goa gen github.com/team-azb/knowtfolio/$(GOA_DESIGN_DIR) \
+		/server/go/bin/goa gen github.com/team-azb/knowtfolio/$(GOA_DESIGN_DIR) \
 		-o /$(GOA_DIR)
 
 $(BLOCKCHAIN_NODE_MODULES_DIR): ./blockchain/package.json ./blockchain/Dockerfile
