@@ -7,4 +7,5 @@
 useradd -u $HOST_UID -g $HOST_GID -o -m knowtfolio
 export HOME=/home/knowtfolio
 
+chown -R knowtfolio .
 exec /usr/sbin/gosu knowtfolio "$@"
