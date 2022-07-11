@@ -22,6 +22,7 @@ ENTRYPOINT_OPTS = --entrypoint "/entrypoint.sh" \
 $(GOA_GEN_DIR): $(GOA_DESIGN_DIR) $(GOA_DOCKER_FILE) ./server/go.mod
 	docker build -t knowtfolio/goa-gen -f $(GOA_DOCKER_FILE) ./server
 	docker run $(ENTRYPOINT_OPTS) \
+		-e CHOWN_WORKDIR=1 \
 		-v `pwd`/$(GOA_DIR):/$(GOA_DIR) \
 		knowtfolio/goa-gen \
 		/server/go/bin/goa gen github.com/team-azb/knowtfolio/$(GOA_DESIGN_DIR) \
