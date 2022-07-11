@@ -4,6 +4,7 @@
 # will be owned by the host user (not the root user).
 # Ref: https://qiita.com/yohm/items/047b2e68d008ebb0f001
 
+groupadd -g $HOST_GID -o knowtfolio
 useradd -u $HOST_UID -g $HOST_GID -o -m knowtfolio
 export HOME=/home/knowtfolio
 
