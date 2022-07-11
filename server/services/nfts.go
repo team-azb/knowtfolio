@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"github.com/ethereum/go-ethereum/accounts"
-	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/crypto"
@@ -50,7 +49,7 @@ func (s nftsService) CreateForArticle(_ context.Context, request *nfts.CreateNft
 		return nil, nfts.MakeUnauthorized(errors.New(msg))
 	}
 
-	opts, err := bind.NewKeyedTransactorWithChainID(config.AdminPrivateKey, config.ChainID)
+	opts, err := s.Contract.NewAdminTransactOpts()
 	tx, err := s.Contract.MintNFT(
 		opts,
 		common.HexToAddress(request.Address),

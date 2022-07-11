@@ -1,7 +1,9 @@
 package models
 
 import (
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/stretchr/testify/assert"
+	"math/big"
 	"strings"
 	"testing"
 	"time"
@@ -9,8 +11,8 @@ import (
 
 func TestSetTitleIfPresent(t *testing.T) {
 	orgTitle := "Hello Knowtfolio!"
-	content := []byte("<h1> Hello HTML! </h1>")
-	actual := NewArticle(orgTitle, content)
+	content := []byte("<div> Hello HTML! </div>")
+	actual := NewArticle(orgTitle, content, common.BigToAddress(big.NewInt(0)).String())
 
 	actual.SetTitleIfPresent(nil)
 	assert.Equal(t, orgTitle, actual.Title, "Title should not be changed when nil is given.")
@@ -22,13 +24,13 @@ func TestSetTitleIfPresent(t *testing.T) {
 
 func TestSetContentIfPresent(t *testing.T) {
 	title := "Hello Knowtfolio!"
-	orgContent := "<h1> Hello HTML! </h1>"
-	actual := NewArticle(title, []byte(orgContent))
+	orgContent := "<div> Hello HTML! </div>"
+	actual := NewArticle(title, []byte(orgContent), common.BigToAddress(big.NewInt(0)).String())
 
 	actual.SetContentIfPresent(nil)
 	assert.Equal(t, []byte(orgContent), actual.Content, "Content should not be changed when nil is given.")
 
-	newContent := "<h1> New Content! </h1>"
+	newContent := "<div> New Content! </div>"
 	actual.SetContentIfPresent(&newContent)
 	assert.Equal(t, newContent, string(actual.Content), "Content should be set by SetContentIfPresent.")
 }
@@ -37,14 +39,22 @@ func TestToHtml(t *testing.T) {
 	src := Article{
 		ID:        "abcdefghijk",
 		Title:     "Hello Knowtfolio!",
-		Content:   []byte("<h1> Hello HTML! </h1>"),
+		Content:   []byte("<div> Hello HTML! </div>"),
 		CreatedAt: time.Time{},
 		UpdatedAt: time.Time{},
 	}
 	actual, err := src.ToHTML()
 	assert.NoError(t, err)
 
-	expected := "<title> Hello Knowtfolio! </title> <h1> Hello HTML! </h1>"
+	expected := `
+			<head>
+				<meta charset="UTF-8" />
+				<title> Hello Knowtfolio! </title>
+			</head>
+			<body>
+				<h1> Hello Knowtfolio! </h1>
+				<div> Hello HTML! </div>
+			</body>`
 
 	assert.Equal(t, strings.Fields(expected), strings.Fields(string(actual)))
 }
