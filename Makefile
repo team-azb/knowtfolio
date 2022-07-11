@@ -14,12 +14,14 @@ CONTRACT_BIN_FILE = $(CONTRACT_JSON_FILE:.json=.bin)
 
 GO_ETH_BINDING_PATH = server/gateways/ethereum/binding.go
 
-ENTRYPOINT_OPTS = -e HOST_UID=`id -u ${USER}` -e HOST_GID=`id -g ${USER}`
+ENTRYPOINT_OPTS = --entrypoint "/entrypoint.sh" \
+	-v `pwd`/entrypoint.sh:/entrypoint.sh \
+	-e HOST_UID=`id -u ${USER}` \
+	-e HOST_GID=`id -g ${USER}`
 
 $(GOA_GEN_DIR): $(GOA_DESIGN_DIR) $(GOA_DOCKER_FILE) ./server/go.mod
 	docker build -t knowtfolio/goa-gen -f $(GOA_DOCKER_FILE) ./server
 	docker run $(ENTRYPOINT_OPTS) \
-		-v `pwd`/entrypoint.sh:/server/entrypoint.sh \
 		-v `pwd`/$(GOA_DIR):/$(GOA_DIR) \
 		knowtfolio/goa-gen \
 		/server/go/bin/goa gen github.com/team-azb/knowtfolio/$(GOA_DESIGN_DIR) \

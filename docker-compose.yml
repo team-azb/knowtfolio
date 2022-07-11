@@ -51,7 +51,6 @@ services:
       dockerfile: blockchain/Dockerfile
     ports:
       - "8545:8545"
-    entrypoint: ./entrypoint.sh
     command: npm --prefix ./blockchain run node
     volumes:
       - type: bind
@@ -60,7 +59,3 @@ services:
       - type: bind
         source: ./server
         target: /work/server
-      - type: bind
-        source: ./entrypoint.sh
-        target: /work/entrypoint.sh
-        read_only: true
