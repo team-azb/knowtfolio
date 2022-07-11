@@ -1,10 +1,14 @@
-FROM node:16.3-alpine
+FROM node:16.3
 
 WORKDIR /work
 
-RUN apk update && \
-    apk upgrade && \
+RUN apt update -y && \
+    apt upgrade -y && \
     # Necessary packages for npm to work
-    apk add alpine-sdk python3 && \
+    apt install -y build-essential && \
     # Need jq to extract abi from hardhat artifacts.
-    apk add jq
+    apt install -y jq
+
+RUN apt-get update && \
+    # Necessary packages for entrypoint.sh
+    apt-get -y install gosu bash
