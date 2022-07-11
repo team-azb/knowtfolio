@@ -23,8 +23,4 @@ resource "aws_route53_record" "knowtfolio_cloudfront" {
     name                   = aws_cloudfront_distribution.knowtfolio.domain_name
     zone_id                = aws_cloudfront_distribution.knowtfolio.hosted_zone_id
   }
-
-  depends_on = [
-    aws_cloudfront_distribution.knowtfolio
-  ]
 }

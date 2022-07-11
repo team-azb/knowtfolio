@@ -42,11 +42,6 @@ resource "aws_cloudfront_distribution" "knowtfolio" {
     minimum_protocol_version       = "TLSv1.2_2018"
     ssl_support_method             = "sni-only"
   }
-
-  depends_on = [
-    aws_s3_bucket.knowtfolio,
-    aws_acm_certificate.knowtfolio
-  ]
 }
 
 resource "aws_cloudfront_origin_access_identity" "knowtfolio" {
