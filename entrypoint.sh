@@ -4,7 +4,14 @@
 # will be owned by the host user (not the root user).
 # Ref: https://qiita.com/yohm/items/047b2e68d008ebb0f001
 
+groupadd -g $HOST_GID -o knowtfolio
 useradd -u $HOST_UID -g $HOST_GID -o -m knowtfolio
 export HOME=/home/knowtfolio
 
+# Since chown takes some time if the target dir is big,
+# this is an option.
+if [[ $CHOWN_WORKDIR ]]; then
+  echo "chowning all files in WORKDIR"
+  chown -R knowtfolio .
+fi
 exec /usr/sbin/gosu knowtfolio "$@"
