@@ -28,11 +28,13 @@ $(CONTRACT_JSON_FILE): $(CONTRACT_SOL_FILE) $(BLOCKCHAIN_NODE_MODULES_DIR)
 
 # Extract abi field from `$(CONTRACT_JSON_FILE)`.
 $(CONTRACT_ABI_FILE): $(CONTRACT_JSON_FILE)
-	cat $(CONTRACT_JSON_FILE) | jq '.abi' > $(CONTRACT_ABI_FILE)
+	docker-compose run $(ENTRYPOINT_OPTS) hardhat \
+    	/bin/bash -c "cat $(CONTRACT_JSON_FILE) | jq '.abi' > $(CONTRACT_ABI_FILE)"
 
 # Extract bytecode field from `$(CONTRACT_JSON_FILE)`.
 $(CONTRACT_BIN_FILE): $(CONTRACT_JSON_FILE)
-	cat $(CONTRACT_JSON_FILE) | jq -r '.bytecode' > $(CONTRACT_BIN_FILE)
+	docker-compose run $(ENTRYPOINT_OPTS) hardhat \
+    	/bin/bash -c "cat $(CONTRACT_JSON_FILE) | jq -r '.bytecode' > $(CONTRACT_BIN_FILE)"
 
 $(GO_ETH_BINDING_PATH): $(CONTRACT_ABI_FILE) $(CONTRACT_BIN_FILE)
 	docker run -v `pwd`/blockchain:/blockchain \
