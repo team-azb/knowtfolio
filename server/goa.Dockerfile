@@ -3,7 +3,7 @@ FROM golang:1.18.3
 WORKDIR /server
 
 # Putting GOPATH under the WORKDIR makes entrypoint.sh `chown` the binaries,
-# and that makes the binaries will be accessible from non-root user.
+# and that makes the binaries accessible from non-root user.
 ENV GOPATH=/server/go
 
 RUN apt-get update && \
