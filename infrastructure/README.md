@@ -4,7 +4,11 @@
 - install `aws-cli`  
 doc: https://docs.aws.amazon.com/ja_jp/cli/latest/userguide/getting-started-install.html
 - install `terraform`  
-doc: https://learn.hashicorp.com/tutorials/terraform/install-cli
+  ```
+  version: v1.1.7
+  provider registry.terraform.io/hashicorp/aws v4.11.0
+  ```
+  doc: https://learn.hashicorp.com/tutorials/terraform/install-cli
 
 ### 2. add knowtfolio profile to aws-cli configure and credentials
 The private key and the access key are managed by using profile of aws-cli. profile name is "knowtfolio" and the following is set in the configuration file of aws-cli.  
