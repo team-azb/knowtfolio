@@ -24,6 +24,7 @@ resource "aws_cloudfront_distribution" "knowtfolio" {
     compress               = true
   }
 
+  # TODO: SPAのルーティングの方法について考え直す
   custom_error_response {
     error_code         = 403
     response_code      = 200
