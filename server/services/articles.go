@@ -166,9 +166,9 @@ func articleIdToResult(src string) *articles.ArticleResult {
 	})
 }
 
-func articleWithOwnerAddressToResult(src models.Article, ownerAddress common.Address) *articles.ArticleResult {
+func articleWithOwnerAddressToResult(src models.Article, owner common.Address) *articles.ArticleResult {
 	contentStr := string(src.Content)
-	ownerAddressStr := ownerAddress.String()
+	ownerAddressStr := owner.String()
 	return articles.NewArticleResult(&articlesviews.ArticleResult{
 		Projected: &articlesviews.ArticleResultView{
 			ID:           &src.ID,
