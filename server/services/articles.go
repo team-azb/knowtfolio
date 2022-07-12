@@ -50,12 +50,21 @@ func (a articleService) Create(_ context.Context, request *articles.ArticleCreat
 }
 
 func (a articleService) Read(_ context.Context, request *articles.ArticleReadRequest) (res *articles.ArticleResult, err error) {
-	targetArticle := models.Article{ID: request.ID}
-	result := a.DB.First(&targetArticle)
+	target := models.Article{ID: request.ID}
+	result := a.DB.First(&target)
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 		return nil, articles.MakeArticleNotFound(result.Error)
 	}
-	return articleToResult(targetArticle), result.Error
+	if result.Error != nil {
+		return nil, result.Error
+	}
+
+	owner, err := a.getOwnerAddressOf(target)
+	if err != nil {
+		return nil, err
+	}
+
+	return articleWithOwnerAddressToResult(target, *owner), nil
 }
 
 func (a articleService) Update(_ context.Context, request *articles.ArticleUpdateRequest) (res *articles.ArticleResult, err error) {
@@ -130,6 +139,18 @@ func (a articleService) AuthorizeEdit(editorAddr string, target models.Article, 
 	}
 }
 
+func (a articleService) getOwnerAddressOf(target models.Article) (*common.Address, error) {
+	owner, err := a.Contract.GetOwnerOfArticle(&bind.CallOpts{}, target.ID)
+	if err != nil {
+		return nil, err
+	}
+	// TODO: Add Article.IsTokenized to check this before contract call.
+	if owner == common.BigToAddress(big.NewInt(0)) {
+		owner = common.HexToAddress(target.OriginalAuthorAddress)
+	}
+	return &owner, nil
+}
+
 func articleToResult(src models.Article) *articles.ArticleResult {
 	return &articles.ArticleResult{
 		ID:      src.ID,
@@ -142,5 +163,19 @@ func articleIdToResult(src string) *articles.ArticleResult {
 	return articles.NewArticleResult(&articlesviews.ArticleResult{
 		Projected: &articlesviews.ArticleResultView{ID: &src},
 		View:      "only-id",
+	})
+}
+
+func articleWithOwnerAddressToResult(src models.Article, ownerAddress common.Address) *articles.ArticleResult {
+	contentStr := string(src.Content)
+	ownerAddressStr := ownerAddress.String()
+	return articles.NewArticleResult(&articlesviews.ArticleResult{
+		Projected: &articlesviews.ArticleResultView{
+			ID:           &src.ID,
+			Title:        &src.Title,
+			Content:      &contentStr,
+			OwnerAddress: &ownerAddressStr,
+		},
+		View: "with-owner-address",
 	})
 }

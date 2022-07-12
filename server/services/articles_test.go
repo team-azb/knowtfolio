@@ -66,17 +66,37 @@ func TestCreateArticle(t *testing.T) {
 }
 
 func TestReadArticle(t *testing.T) {
-	service := prepareArticlesService(t)
+	t.Run("WithoutNFT", func(t *testing.T) {
+		service := prepareArticlesService(t)
 
-	service.DB.Create(&article0)
+		service.DB.Create(&article0)
 
-	result, err := service.Read(context.Background(), &articles.ArticleReadRequest{ID: article0.ID})
+		result, err := service.Read(context.Background(), &articles.ArticleReadRequest{ID: article0.ID})
 
-	// Assert request body.
-	assert.NoError(t, err)
-	assert.Equal(t, article0.ID, result.ID)
-	assert.Equal(t, article0.Title, result.Title)
-	assert.Equal(t, string(article0.Content), result.Content)
+		// Assert request body.
+		assert.NoError(t, err)
+		assert.Equal(t, article0.ID, result.ID)
+		assert.Equal(t, article0.Title, result.Title)
+		assert.Equal(t, article0.OriginalAuthorAddress, result.OwnerAddress)
+		assert.Equal(t, string(article0.Content), result.Content)
+	})
+
+	t.Run("WithNFT", func(t *testing.T) {
+		service := prepareArticlesService(t)
+
+		// Article0 here is created by user0 and currently owned by user1.
+		service.DB.Create(&article0)
+		mintNFTOfArticle0AndWait(t, service.Contract, user1Addr)
+
+		result, err := service.Read(context.Background(), &articles.ArticleReadRequest{ID: article0.ID})
+
+		// Assert request body.
+		assert.NoError(t, err)
+		assert.Equal(t, article0.ID, result.ID)
+		assert.Equal(t, article0.Title, result.Title)
+		assert.Equal(t, user1Addr, result.OwnerAddress)
+		assert.Equal(t, string(article0.Content), result.Content)
+	})
 }
 
 func TestUpdateArticle(t *testing.T) {
@@ -102,7 +122,7 @@ func TestUpdateArticle(t *testing.T) {
 
 		// Create article and the corresponding NFT.
 		service.DB.Create(&article0)
-		mintNFTOfArticle0AndWait(t, service.Contract)
+		mintNFTOfArticle0AndWait(t, service.Contract, user0Addr)
 
 		// Send update request
 		result, err := service.Update(context.Background(), &updateRequestByUser0)
@@ -144,7 +164,7 @@ func TestUpdateArticle(t *testing.T) {
 
 		// Create article and the corresponding NFT.
 		service.DB.Create(&article0)
-		mintNFTOfArticle0AndWait(t, service.Contract)
+		mintNFTOfArticle0AndWait(t, service.Contract, user0Addr)
 
 		// Send update request
 		_, err := service.Update(context.Background(), &updateRequestByUser1)
@@ -198,12 +218,12 @@ func TestDeleteArticles(t *testing.T) {
 	})
 }
 
-func mintNFTOfArticle0AndWait(t *testing.T, cli *ethereum.ContractClient) {
+func mintNFTOfArticle0AndWait(t *testing.T, cli *ethereum.ContractClient, ownerAddr string) {
 	opts, err := cli.NewAdminTransactOpts()
 	if err != nil {
 		t.Fatal(err)
 	}
-	tx, err := cli.MintNFT(opts, common.HexToAddress(user0Addr), article0.ID)
+	tx, err := cli.MintNFT(opts, common.HexToAddress(ownerAddr), article0.ID)
 	if err != nil {
 		t.Fatal(err)
 	}
