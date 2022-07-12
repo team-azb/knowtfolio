@@ -30,19 +30,15 @@ terraform init
 ```
 [Learn more about aws-cli profiles](https://docs.aws.amazon.com/ja_jp/cli/latest/userguide/cli-configure-profiles.html)
 ## Usage
-initialize project
-```
-terraform init
-```
 format tf files
 ```
 terraform fmt
 ```
-check the changes
+check the changes, (not apply the changes to real AWS resources)
 ```
 terraform plan
 ```
-apply the changes
+apply the changes to real AWS resources
 ```
 terraform apply
 ```
