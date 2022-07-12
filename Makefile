@@ -64,6 +64,7 @@ server: goa go-eth-binding
 	docker-compose up --build server
 
 test: goa go-eth-binding
+	HOST_UID=`id -u ${USER}` HOST_GID=`id -g ${USER}` \
 	docker-compose up --build test
 
 clean:
