@@ -57,21 +57,32 @@ var articleDeleteRequest = dsl.Type("ArticleDeleteRequest", func() {
 	dsl.Required("id", "address", "signature")
 })
 
-var article = dsl.Type("Article", func() {
-	articleIdAttribute("id")
-	articleTitleAttribute("title")
-	articleContentAttribute("content")
-	dsl.Required("id", "title", "content")
-})
-
 var articleResult = dsl.ResultType("article-result", "ArticleResult", func() {
-	dsl.Extend(article)
+	dsl.Attributes(func() {
+		articleIdAttribute("id")
+		articleTitleAttribute("title")
+		articleContentAttribute("content")
+		dsl.Attribute("owner_address", dsl.String, func() {
+			dsl.Description("所有者のウォレットのアドレス")
+			dsl.Pattern("^0x[a-fA-F0-9]{40}$")
+			dsl.Example(`0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 `)
+		})
+		dsl.Required("id", "title", "content", "owner_address")
+	})
 
 	dsl.View("default", func() {
 		dsl.Attribute("id")
 		dsl.Attribute("title")
 		dsl.Attribute("content")
 	})
+
+	dsl.View("with-owner-address", func() {
+		dsl.Attribute("id")
+		dsl.Attribute("title")
+		dsl.Attribute("content")
+		dsl.Attribute("owner_address")
+	})
+
 	dsl.View("only-id", func() {
 		dsl.Attribute("id")
 	})
@@ -109,7 +120,7 @@ var _ = dsl.Service("articles", func() {
 		dsl.Payload(articleReadRequest)
 
 		dsl.Result(articleResult, func() {
-			dsl.View("default")
+			dsl.View("with-owner-address")
 		})
 
 		dsl.HTTP(func() {

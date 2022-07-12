@@ -128,10 +128,11 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/CreateResponseBody'
+                                $ref: '#/components/schemas/ReadResponseBodyWithOwnerAddress'
                             example:
                                 content: <h1> Hello World! </h1>
                                 id: exampleId01
+                                owner_address: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 '
                                 title: My Awesome Article
                 "404":
                     description: 'article_not_found: 記事IDに対応する記事が見つからなかった場合'
@@ -438,6 +439,39 @@ components:
                 - temporary
                 - timeout
                 - fault
+        ReadResponseBodyWithOwnerAddress:
+            type: object
+            properties:
+                content:
+                    type: string
+                    description: 本文のHTML
+                    example: <h1> Hello World! </h1>
+                id:
+                    type: string
+                    description: 記事のID
+                    example: exampleId01
+                    pattern: ^[A-Za-z0-9_-]+$
+                    minLength: 11
+                    maxLength: 11
+                owner_address:
+                    type: string
+                    description: 所有者のウォレットのアドレス
+                    example: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 '
+                    pattern: ^0x[a-fA-F0-9]{40}$
+                title:
+                    type: string
+                    example: My Awesome Article
+            description: ReadResponseBody result type (with-owner-address view)
+            example:
+                content: <h1> Hello World! </h1>
+                id: exampleId01
+                owner_address: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 '
+                title: My Awesome Article
+            required:
+                - id
+                - title
+                - content
+                - owner_address
         UpdateRequestBody:
             type: object
             properties:
