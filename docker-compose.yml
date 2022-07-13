@@ -31,6 +31,7 @@ services:
     build: server
     command: bash -c "
       /scripts/wait-for-it.sh db:3306 --timeout=60 --strict &&
+      /scripts/wait-for-it.sh hardhat:8545 --timeout=60 --strict &&
       go test ./models/... ./services/..."
     environment:
       ADMIN_PRIVATE_KEY: ac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
@@ -51,6 +52,10 @@ services:
       dockerfile: blockchain/Dockerfile
     ports:
       - "8545:8545"
+    environment:
+      HOST_UID: ${HOST_UID}
+      HOST_GID: ${HOST_GID}
+    entrypoint: /entrypoint.sh
     command: npm --prefix ./blockchain run node
     volumes:
       - type: bind
@@ -59,3 +64,6 @@ services:
       - type: bind
         source: ./server
         target: /work/server
+      - type: bind
+        source: ./entrypoint.sh
+        target: /entrypoint.sh
