@@ -10,6 +10,7 @@ import (
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"strings"
+	"sync"
 	"testing"
 )
 
@@ -48,6 +49,10 @@ func initTestDB(t *testing.T) (db *gorm.DB) {
 	return
 }
 
+var adminAddr = "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC"
+
+var transactionLock = map[string]*sync.Mutex{user0Addr: {}, user1Addr: {}, adminAddr: {}}
+
 func initTestContractClient(t *testing.T) *ethereum.ContractClient {
 	if testing.Short() {
 		t.Skip("Tests using Contract are skipped.")
@@ -60,6 +65,9 @@ func initTestContractClient(t *testing.T) *ethereum.ContractClient {
 	opts, err := bind.NewKeyedTransactorWithChainID(config.AdminPrivateKey, config.ChainID)
 	opts.GasPrice, err = client.SuggestGasPrice(opts.Context)
 	fatalfIfError(t, err, "Failed to init transactor")
+
+	transactionLock[opts.From.String()].Lock()
+	defer transactionLock[opts.From.String()].Unlock()
 
 	// Deploy the contract and wait for it to complete.
 	_, tx, _, err := ethereum.DeployContractBinding(opts, client)

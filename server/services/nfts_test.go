@@ -38,11 +38,13 @@ func TestCreateNFTForArticle(t *testing.T) {
 
 	service.DB.Create(&article0)
 
+	transactionLock[user0Addr].Lock()
 	result, err := service.CreateForArticle(context.Background(), &nfts.CreateNftForArticleRequest{
 		ArticleID: article0.ID,
 		Address:   user0Addr,
 		Signature: user0MintNFTSign,
 	})
+	transactionLock[user0Addr].Unlock()
 	assert.NoError(t, err)
 
 	// Assert NFT existence.
