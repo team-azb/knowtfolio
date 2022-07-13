@@ -13,16 +13,19 @@ import (
 	"testing"
 )
 
-func skipfIfError(t *testing.T, err error, format string, args ...any) {
+func fatalfIfError(t *testing.T, err error, format string, args ...any) {
 	if err != nil {
-		t.Skipf("%v: %v", fmt.Sprintf(format, args...), err)
+		t.Fatalf("%v: %v", fmt.Sprintf(format, args...), err)
 	}
 }
 
 func initTestDB(t *testing.T) (db *gorm.DB) {
+	if testing.Short() {
+		t.Skip("Tests using DB are skipped.")
+	}
 	// Connect to DB.
 	db, err := gorm.Open(mysql.Open("root:password@tcp(db:3306)/?parseTime=true"))
-	skipfIfError(t, err, "DB Connection failed")
+	fatalfIfError(t, err, "DB Connection failed")
 
 	// Create temporary database dedicated to this test call.
 	dbName := fmt.Sprintf("knowtfolio-db-test-%v", strings.ReplaceAll(t.Name(), "/", "_"))
@@ -40,25 +43,29 @@ func initTestDB(t *testing.T) (db *gorm.DB) {
 
 	// Connect to the temporary database.
 	db, err = gorm.Open(mysql.Open(fmt.Sprintf("root:password@tcp(db:3306)/%v?parseTime=true", dbName)))
-	skipfIfError(t, err, "Connection to Created DB %v failed", dbName)
+	fatalfIfError(t, err, "Connection to Created DB %v failed", dbName)
 
 	return
 }
 
 func initTestContractClient(t *testing.T) *ethereum.ContractClient {
+	if testing.Short() {
+		t.Skip("Tests using Contract are skipped.")
+	}
+
 	client, err := ethclient.Dial(config.NetworkURI)
-	skipfIfError(t, err, "EthClient Connection failed")
+	fatalfIfError(t, err, "EthClient Connection failed")
 
 	// Initialize transactor to deploy the contract.
 	opts, err := bind.NewKeyedTransactorWithChainID(config.AdminPrivateKey, config.ChainID)
 	opts.GasPrice, err = client.SuggestGasPrice(opts.Context)
-	skipfIfError(t, err, "Failed to init transactor")
+	fatalfIfError(t, err, "Failed to init transactor")
 
 	// Deploy the contract and wait for it to complete.
 	_, tx, _, err := ethereum.DeployContractBinding(opts, client)
-	skipfIfError(t, err, "Contract deployment failed")
+	fatalfIfError(t, err, "Contract deployment failed")
 	addr, err := bind.WaitDeployed(context.Background(), client, tx)
-	skipfIfError(t, err, "Contract deployment waiting failed")
+	fatalfIfError(t, err, "Contract deployment waiting failed")
 
 	// Initialize the client and the contract.
 	config.ContractAddress = addr
@@ -67,7 +74,7 @@ func initTestContractClient(t *testing.T) *ethereum.ContractClient {
 	//       and, as a result, the owner of the contract becomes 0x0, which makes onlyOwner calls impossible.
 	//       Therefore, we call `initialize` explicitly here in order to the owner to admin.
 	_, _ = cli.Initialize(opts)
-	skipfIfError(t, err, "Contract initialization failed")
+	fatalfIfError(t, err, "Contract initialization failed")
 
 	t.Logf("[%v] Deployed contract %v to %v!", t.Name(), config.ContractAddress, config.NetworkURI)
 
