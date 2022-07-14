@@ -1,5 +1,5 @@
 resource "aws_s3_bucket" "knowtfolio" {
-  bucket = "knowtfolio"
+  bucket = "dev-knowtfolio"
 }
 
 resource "aws_s3_bucket_versioning" "knowtfolio" {
@@ -31,7 +31,7 @@ resource "aws_s3_bucket_policy" "knowtfolio" {
 }
 
 resource "aws_s3_bucket" "knowtfolio_alpha" {
-  bucket = "knowtfolio-alpha"
+  bucket = "dev-knowtfolio-alpha"
 }
 
 resource "aws_s3_bucket_versioning" "knowtfolio_alpha" {
