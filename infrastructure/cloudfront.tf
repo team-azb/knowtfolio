@@ -8,6 +8,15 @@ resource "aws_cloudfront_distribution" "knowtfolio" {
     }
   }
 
+  origin {
+    domain_name = aws_s3_bucket.knowtfolio_resources.bucket_regional_domain_name
+    origin_id   = aws_s3_bucket.knowtfolio_resources.id
+
+    s3_origin_config {
+      origin_access_identity = aws_cloudfront_origin_access_identity.knowtfolio_resources.cloudfront_access_identity_path
+    }
+  }
+
   comment             = "CDN for knowtfolio static files hosting"
   enabled             = true
   is_ipv6_enabled     = false
@@ -20,6 +29,16 @@ resource "aws_cloudfront_distribution" "knowtfolio" {
     cached_methods         = ["GET", "HEAD"]
     viewer_protocol_policy = "redirect-to-https"
     target_origin_id       = aws_s3_bucket.knowtfolio.id
+    cache_policy_id        = "658327ea-f89d-4fab-a63d-7e88639e58f6" // CachingOptimized
+    compress               = true
+  }
+
+  ordered_cache_behavior {
+    path_pattern           = "/nfts/*.json"
+    allowed_methods        = ["GET", "HEAD", "OPTIONS"]
+    cached_methods         = ["GET", "HEAD", "OPTIONS"]
+    viewer_protocol_policy = "redirect-to-https"
+    target_origin_id       = aws_s3_bucket.knowtfolio_resources.id
     cache_policy_id        = "658327ea-f89d-4fab-a63d-7e88639e58f6" // CachingOptimized
     compress               = true
   }
@@ -46,5 +65,9 @@ resource "aws_cloudfront_distribution" "knowtfolio" {
 }
 
 resource "aws_cloudfront_origin_access_identity" "knowtfolio" {
-  comment = "origin access identity for s3"
+  comment = "origin access identity for s3 knowtfolio"
+}
+
+resource "aws_cloudfront_origin_access_identity" "knowtfolio_resources" {
+  comment = "origin access identity for s3 knowtfolio-resources"
 }
