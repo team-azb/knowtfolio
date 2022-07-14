@@ -223,6 +223,10 @@ func mintNFTOfArticle0AndWait(t *testing.T, cli *ethereum.ContractClient, ownerA
 	if err != nil {
 		t.Fatal(err)
 	}
+
+	transactionLock[opts.From.String()].Lock()
+	defer transactionLock[opts.From.String()].Unlock()
+
 	tx, err := cli.MintNFT(opts, common.HexToAddress(ownerAddr), article0.ID)
 	if err != nil {
 		t.Fatal(err)

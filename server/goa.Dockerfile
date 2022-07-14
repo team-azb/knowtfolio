@@ -12,4 +12,4 @@ RUN apt-get update && \
 
 RUN go install goa.design/goa/v3/cmd/goa@v3
 
-COPY go.mod /server/
+COPY go.mod go.sum /server/
