@@ -24,7 +24,7 @@ resource "aws_s3_bucket_public_access_block" "knowtfolio" {
 
 resource "aws_s3_bucket_policy" "knowtfolio" {
   bucket = aws_s3_bucket.knowtfolio.id
-  policy = templatefile("${path.module}/src/templates/s3/hosting_bucket_policy.json", {
+  policy = templatefile("${path.module}/templates/s3/hosting_bucket_policy.json", {
     bucket     = aws_s3_bucket.knowtfolio.bucket
     identifier = aws_cloudfront_origin_access_identity.knowtfolio.iam_arn
   })
@@ -56,7 +56,7 @@ resource "aws_s3_bucket_public_access_block" "knowtfolio_resources" {
 
 resource "aws_s3_bucket_policy" "knowtfolio_resources" {
   bucket = aws_s3_bucket.knowtfolio_resources.id
-  policy = templatefile("${path.module}/src/templates/s3/hosting_bucket_policy.json", {
+  policy = templatefile("${path.module}/templates/s3/hosting_bucket_policy.json", {
     bucket     = aws_s3_bucket.knowtfolio_resources.bucket
     identifier = aws_cloudfront_origin_access_identity.knowtfolio_resources.iam_arn
   })
