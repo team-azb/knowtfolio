@@ -1,5 +1,5 @@
 resource "aws_cognito_user_pool" "knowtfolio" {
-  name = "knowtfolio"
+  name = "dev-knowtfolio"
   admin_create_user_config {
     allow_admin_create_user_only = false
   }
