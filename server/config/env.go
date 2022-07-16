@@ -12,4 +12,5 @@ var (
 	ContractAddress    = common.HexToAddress(os.Getenv("CONTRACT_ADDRESS"))
 	NetworkURI         = os.Getenv("NETWORK_URI")
 	ChainID, _         = big.NewInt(0).SetString(os.Getenv("CHAIN_ID"), 0)
+	S3BucketName       = os.Getenv("S3_BUCKET_NAME")
 )
