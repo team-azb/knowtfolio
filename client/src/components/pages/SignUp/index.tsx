@@ -10,7 +10,6 @@ const SignUp = () => {
     email: "",
     password: "",
     username: "",
-    phoneNumber: "",
   });
   const [hasSignUp, setHasSignUp] = useState(false);
   const [code, setCode] = useState("");
@@ -21,7 +20,6 @@ const SignUp = () => {
         case "email":
         case "password":
         case "username":
-        case "phonenumber":
           setForm((prev) => {
             return { ...prev, [event.target.name]: event.target.value };
           });
@@ -89,16 +87,6 @@ const SignUp = () => {
           name="password"
           onChange={changeForm}
           value={form.password}
-        />
-      </div>
-      <div>
-        phonenumber
-        <input
-          disabled={hasSignUp}
-          type="text"
-          name="phonenumber"
-          onChange={changeForm}
-          value={form.phoneNumber}
         />
       </div>
       <div>
