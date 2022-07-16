@@ -1,9 +1,13 @@
 package services
 
 import (
+	"bytes"
 	"context"
 	"errors"
 	"fmt"
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/feature/s3/manager"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/ethereum/go-ethereum/accounts"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
@@ -20,10 +24,11 @@ import (
 type nftsService struct {
 	DB       *gorm.DB
 	Contract *ethereum.ContractClient
+	S3Client *s3.Client
 }
 
-func NewNftsService(db *gorm.DB, contract *ethereum.ContractClient, handler HttpHandler) *server.Server {
-	endpoints := nfts.NewEndpoints(nftsService{DB: db, Contract: contract})
+func NewNftsService(db *gorm.DB, contract *ethereum.ContractClient, s3Client *s3.Client, handler HttpHandler) *server.Server {
+	endpoints := nfts.NewEndpoints(nftsService{DB: db, Contract: contract, S3Client: s3Client})
 	return server.New(
 		endpoints,
 		handler,
@@ -33,12 +38,13 @@ func NewNftsService(db *gorm.DB, contract *ethereum.ContractClient, handler Http
 		nil)
 }
 
-func (s nftsService) CreateForArticle(_ context.Context, request *nfts.CreateNftForArticleRequest) (res *nfts.CreateNftForArticleResult, err error) {
+func (s nftsService) CreateForArticle(ctx context.Context, request *nfts.CreateNftForArticleRequest) (res *nfts.CreateNftForArticleResult, err error) {
 	err = VerifySignature(request.Address, request.Signature, config.SignData["CreateNFT"])
 	if err != nil {
 		return nil, nfts.MakeUnauthenticated(err)
 	}
 
+	// Find corresponding Article from DB
 	target := models.Article{ID: request.ArticleID}
 	result := s.DB.First(&target)
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
@@ -49,11 +55,27 @@ func (s nftsService) CreateForArticle(_ context.Context, request *nfts.CreateNft
 		return nil, nfts.MakeUnauthorized(errors.New(msg))
 	}
 
+	// Mint Article token
 	opts, err := s.Contract.NewAdminTransactOpts()
 	tx, err := s.Contract.MintNFT(
 		opts,
 		common.HexToAddress(request.Address),
 		target.ID)
+	if err != nil {
+		return nil, err
+	}
+
+	// Upload NFT metadata to S3
+	metadata := models.NewNFTMetadata(target)
+	metadataJson, err := metadata.ToJSON()
+
+	uploader := manager.NewUploader(s.S3Client)
+	_, err = uploader.Upload(ctx, &s3.PutObjectInput{
+		Body:        bytes.NewReader(metadataJson),
+		Bucket:      &config.S3BucketName,
+		ContentType: aws.String("application/json"),
+		Key:         aws.String(fmt.Sprintf("nfts/%v.json", target.ID)),
+	})
 	if err != nil {
 		return nil, err
 	}

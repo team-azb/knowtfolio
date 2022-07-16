@@ -3,6 +3,8 @@ package services
 import (
 	"context"
 	"errors"
+	awscfg "github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
 	goethereum "github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
@@ -17,11 +19,18 @@ import (
 func prepareNftsService(t *testing.T) nftsService {
 	t.Parallel()
 
+	cfg, err := awscfg.LoadDefaultConfig(context.Background())
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	service := nftsService{
 		DB:       initTestDB(t),
 		Contract: initTestContractClient(t),
+		S3Client: s3.NewFromConfig(cfg),
 	}
-	err := service.DB.AutoMigrate(models.Article{})
+
+	err = service.DB.AutoMigrate(models.Article{})
 	if err != nil {
 		t.Fatal(err)
 	}

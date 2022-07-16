@@ -1,6 +1,9 @@
 package main
 
 import (
+	"context"
+	awscfg "github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/joho/godotenv"
 	"github.com/team-azb/knowtfolio/server/config"
@@ -34,9 +37,16 @@ func main() {
 		logger.Fatal().Msgf("Failed to initialize with Contract Client: %v", err)
 	}
 
+	// Create S3 Client
+	cfg, err := awscfg.LoadDefaultConfig(context.Background())
+	if err != nil {
+		logger.Fatal().Msgf("Failed to load AWS config: %v", err)
+	}
+	s3Client := s3.NewFromConfig(cfg)
+
 	handler := services.NewHttpHandler()
 	handler.AddService(services.NewArticlesService(db, contract, *handler), "articles")
-	handler.AddService(services.NewNftsService(db, contract, *handler), "nfts")
+	handler.AddService(services.NewNftsService(db, contract, s3Client, *handler), "nfts")
 	handler.AddService(services.NewArticlesHtmlService(db, *handler), "articles-html")
 
 	logger.Info().Msg("Starting backend server...")
