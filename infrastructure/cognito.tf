@@ -7,6 +7,10 @@ resource "aws_cognito_user_pool" "knowtfolio" {
     name                = "email"
     attribute_data_type = "String"
     required            = true
+    string_attribute_constraints {
+      min_length = 0
+      max_length = 2048
+    }
   }
 
   schema {
