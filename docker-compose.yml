@@ -32,9 +32,10 @@ services:
     command: bash -c "
       /scripts/wait-for-it.sh db:3306 --timeout=60 --strict &&
       /scripts/wait-for-it.sh hardhat:8545 --timeout=60 --strict &&
-      go test ./models/... ./services/..."
+      go test -count=1 ./models/... ./services/..."
     environment:
-      ADMIN_PRIVATE_KEY: ac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
+      # Account#2 of hardhat local node.
+      ADMIN_PRIVATE_KEY: 5de4111afa1a4b94908f83103eb1f1706367c2e68ca870fc3fb9a804cdab365a
       CONTRACT_ADDRESS: will-be-set-in-the-program
       NETWORK_URI: http://hardhat:8545
       CHAIN_ID: 31337
@@ -67,3 +68,39 @@ services:
       - type: bind
         source: ./entrypoint.sh
         target: /entrypoint.sh
+
+  goa:
+    build:
+      context: server
+      dockerfile: goa.Dockerfile
+    entrypoint: /entrypoint.sh
+    command: [
+        "/server/go/bin/goa", "gen",
+        "github.com/team-azb/knowtfolio/${GOA_DESIGN_DIR}",
+        "-o", "/${GOA_DIR}"
+    ]
+    environment:
+      CHOWN_WORKDIR: 1
+      HOST_UID: ${HOST_UID}
+      HOST_GID: ${HOST_GID}
+    volumes:
+      - type: bind
+        source: ./server/gateways/api
+        target: /server/gateways/api
+      - type: bind
+        source: ./entrypoint.sh
+        target: /entrypoint.sh
+
+  go-eth-binding:
+    image: ethereum/client-go:alltools-v1.10.20
+    command: [
+        "abigen", "--abi", "${CONTRACT_ABI_FILE}", "--bin", "${CONTRACT_BIN_FILE}",
+        "--pkg", "ethereum", "--type", "ContractBinding", "--out", "${GO_ETH_BINDING_PATH}"
+    ]
+    volumes:
+      - type: bind
+        source: ./blockchain
+        target: /blockchain
+      - type: bind
+        source: ./server
+        target: /server

@@ -33,7 +33,7 @@ contract Knowtfolio is
         override(ERC721Upgradeable)
         returns (string memory)
     {
-        return "https://knowtfolio.com/articles/";
+        return "https://knowtfolio.com/nfts/";
     }
 
     function mintNFT(address recipient, string memory _articleId)
