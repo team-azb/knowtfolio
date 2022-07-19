@@ -49,6 +49,8 @@ func (s nftsService) CreateForArticle(ctx context.Context, request *nfts.CreateN
 	result := s.DB.First(&target)
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 		return nil, nfts.MakeArticleNotFound(result.Error)
+	} else if result.Error != nil {
+		return nil, result.Error
 	}
 	if target.OriginalAuthorAddress != request.Address {
 		msg := fmt.Sprintf("Address %v is not the orignial owner of article %v.", request.Address, target.ID)
@@ -57,6 +59,9 @@ func (s nftsService) CreateForArticle(ctx context.Context, request *nfts.CreateN
 
 	// Mint Article token
 	opts, err := s.Contract.NewAdminTransactOpts()
+	if err != nil {
+		return nil, err
+	}
 	tx, err := s.Contract.MintNFT(
 		opts,
 		common.HexToAddress(request.Address),
@@ -68,6 +73,9 @@ func (s nftsService) CreateForArticle(ctx context.Context, request *nfts.CreateN
 	// Upload NFT metadata to S3
 	metadata := models.NewNFTMetadata(target)
 	metadataJson, err := metadata.ToJSON()
+	if err != nil {
+		return nil, err
+	}
 
 	uploader := manager.NewUploader(s.S3Client)
 	_, err = uploader.Upload(ctx, &s3.PutObjectInput{
