@@ -1,17 +1,21 @@
 package services
 
 import (
+	"bytes"
 	"context"
 	"errors"
+	"fmt"
 	awscfg "github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	goethereum "github.com/ethereum/go-ethereum"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/stretchr/testify/assert"
+	"github.com/team-azb/knowtfolio/server/config"
 	"github.com/team-azb/knowtfolio/server/gateways/api/gen/nfts"
 	"github.com/team-azb/knowtfolio/server/gateways/ethereum"
 	"github.com/team-azb/knowtfolio/server/models"
+	"io"
 	"testing"
 	"time"
 )
@@ -56,12 +60,34 @@ func TestCreateNFTForArticle(t *testing.T) {
 	transactionLock[user0Addr].Unlock()
 	assert.NoError(t, err)
 
+	// Remove s3 object after the test is done.
+	// TODO: Remove this part after LocalStack is introduced.
+	objectKey := fmt.Sprintf("nfts/%v.json", article0.ID)
+	t.Cleanup(func() {
+		_, _ = service.S3Client.DeleteObject(context.Background(), &s3.DeleteObjectInput{
+			Bucket: &config.S3BucketName,
+			Key:    &objectKey,
+		})
+	})
+
 	// Assert NFT existence.
 	nftMinted := waitForNFTByHash(service.Contract, result.Hash)
 	actualOwner, err := service.Contract.GetOwnerOfArticle(&bind.CallOpts{}, article0.ID)
 	assert.True(t, nftMinted)
 	assert.NoError(t, err)
 	assert.Equal(t, article0.OriginalAuthorAddress, actualOwner.String())
+
+	// Assert metadata existence.
+	getObjOutput, reqErr := service.S3Client.GetObject(context.Background(), &s3.GetObjectInput{
+		Bucket: &config.S3BucketName,
+		Key:    &objectKey,
+	})
+	actualJSONBuf := new(bytes.Buffer)
+	_, copyErr := io.Copy(actualJSONBuf, getObjOutput.Body)
+	metadata := models.NewNFTMetadata(article0)
+	expectedJSON, jsonErr := metadata.ToJSON()
+	assert.NoError(t, reqErr, copyErr, jsonErr)
+	assert.JSONEq(t, string(expectedJSON), actualJSONBuf.String())
 }
 
 func waitForNFTByHash(cli *ethereum.ContractClient, txHash string) bool {
