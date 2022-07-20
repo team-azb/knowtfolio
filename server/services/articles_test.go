@@ -56,11 +56,10 @@ func TestCreateArticle(t *testing.T) {
 	assert.Equal(t, string(article0.Content), result.Content)
 
 	// Assert DB contents.
-	article0.ID = result.ID
-	target := models.Article{ID: article0.ID}
+	target := models.Article{ID: result.ID}
 	res := service.DB.First(&target)
 	assert.NoError(t, res.Error)
-	assert.Equal(t, article0.ID, target.ID)
+	assert.Equal(t, result.ID, target.ID)
 	assert.Equal(t, article0.Title, target.Title)
 	assert.Equal(t, article0.Content, target.Content)
 }

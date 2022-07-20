@@ -33,6 +33,9 @@ services:
       /scripts/wait-for-it.sh db:3306 --timeout=60 --strict &&
       /scripts/wait-for-it.sh hardhat:8545 --timeout=60 --strict &&
       go test -count=1 ./models/... ./services/..."
+    env_file:
+      # For AWS Credentials
+      - server/.env
     environment:
       # Account#2 of hardhat local node.
       ADMIN_PRIVATE_KEY: 5de4111afa1a4b94908f83103eb1f1706367c2e68ca870fc3fb9a804cdab365a
