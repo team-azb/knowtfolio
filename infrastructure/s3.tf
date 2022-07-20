@@ -61,3 +61,20 @@ resource "aws_s3_bucket_policy" "knowtfolio_resources" {
     identifier = aws_cloudfront_origin_access_identity.knowtfolio_resources.iam_arn
   })
 }
+
+resource "aws_s3_bucket_cors_configuration" "knowtfolio" {
+  bucket = aws_s3_bucket.knowtfolio.bucket
+
+  cors_rule {
+    allowed_headers = ["*"]
+    allowed_methods = ["PUT", "POST"]
+    allowed_origins = ["https://knowtfolio.com", "http://localhost:3000"]
+    expose_headers  = ["ETag"]
+    max_age_seconds = 3000
+  }
+
+  cors_rule {
+    allowed_methods = ["GET"]
+    allowed_origins = ["*"]
+  }
+}
