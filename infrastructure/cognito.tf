@@ -18,8 +18,8 @@ resource "aws_cognito_user_pool" "knowtfolio" {
     attribute_data_type = "String"
     mutable             = true
     string_attribute_constraints {
-      min_length = 1
-      max_length = 256
+      min_length = 42
+      max_length = 42
     }
   }
 
