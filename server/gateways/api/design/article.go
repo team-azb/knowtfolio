@@ -28,6 +28,14 @@ func articleContentAttribute(fieldName string) {
 	})
 }
 
+func articleOwnerAddressAttribute(fieldName string) {
+	dsl.Attribute(fieldName, dsl.String, func() {
+		dsl.Description("所有者のウォレットのアドレス")
+		dsl.Pattern("^0x[a-fA-F0-9]{40}$")
+		dsl.Example(`0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 `)
+	})
+}
+
 var articleReadRequest = dsl.Type("ArticleReadRequest", func() {
 	articleIdAttribute("id")
 	dsl.Required("id")
@@ -62,11 +70,7 @@ var articleResult = dsl.ResultType("article-result", "ArticleResult", func() {
 		articleIdAttribute("id")
 		articleTitleAttribute("title")
 		articleContentAttribute("content")
-		dsl.Attribute("owner_address", dsl.String, func() {
-			dsl.Description("所有者のウォレットのアドレス")
-			dsl.Pattern("^0x[a-fA-F0-9]{40}$")
-			dsl.Example(`0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 `)
-		})
+		articleOwnerAddressAttribute("owner_address")
 		dsl.Required("id", "title", "content", "owner_address")
 	})
 
