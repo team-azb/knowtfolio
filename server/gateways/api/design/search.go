@@ -33,7 +33,7 @@ var searchResultEntry = dsl.Type("SearchResultEntry", func() {
 
 var searchResult = dsl.ResultType("SearchResult", func() {
 	dsl.Attribute("results", dsl.ArrayOf(searchResultEntry), "指定したページ内の検索結果")
-	dsl.Attribute("total_count", dsl.ArrayOf(searchResultEntry), "指定したページを含めたすべての検索結果の件数")
+	dsl.Attribute("total_count", dsl.UInt, "指定したページを含めたすべての検索結果の件数")
 })
 
 var _ = dsl.Service("search", func() {
@@ -44,7 +44,7 @@ var _ = dsl.Service("search", func() {
 	})
 
 	dsl.Method("Search for Articles", func() {
-		dsl.Description("Get article's that matches to the request query.")
+		dsl.Description("Get articles that matches to the request query.")
 
 		dsl.Payload(searchRequest)
 

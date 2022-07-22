@@ -261,7 +261,7 @@ paths:
             tags:
                 - search
             summary: Search for Articles search
-            description: Get article's that matches to the request query.
+            description: Get articles that matches to the request query.
             operationId: search#Search for Articles
             parameters:
                 - name: keywords
@@ -321,13 +321,7 @@ paths:
                                     - id: exampleId01
                                       owner_address: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 '
                                       title: My Awesome Article
-                                total_count:
-                                    - id: exampleId01
-                                      owner_address: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 '
-                                      title: My Awesome Article
-                                    - id: exampleId01
-                                      owner_address: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 '
-                                      title: My Awesome Article
+                                total_count: 9017659154547287277
     /articles/{id}:
         get:
             tags:
@@ -585,20 +579,9 @@ components:
                           owner_address: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 '
                           title: My Awesome Article
                 total_count:
-                    type: array
-                    items:
-                        $ref: '#/components/schemas/SearchResultEntry'
+                    type: integer
                     description: 指定したページを含めたすべての検索結果の件数
-                    example:
-                        - id: exampleId01
-                          owner_address: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 '
-                          title: My Awesome Article
-                        - id: exampleId01
-                          owner_address: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 '
-                          title: My Awesome Article
-                        - id: exampleId01
-                          owner_address: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 '
-                          title: My Awesome Article
+                    example: 5023432583872562116
             example:
                 results:
                     - id: exampleId01
@@ -607,16 +590,7 @@ components:
                     - id: exampleId01
                       owner_address: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 '
                       title: My Awesome Article
-                total_count:
-                    - id: exampleId01
-                      owner_address: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 '
-                      title: My Awesome Article
-                    - id: exampleId01
-                      owner_address: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 '
-                      title: My Awesome Article
-                    - id: exampleId01
-                      owner_address: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 '
-                      title: My Awesome Article
+                total_count: 18413131499743742823
         UpdateRequestBody:
             type: object
             properties:
