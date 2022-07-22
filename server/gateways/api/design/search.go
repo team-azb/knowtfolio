@@ -12,6 +12,11 @@ var searchRequest = dsl.Type("SearchRequest", func() {
 		dsl.Pattern("^0x[a-fA-F0-9]{40}$")
 		dsl.Example(`'0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'`)
 	})
+	dsl.Attribute("sort_by", dsl.String, func() {
+		dsl.Description("記事をソートするkey")
+		dsl.Enum("created_at", "updated_at")
+		dsl.Default("created_at")
+	})
 	dsl.Attribute("page_num", dsl.UInt, func() {
 		dsl.Description("取得したい位置のページ番号（1-indexed）")
 		dsl.Minimum(1)
@@ -55,6 +60,7 @@ var _ = dsl.Service("search", func() {
 			dsl.Params(func() {
 				dsl.Param("keywords")
 				dsl.Param("owned_by")
+				dsl.Param("sort_by")
 				dsl.Param("page_num")
 				dsl.Param("page_size")
 			})
