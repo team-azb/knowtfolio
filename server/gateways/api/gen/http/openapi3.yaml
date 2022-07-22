@@ -22,7 +22,7 @@ paths:
                         example:
                             address: '''0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'''
                             content: <h1> Hello World! </h1>
-                            signature: Praesentium repellendus est esse assumenda.
+                            signature: Odit et voluptates quis nulla pariatur optio.
                             title: My Awesome Article
             responses:
                 "200":
@@ -75,7 +75,7 @@ paths:
                             $ref: '#/components/schemas/DeleteRequestBody'
                         example:
                             address: '''0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'''
-                            signature: Atque veritatis et in explicabo.
+                            signature: Et in explicabo quia tenetur.
             responses:
                 "200":
                     description: OK response.
@@ -168,7 +168,7 @@ paths:
                         example:
                             address: '''0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'''
                             content: <h1> Hello World! </h1>
-                            signature: Et voluptates quis nulla pariatur optio reiciendis.
+                            signature: Aliquid atque.
                             title: My Awesome Article
             responses:
                 "200":
@@ -227,7 +227,7 @@ paths:
                             $ref: '#/components/schemas/DeleteRequestBody'
                         example:
                             address: '''0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'''
-                            signature: Tenetur animi.
+                            signature: Velit nam quis facilis.
             responses:
                 "200":
                     description: OK response.
@@ -236,8 +236,8 @@ paths:
                             schema:
                                 $ref: '#/components/schemas/CreateNftForArticleResult'
                             example:
-                                cost: 5663578019026462848
-                                hash: Asperiores repellendus.
+                                cost: 2272994791495004502
+                                hash: A velit et et dolorem sed pariatur.
                 "401":
                     description: 'unauthenticated: 認証に失敗した場合'
                     content:
@@ -256,6 +256,85 @@ paths:
                         application/vnd.goa.error+json:
                             schema:
                                 $ref: '#/components/schemas/Error'
+    /api/search:
+        get:
+            tags:
+                - search
+            summary: Search for Articles search
+            description: Get articles that matches to the request query.
+            operationId: search#Search for Articles
+            parameters:
+                - name: keywords
+                  in: query
+                  description: 検索に使用するキーワード。`+`で区切ることで、複数指定可能
+                  allowEmptyValue: true
+                  schema:
+                    type: string
+                    description: 検索に使用するキーワード。`+`で区切ることで、複数指定可能
+                    example: Golang+NFT
+                  example: Golang+NFT
+                - name: owned_by
+                  in: query
+                  description: 記事の所有者。指定がない場合、全ての所有者の記事を検索する。
+                  allowEmptyValue: true
+                  schema:
+                    type: string
+                    description: 記事の所有者。指定がない場合、全ての所有者の記事を検索する。
+                    example: '''0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'''
+                    pattern: ^0x[a-fA-F0-9]{40}$
+                  example: '''0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'''
+                - name: sort_by
+                  in: query
+                  description: 記事をソートするkey
+                  allowEmptyValue: true
+                  schema:
+                    type: string
+                    description: 記事をソートするkey
+                    default: created_at
+                    example: created_at
+                    enum:
+                        - created_at
+                        - updated_at
+                  example: created_at
+                - name: page_num
+                  in: query
+                  description: 取得したい位置のページ番号（1-indexed）
+                  allowEmptyValue: true
+                  schema:
+                    type: integer
+                    description: 取得したい位置のページ番号（1-indexed）
+                    default: 1
+                    example: 11672134284603955137
+                    minimum: 1
+                  example: 13903759627942341001
+                - name: page_size
+                  in: query
+                  description: 1ページあたりのコンテンツ数
+                  allowEmptyValue: true
+                  schema:
+                    type: integer
+                    description: 1ページあたりのコンテンツ数
+                    default: 10
+                    example: 76
+                    minimum: 1
+                    maximum: 100
+                  example: 53
+            responses:
+                "200":
+                    description: OK response.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Searchresult'
+                            example:
+                                results:
+                                    - id: exampleId01
+                                      owner_address: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 '
+                                      title: My Awesome Article
+                                    - id: exampleId01
+                                      owner_address: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 '
+                                      title: My Awesome Article
+                                total_count: 9017659154547287277
     /articles/{id}:
         get:
             tags:
@@ -300,15 +379,15 @@ components:
                 cost:
                     type: integer
                     description: トークン発行にかかったコスト
-                    example: 6202392799343861228
+                    example: 5250902387539283934
                     format: int64
                 hash:
                     type: string
                     description: トランザクションのハッシュ
-                    example: Dolor sapiente laboriosam veniam eos eos.
+                    example: Voluptatem debitis nesciunt nesciunt alias nulla.
             example:
-                cost: 4471315468130594924
-                hash: Esse molestiae illum temporibus mollitia voluptatem.
+                cost: 3983753186087891933
+                hash: Odio voluptas voluptatibus sunt esse.
             required:
                 - hash
                 - cost
@@ -327,7 +406,7 @@ components:
                 signature:
                     type: string
                     description: '`address`のアカウントが行った署名'
-                    example: Asperiores quam.
+                    example: Magni maxime voluptates.
                 title:
                     type: string
                     example: My Awesome Article
@@ -335,7 +414,7 @@ components:
             example:
                 address: '''0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'''
                 content: <h1> Hello World! </h1>
-                signature: Cupiditate eos nobis.
+                signature: Odit dolorem eius.
                 title: My Awesome Article
             required:
                 - title
@@ -379,10 +458,10 @@ components:
                 signature:
                     type: string
                     description: '`address`のアカウントが行った署名'
-                    example: Saepe officiis provident nobis qui itaque.
+                    example: Nisi dolor sapiente laboriosam veniam eos.
             example:
                 address: '''0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'''
-                signature: Vel eligendi distinctio consectetur doloremque.
+                signature: Itaque et esse molestiae illum temporibus.
             required:
                 - address
                 - signature
@@ -407,7 +486,7 @@ components:
                 fault:
                     type: boolean
                     description: Is the error a server-side fault?
-                    example: true
+                    example: false
                 id:
                     type: string
                     description: ID is a unique identifier for this particular occurrence of the problem.
@@ -423,7 +502,7 @@ components:
                 temporary:
                     type: boolean
                     description: Is the error temporary?
-                    example: false
+                    example: true
                 timeout:
                     type: boolean
                     description: Is the error a timeout?
@@ -472,6 +551,59 @@ components:
                 - title
                 - content
                 - owner_address
+        SearchResultEntry:
+            type: object
+            properties:
+                id:
+                    type: string
+                    description: 記事のID
+                    example: exampleId01
+                    pattern: ^[A-Za-z0-9_-]+$
+                    minLength: 11
+                    maxLength: 11
+                owner_address:
+                    type: string
+                    description: 所有者のウォレットのアドレス
+                    example: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 '
+                    pattern: ^0x[a-fA-F0-9]{40}$
+                title:
+                    type: string
+                    example: My Awesome Article
+            example:
+                id: exampleId01
+                owner_address: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 '
+                title: My Awesome Article
+        Searchresult:
+            type: object
+            properties:
+                results:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/SearchResultEntry'
+                    description: 指定したページ内の検索結果
+                    example:
+                        - id: exampleId01
+                          owner_address: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 '
+                          title: My Awesome Article
+                        - id: exampleId01
+                          owner_address: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 '
+                          title: My Awesome Article
+                        - id: exampleId01
+                          owner_address: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 '
+                          title: My Awesome Article
+                total_count:
+                    type: integer
+                    description: 指定したページを含めたすべての検索結果の件数
+                    example: 5023432583872562116
+            example:
+                results:
+                    - id: exampleId01
+                      owner_address: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 '
+                      title: My Awesome Article
+                    - id: exampleId01
+                      owner_address: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 '
+                      title: My Awesome Article
+                total_count: 18413131499743742823
         UpdateRequestBody:
             type: object
             properties:
@@ -487,7 +619,7 @@ components:
                 signature:
                     type: string
                     description: '`address`のアカウントが行った署名'
-                    example: Accusantium mollitia magni maxime voluptates porro odit.
+                    example: Alias libero saepe officiis provident.
                 title:
                     type: string
                     example: My Awesome Article
@@ -497,7 +629,7 @@ components:
             example:
                 address: '''0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'''
                 content: <h1> Hello World! </h1>
-                signature: Eius dolorum ipsa quis incidunt alias.
+                signature: Qui itaque ipsum vel eligendi distinctio consectetur.
                 title: My Awesome Article
             required:
                 - address
@@ -509,3 +641,5 @@ tags:
       description: SEO対策で、記事の表示だけ直接HTMLで返すためのサービス
     - name: nfts
       description: NFTを管理するサービス
+    - name: search
+      description: 検索サービス
