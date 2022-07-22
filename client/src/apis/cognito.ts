@@ -48,7 +48,6 @@ export type SignUpForm = {
   email: string;
   password: string;
   username: string;
-  phoneNumber: string;
 };
 
 export const signUpToCognito = (form: SignUpForm) => {
@@ -56,10 +55,6 @@ export const signUpToCognito = (form: SignUpForm) => {
     new AmazonCognitoIdentity.CognitoUserAttribute({
       Name: "email",
       Value: form.email,
-    }),
-    new AmazonCognitoIdentity.CognitoUserAttribute({
-      Name: "phone_number",
-      Value: form.phoneNumber,
     }),
   ];
   return new Promise<AmazonCognitoIdentity.CognitoUser>((resolve, reject) => {

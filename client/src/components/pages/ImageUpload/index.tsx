@@ -3,7 +3,11 @@ import { fromCognitoIdentityPool } from "@aws-sdk/credential-providers";
 import { useCallback, useMemo, useState } from "react";
 import { useAuthContext } from "~/components/organisms/providers/AuthProvider";
 import { COGNITO_USER_POOL_ID } from "~/configs/cognito";
-import { COGNITO_IDENTITY_POOL_ID, getS3Client } from "~/configs/s3";
+import {
+  COGNITO_IDENTITY_POOL_ID,
+  getS3Client,
+  S3_BUCKET_NAME_TO_DEPLOY,
+} from "~/configs/s3";
 
 type imageForm = {
   blob: Blob;
@@ -32,7 +36,7 @@ const ImageUpload = () => {
   const uploadImage = useCallback(async () => {
     if (imageForm) {
       const command = new PutObjectCommand({
-        Bucket: "knowtfolio-alpha",
+        Bucket: S3_BUCKET_NAME_TO_DEPLOY,
         Key: `images/${imageForm.name}`,
         Body: imageForm.blob,
       });

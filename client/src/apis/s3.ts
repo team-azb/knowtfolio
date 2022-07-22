@@ -1,7 +1,11 @@
 import { PutObjectCommand } from "@aws-sdk/client-s3";
 import { fromCognitoIdentityPool } from "@aws-sdk/credential-providers";
 import { COGNITO_USER_POOL_ID } from "~/configs/cognito";
-import { COGNITO_IDENTITY_POOL_ID, getS3Client } from "~/configs/s3";
+import {
+  COGNITO_IDENTITY_POOL_ID,
+  getS3Client,
+  S3_BUCKET_NAME_TO_DEPLOY,
+} from "~/configs/s3";
 
 export const getS3ClientWithCognitoJwtToken = (jwtToken: string) => {
   return getS3Client(
@@ -20,7 +24,7 @@ export const getS3ClientWithCognitoJwtToken = (jwtToken: string) => {
 
 export const createPutImageObjectCommand = (key: string, blob: Blob) => {
   return new PutObjectCommand({
-    Bucket: "knowtfolio-alpha",
+    Bucket: S3_BUCKET_NAME_TO_DEPLOY,
     Key: key,
     Body: blob,
   });
