@@ -17,6 +17,15 @@ resource "aws_cloudfront_distribution" "knowtfolio" {
     }
   }
 
+  origin {
+    domain_name = aws_s3_bucket.knowtfolio_article_resources.bucket_regional_domain_name
+    origin_id   = aws_s3_bucket.knowtfolio_article_resources.id
+
+    s3_origin_config {
+      origin_access_identity = aws_cloudfront_origin_access_identity.knowtfolio_article_resources.cloudfront_access_identity_path
+    }
+  }
+
   comment             = "CDN for knowtfolio static files hosting"
   enabled             = true
   is_ipv6_enabled     = false
@@ -47,6 +56,16 @@ resource "aws_cloudfront_distribution" "knowtfolio" {
     }
   }
 
+  ordered_cache_behavior {
+    path_pattern           = "/images/*"
+    allowed_methods        = ["GET", "HEAD", "OPTIONS"]
+    cached_methods         = ["GET", "HEAD", "OPTIONS"]
+    viewer_protocol_policy = "redirect-to-https"
+    target_origin_id       = aws_s3_bucket.knowtfolio_article_resources.id
+    cache_policy_id        = "658327ea-f89d-4fab-a63d-7e88639e58f6" // CachingOptimized
+    compress               = true
+  }
+
   # TODO: SPAのルーティングの方法について考え直す
   custom_error_response {
     error_code         = 403
@@ -69,11 +88,15 @@ resource "aws_cloudfront_distribution" "knowtfolio" {
 }
 
 resource "aws_cloudfront_origin_access_identity" "knowtfolio_client" {
-  comment = "origin access identity for s3 knowtfolio"
+  comment = "origin access identity for s3 knowtfolio-client"
 }
 
 resource "aws_cloudfront_origin_access_identity" "knowtfolio_nfts" {
-  comment = "origin access identity for s3 knowtfolio-resources"
+  comment = "origin access identity for s3 knowtfolio-nfts"
+}
+
+resource "aws_cloudfront_origin_access_identity" "knowtfolio_article_resources" {
+  comment = "origin access identity for s3 knowtfolio-article-resources"
 }
 
 resource "aws_cloudfront_function" "append_dot_json" {

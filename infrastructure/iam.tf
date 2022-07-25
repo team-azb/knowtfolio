@@ -25,7 +25,7 @@ resource "aws_iam_role_policy" "knowtfolio_put_article_images_policy" {
   name = "put-article-images-policy"
   role = aws_iam_role.knowtfolio_article_writer.name
   policy = templatefile("${path.module}/templates/iam/put_object_to_s3_policy.json", {
-    resource = "${aws_s3_bucket.knowtfolio_client.arn}/images/*"
+    resource = "${aws_s3_bucket.knowtfolio_article_resources.arn}/images/*"
   })
 }
 

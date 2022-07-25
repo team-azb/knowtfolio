@@ -62,8 +62,40 @@ resource "aws_s3_bucket_policy" "knowtfolio_nfts" {
   })
 }
 
-resource "aws_s3_bucket_cors_configuration" "knowtfolio" {
-  bucket = aws_s3_bucket.knowtfolio_client.bucket
+resource "aws_s3_bucket" "knowtfolio_article_resources" {
+  bucket = "dev-knowtfolio-article-resources"
+}
+
+resource "aws_s3_bucket_versioning" "knowtfolio_article_resources" {
+  bucket = aws_s3_bucket.knowtfolio_article_resources.id
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
+resource "aws_s3_bucket_acl" "knowtfolio_article_resources" {
+  bucket = aws_s3_bucket.knowtfolio_article_resources.id
+  acl    = "private"
+}
+
+resource "aws_s3_bucket_public_access_block" "knowtfolio_article_resources" {
+  bucket                  = aws_s3_bucket.knowtfolio_article_resources.id
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
+resource "aws_s3_bucket_policy" "knowtfolio_article_resources" {
+  bucket = aws_s3_bucket.knowtfolio_article_resources.id
+  policy = templatefile("${path.module}/templates/s3/hosting_bucket_policy.json", {
+    bucket     = aws_s3_bucket.knowtfolio_article_resources.bucket
+    identifier = aws_cloudfront_origin_access_identity.knowtfolio_article_resources.iam_arn
+  })
+}
+
+resource "aws_s3_bucket_cors_configuration" "knowtfolio_article_resources" {
+  bucket = aws_s3_bucket.knowtfolio_article_resources.bucket
 
   cors_rule {
     allowed_headers = ["*"]
