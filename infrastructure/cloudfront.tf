@@ -1,19 +1,19 @@
 resource "aws_cloudfront_distribution" "knowtfolio" {
   origin {
-    domain_name = aws_s3_bucket.knowtfolio.bucket_regional_domain_name
-    origin_id   = aws_s3_bucket.knowtfolio.id
+    domain_name = aws_s3_bucket.knowtfolio_client.bucket_regional_domain_name
+    origin_id   = aws_s3_bucket.knowtfolio_client.id
 
     s3_origin_config {
-      origin_access_identity = aws_cloudfront_origin_access_identity.knowtfolio.cloudfront_access_identity_path
+      origin_access_identity = aws_cloudfront_origin_access_identity.knowtfolio_client.cloudfront_access_identity_path
     }
   }
 
   origin {
-    domain_name = aws_s3_bucket.knowtfolio_resources.bucket_regional_domain_name
-    origin_id   = aws_s3_bucket.knowtfolio_resources.id
+    domain_name = aws_s3_bucket.knowtfolio_nfts.bucket_regional_domain_name
+    origin_id   = aws_s3_bucket.knowtfolio_nfts.id
 
     s3_origin_config {
-      origin_access_identity = aws_cloudfront_origin_access_identity.knowtfolio_resources.cloudfront_access_identity_path
+      origin_access_identity = aws_cloudfront_origin_access_identity.knowtfolio_nfts.cloudfront_access_identity_path
     }
   }
 
@@ -28,7 +28,7 @@ resource "aws_cloudfront_distribution" "knowtfolio" {
     allowed_methods        = ["GET", "HEAD"]
     cached_methods         = ["GET", "HEAD"]
     viewer_protocol_policy = "redirect-to-https"
-    target_origin_id       = aws_s3_bucket.knowtfolio.id
+    target_origin_id       = aws_s3_bucket.knowtfolio_client.id
     cache_policy_id        = "658327ea-f89d-4fab-a63d-7e88639e58f6" // CachingOptimized
     compress               = true
   }
@@ -38,7 +38,7 @@ resource "aws_cloudfront_distribution" "knowtfolio" {
     allowed_methods        = ["GET", "HEAD", "OPTIONS"]
     cached_methods         = ["GET", "HEAD", "OPTIONS"]
     viewer_protocol_policy = "redirect-to-https"
-    target_origin_id       = aws_s3_bucket.knowtfolio_resources.id
+    target_origin_id       = aws_s3_bucket.knowtfolio_nfts.id
     cache_policy_id        = "658327ea-f89d-4fab-a63d-7e88639e58f6" // CachingOptimized
     compress               = true
     function_association {
@@ -68,11 +68,11 @@ resource "aws_cloudfront_distribution" "knowtfolio" {
   }
 }
 
-resource "aws_cloudfront_origin_access_identity" "knowtfolio" {
+resource "aws_cloudfront_origin_access_identity" "knowtfolio_client" {
   comment = "origin access identity for s3 knowtfolio"
 }
 
-resource "aws_cloudfront_origin_access_identity" "knowtfolio_resources" {
+resource "aws_cloudfront_origin_access_identity" "knowtfolio_nfts" {
   comment = "origin access identity for s3 knowtfolio-resources"
 }
 
