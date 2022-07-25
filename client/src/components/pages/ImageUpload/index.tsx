@@ -6,7 +6,7 @@ import { COGNITO_USER_POOL_ID } from "~/configs/cognito";
 import {
   COGNITO_IDENTITY_POOL_ID,
   getS3Client,
-  S3_BUCKET_NAME_TO_DEPLOY,
+  S3_BUCKET_NAME_TO_UPLOAD_ARTICLE_RESOURCES,
 } from "~/configs/s3";
 
 type imageForm = {
@@ -36,7 +36,7 @@ const ImageUpload = () => {
   const uploadImage = useCallback(async () => {
     if (imageForm) {
       const command = new PutObjectCommand({
-        Bucket: S3_BUCKET_NAME_TO_DEPLOY,
+        Bucket: S3_BUCKET_NAME_TO_UPLOAD_ARTICLE_RESOURCES,
         Key: `images/${imageForm.name}`,
         Body: imageForm.blob,
       });
