@@ -26,6 +26,18 @@ resource "aws_cloudfront_distribution" "knowtfolio" {
     }
   }
 
+  origin {
+    domain_name = aws_lb.knowtfolio_backend.dns_name
+    origin_id   = aws_lb.knowtfolio_backend.id
+
+    custom_origin_config {
+      http_port              = 80
+      https_port             = 443
+      origin_protocol_policy = "http-only"
+      origin_ssl_protocols   = ["TLSv1"]
+    }
+  }
+
   comment             = "CDN for knowtfolio static files hosting"
   enabled             = true
   is_ipv6_enabled     = false
@@ -63,6 +75,16 @@ resource "aws_cloudfront_distribution" "knowtfolio" {
     viewer_protocol_policy = "redirect-to-https"
     target_origin_id       = aws_s3_bucket.knowtfolio_article_resources.id
     cache_policy_id        = "658327ea-f89d-4fab-a63d-7e88639e58f6" // CachingOptimized
+    compress               = true
+  }
+
+  ordered_cache_behavior {
+    path_pattern           = "/api/*"
+    allowed_methods        = ["GET", "HEAD", "OPTIONS", "PUT", "POST", "PATCH", "DELETE"]
+    cached_methods         = ["GET", "HEAD", "OPTIONS"]
+    viewer_protocol_policy = "allow-all"
+    target_origin_id       = aws_lb.knowtfolio_backend.id
+    cache_policy_id        = "4135ea2d-6df8-44a3-9df3-4b5a84be39ad" // CachingOptimized
     compress               = true
   }
 
