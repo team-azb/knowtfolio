@@ -19,7 +19,7 @@ resource "aws_instance" "knowtfolio_backend" {
     volume_size = 30
   }
 
-  vpc_security_group_ids = [aws_security_group.knowtfolio_backend.id]
+  vpc_security_group_ids = [aws_security_group.knowtfolio_backend_ec2.id]
 
   tags = {
     "Name" = "dev-knowtfolio-backend"
@@ -28,8 +28,8 @@ resource "aws_instance" "knowtfolio_backend" {
   user_data = file("${path.module}/user_data/knowtfolio_backend.sh")
 }
 
-resource "aws_security_group" "knowtfolio_backend" {
-  name   = "knowtfolio-backend"
+resource "aws_security_group" "knowtfolio_backend_ec2" {
+  name   = "knowtfolio-backend-ec2"
   vpc_id = aws_vpc.knowtfolio.id
 
   ingress {
