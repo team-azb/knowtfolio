@@ -3,6 +3,7 @@ resource "aws_lb" "knowtfolio_backend" {
   internal           = false
   load_balancer_type = "application"
   subnets            = [aws_subnet.knowtfolio_public_a.id, aws_subnet.knowtfolio_public_c.id]
+  security_groups    = [aws_security_group.knowtfolio_backend_alb.id]
 
   tags = {
     Environment = "development"
@@ -12,14 +13,14 @@ resource "aws_lb" "knowtfolio_backend" {
 resource "aws_lb_target_group" "knowtfolio_backend" {
   name        = "knowtfolio-backend"
   target_type = "instance"
-  port        = 80
+  port        = 8080
   protocol    = "HTTP"
   vpc_id      = aws_vpc.knowtfolio.id
 
   health_check {
     interval            = 30
     path                = "/api/articles/"
-    port                = "traffic-port"
+    port                = 8080
     protocol            = "HTTP"
     timeout             = 5
     healthy_threshold   = 5
@@ -31,7 +32,7 @@ resource "aws_lb_target_group" "knowtfolio_backend" {
 resource "aws_lb_target_group_attachment" "knowtfolio_backend" {
   target_group_arn = aws_lb_target_group.knowtfolio_backend.arn
   target_id        = aws_instance.knowtfolio_backend.id
-  port             = 80
+  port             = 8080
 }
 
 resource "aws_lb_listener" "knowtfolio_backend" {
@@ -64,8 +65,8 @@ resource "aws_security_group" "knowtfolio_backend_alb" {
   }
 
   egress {
-    from_port   = 80
-    to_port     = 80
+    from_port   = 8080
+    to_port     = 8080
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }

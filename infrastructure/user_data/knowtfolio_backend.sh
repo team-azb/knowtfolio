@@ -13,7 +13,7 @@ sudo apt-get -y install docker-ce docker-ce-cli containerd.io docker-compose-plu
 
 # enable to use docker without sudo
 # https://docs.docker.com/engine/install/linux-postinstall/
-sudo usermod -aG docker ${USER}
+sudo usermod -aG docker ubuntu
 sudo systemctl restart docker
 
 # install docker-compose

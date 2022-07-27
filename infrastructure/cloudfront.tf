@@ -79,13 +79,14 @@ resource "aws_cloudfront_distribution" "knowtfolio" {
   }
 
   ordered_cache_behavior {
-    path_pattern           = "/api/*"
-    allowed_methods        = ["GET", "HEAD", "OPTIONS", "PUT", "POST", "PATCH", "DELETE"]
-    cached_methods         = ["GET", "HEAD", "OPTIONS"]
-    viewer_protocol_policy = "allow-all"
-    target_origin_id       = aws_lb.knowtfolio_backend.id
-    cache_policy_id        = "4135ea2d-6df8-44a3-9df3-4b5a84be39ad" // CachingOptimized
-    compress               = true
+    path_pattern             = "/api/*"
+    allowed_methods          = ["GET", "HEAD", "OPTIONS", "PUT", "POST", "PATCH", "DELETE"]
+    cached_methods           = ["GET", "HEAD", "OPTIONS"]
+    viewer_protocol_policy   = "allow-all"
+    target_origin_id         = aws_lb.knowtfolio_backend.id
+    cache_policy_id          = "4135ea2d-6df8-44a3-9df3-4b5a84be39ad" // CachingDisabled
+    origin_request_policy_id = "216adef6-5c7f-47e4-b989-5492eafa07d3" // AllViewer
+    compress                 = true
   }
 
   # TODO: SPAのルーティングの方法について考え直す
