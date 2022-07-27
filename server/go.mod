@@ -13,6 +13,7 @@ require (
 	github.com/microcosm-cc/bluemonday v1.0.18
 	github.com/rs/zerolog v1.27.0
 	github.com/stretchr/testify v1.7.5
+	go.uber.org/multierr v1.8.0
 	goa.design/goa/v3 v3.7.6
 	gorm.io/driver/mysql v1.3.4
 	gorm.io/gorm v1.23.6
@@ -65,6 +66,7 @@ require (
 	github.com/tklauser/go-sysconf v0.3.5 // indirect
 	github.com/tklauser/numcpus v0.2.2 // indirect
 	github.com/zach-klippenstein/goregen v0.0.0-20160303162051-795b5e3961ea // indirect
+	go.uber.org/atomic v1.9.0 // indirect
 	golang.org/x/crypto v0.0.0-20210921155107-089bfa567519 // indirect
 	golang.org/x/mod v0.6.0-dev.0.20220419223038-86c51ed26bb4 // indirect
 	golang.org/x/net v0.0.0-20220624214902-1bab6f366d9e // indirect
