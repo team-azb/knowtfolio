@@ -4,7 +4,7 @@ import { COGNITO_USER_POOL_ID } from "~/configs/cognito";
 import {
   COGNITO_IDENTITY_POOL_ID,
   getS3Client,
-  ARTICLE_RESOURCES_S3_BUCEKT,
+  ARTICLE_RESOURCES_S3_BUCKET,
 } from "~/configs/s3";
 
 export const getS3ClientWithCognitoJwtToken = (jwtToken: string) => {
@@ -24,7 +24,7 @@ export const getS3ClientWithCognitoJwtToken = (jwtToken: string) => {
 
 export const createPutImageObjectCommand = (key: string, blob: Blob) => {
   return new PutObjectCommand({
-    Bucket: ARTICLE_RESOURCES_S3_BUCEKT,
+    Bucket: ARTICLE_RESOURCES_S3_BUCKET,
     Key: key,
     Body: blob,
   });
