@@ -19,7 +19,7 @@ resource "aws_lb_target_group" "knowtfolio_backend" {
 
   health_check {
     interval            = 30
-    path                = "/api/articles/"
+    path                = "/api/health"
     port                = 8080
     protocol            = "HTTP"
     timeout             = 5
