@@ -59,7 +59,7 @@ func (a articleService) Read(_ context.Context, request *articles.ArticleReadReq
 		return nil, result.Error
 	}
 
-	owner, err := a.getOwnerAddressOf(target)
+	owner, err := a.Contract.GetOwnerAddressOf(target)
 	if err != nil {
 		return nil, err
 	}
@@ -137,18 +137,6 @@ func (a articleService) AuthorizeEdit(editorAddr string, target models.Article, 
 		msg := fmt.Sprintf("Address %v does not have the right to do the specified operation on article %v.", editorAddr, target.ID)
 		return articles.MakeUnauthorized(errors.New(msg))
 	}
-}
-
-func (a articleService) getOwnerAddressOf(target models.Article) (*common.Address, error) {
-	owner, err := a.Contract.GetOwnerOfArticle(&bind.CallOpts{}, target.ID)
-	if err != nil {
-		return nil, err
-	}
-	// TODO: Add Article.IsTokenized to check this before contract call.
-	if owner == common.BigToAddress(big.NewInt(0)) {
-		owner = common.HexToAddress(target.OriginalAuthorAddress)
-	}
-	return &owner, nil
 }
 
 func articleToResult(src models.Article) *articles.ArticleResult {

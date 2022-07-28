@@ -573,6 +573,10 @@ components:
                 id: exampleId01
                 owner_address: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 '
                 title: My Awesome Article
+            required:
+                - id
+                - title
+                - owner_address
         Searchresult:
             type: object
             properties:
@@ -604,6 +608,9 @@ components:
                       owner_address: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 '
                       title: My Awesome Article
                 total_count: 18413131499743742823
+            required:
+                - results
+                - total_count
         UpdateRequestBody:
             type: object
             properties:

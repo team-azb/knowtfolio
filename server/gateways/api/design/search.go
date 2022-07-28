@@ -34,11 +34,13 @@ var searchResultEntry = dsl.Type("SearchResultEntry", func() {
 	articleIdAttribute("id")
 	articleTitleAttribute("title")
 	articleOwnerAddressAttribute("owner_address")
+	dsl.Required("id", "title", "owner_address")
 })
 
 var searchResult = dsl.ResultType("SearchResult", func() {
 	dsl.Attribute("results", dsl.ArrayOf(searchResultEntry), "指定したページ内の検索結果")
 	dsl.Attribute("total_count", dsl.UInt, "指定したページを含めたすべての検索結果の件数")
+	dsl.Required("results", "total_count")
 })
 
 var _ = dsl.Service("search", func() {

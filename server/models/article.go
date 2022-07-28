@@ -11,16 +11,21 @@ import (
 
 type Article struct {
 	ID                    string `gorm:"primarykey"`
-	Title                 string
+	Title                 string `gorm:"index:search_idx,class:FULLTEXT"`
 	Content               []byte
+	RawText               string `gorm:"index:search_idx,class:FULLTEXT"`
 	OriginalAuthorAddress string
 	CreatedAt             time.Time
 	UpdatedAt             time.Time
 }
 
-func NewArticle(title string, content []byte, autherAddress string) *Article {
+var htmlSanitizer = bluemonday.UGCPolicy()
+var rawTextSanitizer = bluemonday.StripTagsPolicy()
+
+func NewArticle(title string, content []byte, authorAddress string) *Article {
 	id, _ := nanoid.GenerateString(nanoid.DefaultAlphabet, 11)
-	return &Article{ID: id, Title: title, Content: content, OriginalAuthorAddress: autherAddress}
+	rawText := rawTextSanitizer.Sanitize(string(content))
+	return &Article{ID: id, Title: title, Content: content, RawText: rawText, OriginalAuthorAddress: authorAddress}
 }
 
 func (a *Article) SetTitleIfPresent(title *string) {
@@ -32,10 +37,9 @@ func (a *Article) SetTitleIfPresent(title *string) {
 func (a *Article) SetContentIfPresent(content *string) {
 	if content != nil {
 		a.Content = []byte(*content)
+		a.RawText = rawTextSanitizer.Sanitize(*content)
 	}
 }
-
-var htmlSanitizer = bluemonday.UGCPolicy()
 
 func (a *Article) ToHTML() ([]byte, error) {
 	htmlTemplate, err := template.
