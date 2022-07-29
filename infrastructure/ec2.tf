@@ -4,7 +4,7 @@ locals {
 
 resource "aws_key_pair" "knowtfolio" {
   key_name   = "knowtfolio"
-  public_key = file("${path.module}/public_keys/knowtfolio.pub")
+  public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCOAJoXw0P64Q4alue2QrwQ1rWPUvNvtyDRJZ/tj1pjK1DldeeJ7RiZX8da8tTiEhIc4c30O2boPb3tChH5BjOARGK5iIhxAJtMqamEan/Z2AwRYlb65ZjNg6Oo3XjyPQ4460SMo6gNxg2eyNOof+ntcG5DUabVBEmIyJwW+oJA34ZXlPrF5BnV81QlXMOjzdLwIZLwLADH7X7rYUGUkFE4L/EH6DH+T6KdIC0oH4NavCxxXutXpZExt3o/1uRrTZo7qpt1sUb7tB80Cynw73uU/KI3STPriaxPYODa69ieSTcQt2D4X7L9DQWNUsGAoI9azdXgpcYUZ/H3uYiot7md"
 }
 
 resource "aws_instance" "knowtfolio_backend" {
