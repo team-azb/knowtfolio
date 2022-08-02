@@ -10,7 +10,7 @@ resource "aws_iam_user_policy" "knowtfolio_nft_io" {
   name = "knowtfolio-nft-io"
   user = aws_iam_user.knowtfolio_admin.name
   policy = templatefile("${path.module}/templates/iam/s3_io_iam_policy.json", {
-    resource = "${aws_s3_bucket.knowtfolio_resources.arn}/nfts/*"
+    resource = "${aws_s3_bucket.knowtfolio_nfts.arn}/nfts/*"
   })
 }
 
@@ -25,7 +25,7 @@ resource "aws_iam_role_policy" "knowtfolio_put_article_images_policy" {
   name = "put-article-images-policy"
   role = aws_iam_role.knowtfolio_article_writer.name
   policy = templatefile("${path.module}/templates/iam/put_object_to_s3_policy.json", {
-    resource = "${aws_s3_bucket.knowtfolio.arn}/images/*"
+    resource = "${aws_s3_bucket.knowtfolio_article_resources.arn}/images/*"
   })
 }
 
