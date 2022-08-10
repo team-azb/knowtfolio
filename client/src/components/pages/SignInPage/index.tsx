@@ -6,7 +6,7 @@ type signInWithPasswordForm = {
   password: string;
 };
 
-const SignIn = () => {
+const SignInPage = () => {
   const [form, setForm] = useState<signInWithPasswordForm>({
     username: "",
     password: "",
@@ -65,4 +65,4 @@ const SignIn = () => {
   );
 };
 
-export default SignIn;
+export default SignInPage;

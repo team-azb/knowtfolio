@@ -2,7 +2,7 @@ import { useCallback, useMemo } from "react";
 import { useAuthContext } from "~/components/organisms/providers/AuthProvider";
 import { signOutFromCognito } from "~/apis/cognito";
 
-const Mypage = () => {
+const AccountPage = () => {
   const { user, attributes } = useAuthContext();
   const email = useMemo(() => {
     return attributes.find((atr) => atr.Name === "email")?.Value;
@@ -22,4 +22,4 @@ const Mypage = () => {
   );
 };
 
-export default Mypage;
+export default AccountPage;
