@@ -199,6 +199,28 @@ paths:
                         application/vnd.goa.error+json:
                             schema:
                                 $ref: '#/components/schemas/Error'
+    /api/health:
+        get:
+            tags:
+                - healthcheck
+            summary: Get health status. healthcheck
+            description: Check server health.
+            operationId: healthcheck#Get health status.
+            responses:
+                "200":
+                    description: サービスが正常に機能している場合
+                "500":
+                    description: 'database_unhealthy: サーバは生きているが、DBと接続できない場合'
+                    content:
+                        application/vnd.goa.error+json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+                "503":
+                    description: 'contract_unhealthy: サーバは生きているが、ブロックチェーン上のスマートコントラクトと接続できない場合'
+                    content:
+                        application/vnd.goa.error+json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
     /api/nfts/{article_id}:
         post:
             tags:
@@ -295,7 +317,7 @@ paths:
                     enum:
                         - created_at
                         - updated_at
-                  example: created_at
+                  example: updated_at
                 - name: page_num
                   in: query
                   description: 取得したい位置のページ番号（1-indexed）
@@ -304,9 +326,9 @@ paths:
                     type: integer
                     description: 取得したい位置のページ番号（1-indexed）
                     default: 1
-                    example: 11672134284603955137
+                    example: 16801712174973070191
                     minimum: 1
-                  example: 13903759627942341001
+                  example: 12291431329987957870
                 - name: page_size
                   in: query
                   description: 1ページあたりのコンテンツ数
@@ -315,10 +337,10 @@ paths:
                     type: integer
                     description: 1ページあたりのコンテンツ数
                     default: 10
-                    example: 76
+                    example: 48
                     minimum: 1
                     maximum: 100
-                  example: 53
+                  example: 83
             responses:
                 "200":
                     description: OK response.
@@ -379,15 +401,15 @@ components:
                 cost:
                     type: integer
                     description: トークン発行にかかったコスト
-                    example: 5250902387539283934
+                    example: 2855234197662528398
                     format: int64
                 hash:
                     type: string
                     description: トランザクションのハッシュ
-                    example: Voluptatem debitis nesciunt nesciunt alias nulla.
+                    example: Esse excepturi rerum et odit qui.
             example:
-                cost: 3983753186087891933
-                hash: Odio voluptas voluptatibus sunt esse.
+                cost: 3391698048732303322
+                hash: Unde ducimus.
             required:
                 - hash
                 - cost
@@ -406,7 +428,7 @@ components:
                 signature:
                     type: string
                     description: '`address`のアカウントが行った署名'
-                    example: Magni maxime voluptates.
+                    example: Ipsa quis incidunt alias libero saepe.
                 title:
                     type: string
                     example: My Awesome Article
@@ -414,7 +436,7 @@ components:
             example:
                 address: '''0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'''
                 content: <h1> Hello World! </h1>
-                signature: Odit dolorem eius.
+                signature: Provident nobis qui itaque ipsum vel.
                 title: My Awesome Article
             required:
                 - title
@@ -458,10 +480,10 @@ components:
                 signature:
                     type: string
                     description: '`address`のアカウントが行った署名'
-                    example: Nisi dolor sapiente laboriosam veniam eos.
+                    example: Voluptatem debitis nesciunt nesciunt alias nulla.
             example:
                 address: '''0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'''
-                signature: Itaque et esse molestiae illum temporibus.
+                signature: Nihil odio voluptas voluptatibus.
             required:
                 - address
                 - signature
@@ -486,7 +508,7 @@ components:
                 fault:
                     type: boolean
                     description: Is the error a server-side fault?
-                    example: false
+                    example: true
                 id:
                     type: string
                     description: ID is a unique identifier for this particular occurrence of the problem.
@@ -506,7 +528,7 @@ components:
                 timeout:
                     type: boolean
                     description: Is the error a timeout?
-                    example: true
+                    example: false
             example:
                 id: 3F1FKVRR
                 message: Value of ID must be an integer
@@ -595,10 +617,13 @@ components:
                         - id: exampleId01
                           owner_address: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 '
                           title: My Awesome Article
+                        - id: exampleId01
+                          owner_address: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 '
+                          title: My Awesome Article
                 total_count:
                     type: integer
                     description: 指定したページを含めたすべての検索結果の件数
-                    example: 5023432583872562116
+                    example: 9646357824349231531
             example:
                 results:
                     - id: exampleId01
@@ -607,7 +632,7 @@ components:
                     - id: exampleId01
                       owner_address: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 '
                       title: My Awesome Article
-                total_count: 18413131499743742823
+                total_count: 11352710926538620347
             required:
                 - results
                 - total_count
@@ -626,7 +651,7 @@ components:
                 signature:
                     type: string
                     description: '`address`のアカウントが行った署名'
-                    example: Alias libero saepe officiis provident.
+                    example: Nisi dolor sapiente laboriosam veniam eos.
                 title:
                     type: string
                     example: My Awesome Article
@@ -636,7 +661,7 @@ components:
             example:
                 address: '''0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'''
                 content: <h1> Hello World! </h1>
-                signature: Qui itaque ipsum vel eligendi distinctio consectetur.
+                signature: Itaque et esse molestiae illum temporibus.
                 title: My Awesome Article
             required:
                 - address
@@ -646,6 +671,8 @@ tags:
       description: 記事サービス
     - name: articles-html
       description: SEO対策で、記事の表示だけ直接HTMLで返すためのサービス
+    - name: healthcheck
+      description: 疎通確認サービス
     - name: nfts
       description: NFTを管理するサービス
     - name: search
