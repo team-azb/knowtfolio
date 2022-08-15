@@ -5,7 +5,7 @@ import {
   confirmSigningUpToCognito,
 } from "~/apis/cognito";
 
-const SignUp = () => {
+const SignUpPage = () => {
   const [form, setForm] = useState<SignUpForm>({
     email: "",
     password: "",
@@ -107,4 +107,4 @@ const SignUp = () => {
   );
 };
 
-export default SignUp;
+export default SignUpPage;

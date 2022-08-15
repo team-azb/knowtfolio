@@ -5,7 +5,7 @@ import { Link } from "react-router-dom";
 import detectEthereumProvider from "@metamask/detect-provider";
 import Web3 from "web3";
 
-const HelloWeb3 = () => {
+const TopPage = () => {
   const [account, setAccount] = useState("");
   const [balance, setBalance] = useState("");
   const [isConnected, setIsConnected] = useState(false);
@@ -66,4 +66,4 @@ const HelloWeb3 = () => {
   );
 };
 
-export default HelloWeb3;
+export default TopPage;
