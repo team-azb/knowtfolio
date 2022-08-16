@@ -25,19 +25,19 @@ func initTestDB(t *testing.T) (db *gorm.DB) {
 		t.Skip("Tests using DB are skipped.")
 	}
 	// Connect to DB.
-	db, err := gorm.Open(mysql.Open("root:password@tcp(db:3306)/?parseTime=true"))
+	setupDB, err := gorm.Open(mysql.Open("root:password@tcp(db:3306)/?parseTime=true"))
 	fatalfIfError(t, err, "DB Connection failed")
 
 	// Create temporary database dedicated to this test call.
 	dbName := fmt.Sprintf("knowtfolio-db-test-%v", strings.ReplaceAll(t.Name(), "/", "_"))
-	res := db.Exec(fmt.Sprintf("CREATE DATABASE `%v`", dbName))
+	res := setupDB.Exec(fmt.Sprintf("CREATE DATABASE `%v`", dbName))
 	if res.Error != nil {
 		t.Fatalf("DB Creation failed: %v", res.Error)
 	}
 
 	// Make sure to drop the temporary database after the test.
 	t.Cleanup(func() {
-		_ = db.Exec(fmt.Sprintf("DROP DATABASE `%v`", dbName))
+		_ = setupDB.Exec(fmt.Sprintf("DROP DATABASE `%v`", dbName))
 	})
 
 	t.Logf("[%v] Created temporary DB %v!", t.Name(), dbName)

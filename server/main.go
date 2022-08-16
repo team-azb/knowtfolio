@@ -49,6 +49,7 @@ func main() {
 	handler.AddService(services.NewArticlesHtmlService(db, *handler), "articles-html")
 	handler.AddService(services.NewNftsService(db, contract, s3Client, *handler), "nfts")
 	handler.AddService(services.NewSearchService(db, contract, *handler), "search")
+	handler.AddService(services.NewHealthcheckService(db, contract, *handler), "healthcheck")
 
 	logger.Info().Msg("Starting backend server...")
 	err = http.ListenAndServe(":8080", handler)

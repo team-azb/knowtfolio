@@ -40,7 +40,7 @@ services:
       # Account#2 of hardhat local node.
       ADMIN_PRIVATE_KEY: 5de4111afa1a4b94908f83103eb1f1706367c2e68ca870fc3fb9a804cdab365a
       CONTRACT_ADDRESS: will-be-set-in-the-program
-      NETWORK_URI: http://hardhat:8545
+      NETWORK_URI: ws://hardhat:8545
       CHAIN_ID: 31337
     volumes:
       - type: bind
