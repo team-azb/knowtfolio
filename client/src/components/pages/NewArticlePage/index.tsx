@@ -46,7 +46,7 @@ const NewArticlePage = () => {
         address: account,
         signature: signatureForMint,
       });
-      navigate(`/artcles/${id}`);
+      navigate(`/articles/${id}/edit`);
     } catch (error) {
       console.error(error);
       alert("記事の作成に失敗しました。");
