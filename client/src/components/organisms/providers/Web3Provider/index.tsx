@@ -10,7 +10,7 @@ import detectEthereumProvider from "@metamask/detect-provider";
 import Web3 from "web3";
 import { AbiItem } from "web3-utils";
 import { Contract } from "web3-eth-contract";
-import Knowtfolio from "../../../../../artifacts/contracts/Knowtfolio.sol/Knowtfolio.json";
+import Knowtfolio from "@/contracts/Knowtfolio.sol/Knowtfolio.json";
 import { CONTRACT_ADDRESS } from "~/configs/blockchain";
 
 const defaultContentOnUnconnected = <div>metamaskに接続してください</div>;

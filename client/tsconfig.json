@@ -4,6 +4,9 @@
         "paths": {
             "~/*": [
                 "src/*"
+            ],
+            "@/*": [
+                "artifacts/*"
             ]
         },
         "target": "esnext",
