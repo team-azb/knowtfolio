@@ -15,6 +15,7 @@ type Article struct {
 	Content               []byte
 	RawText               string `gorm:"index:search_idx,class:FULLTEXT"`
 	OriginalAuthorAddress string
+	IsTokenized           bool
 	CreatedAt             time.Time
 	UpdatedAt             time.Time
 }
@@ -25,7 +26,14 @@ var rawTextSanitizer = bluemonday.StripTagsPolicy()
 func NewArticle(title string, content []byte, authorAddress string) *Article {
 	id, _ := nanoid.GenerateString(nanoid.DefaultAlphabet, 11)
 	rawText := rawTextSanitizer.Sanitize(string(content))
-	return &Article{ID: id, Title: title, Content: content, RawText: rawText, OriginalAuthorAddress: authorAddress}
+	return &Article{
+		ID:                    id,
+		Title:                 title,
+		Content:               content,
+		RawText:               rawText,
+		OriginalAuthorAddress: authorAddress,
+		IsTokenized:           false,
+	}
 }
 
 func (a *Article) SetTitleIfPresent(title *string) {
@@ -39,6 +47,10 @@ func (a *Article) SetContentIfPresent(content *string) {
 		a.Content = []byte(*content)
 		a.RawText = rawTextSanitizer.Sanitize(*content)
 	}
+}
+
+func (a *Article) SetIsTokenized() {
+	a.IsTokenized = true
 }
 
 func (a *Article) ToHTML() ([]byte, error) {
