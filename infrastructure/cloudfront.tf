@@ -89,6 +89,39 @@ resource "aws_cloudfront_distribution" "knowtfolio" {
     compress                 = true
   }
 
+  ordered_cache_behavior {
+    path_pattern             = "/articles/new"
+    allowed_methods          = ["GET", "HEAD"]
+    cached_methods           = ["GET", "HEAD"]
+    viewer_protocol_policy   = "allow-all"
+    target_origin_id         = aws_s3_bucket.knowtfolio_client.id
+    cache_policy_id          = "658327ea-f89d-4fab-a63d-7e88639e58f6" // CachingOptimized
+    origin_request_policy_id = "216adef6-5c7f-47e4-b989-5492eafa07d3" // AllViewer
+    compress                 = true
+  }
+
+  ordered_cache_behavior {
+    path_pattern             = "/articles/*/edit"
+    allowed_methods          = ["GET", "HEAD"]
+    cached_methods           = ["GET", "HEAD"]
+    viewer_protocol_policy   = "allow-all"
+    target_origin_id         = aws_s3_bucket.knowtfolio_client.id
+    cache_policy_id          = "658327ea-f89d-4fab-a63d-7e88639e58f6" // CachingOptimized
+    origin_request_policy_id = "216adef6-5c7f-47e4-b989-5492eafa07d3" // AllViewer
+    compress                 = true
+  }
+
+  ordered_cache_behavior {
+    path_pattern             = "/articles/*"
+    allowed_methods          = ["GET", "HEAD"]
+    cached_methods           = ["GET", "HEAD"]
+    viewer_protocol_policy   = "allow-all"
+    target_origin_id         = aws_lb.knowtfolio_backend.id
+    cache_policy_id          = "658327ea-f89d-4fab-a63d-7e88639e58f6" // CachingOptimized
+    origin_request_policy_id = "216adef6-5c7f-47e4-b989-5492eafa07d3" // AllViewer
+    compress                 = true
+  }
+
   # TODO: SPAのルーティングの方法について考え直す
   custom_error_response {
     error_code         = 403
