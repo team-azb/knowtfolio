@@ -98,5 +98,8 @@ module.exports = {
       rewrites: [{ from: /^\/*/, to: "/index.html" }],
     },
     port: 3000,
+    proxy: {
+      "/api": "http://localhost:8080",
+    },
   },
 };
