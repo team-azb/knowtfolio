@@ -37,10 +37,11 @@ const App = () => {
               </AuthProvider>
             }
           />
-          {/* TODO: chenage endipoint to /articles/new */}
-          <Route path="/new" element={<NewArticlePage />} />
-          {/* TODO: chenage endipoint to /articles/:articleId/edit */}
-          <Route path="/edit/:articleId" element={<EditArticlePage />} />
+          <Route path="/articles/new" element={<NewArticlePage />} />
+          <Route
+            path="/articles/:articleId/edit"
+            element={<EditArticlePage />}
+          />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </Web3Provider>
