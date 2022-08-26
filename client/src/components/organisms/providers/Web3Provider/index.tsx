@@ -8,12 +8,17 @@ import {
 } from "react";
 import detectEthereumProvider from "@metamask/detect-provider";
 import Web3 from "web3";
+import { AbiItem } from "web3-utils";
+import { Contract } from "web3-eth-contract";
+import Knowtfolio from "../../../../../artifacts/contracts/Knowtfolio.sol/Knowtfolio.json";
+import { CONTRACT_ADDRESS } from "~/configs/blockchain";
 
 const defaultContentOnUnconnected = <div>metamaskに接続してください</div>;
 
 type web3Context = {
   web3: Web3;
   account: string;
+  contract: Contract;
 };
 const web3Context = createContext<web3Context>({} as web3Context);
 
@@ -49,9 +54,16 @@ const Web3Provider = ({
       const accounts = await web3.eth.requestAccounts();
       const account = accounts[0];
 
+      // setup instance to call contract with JSON RPC
+      const contract = new web3.eth.Contract(
+        Knowtfolio.abi as AbiItem[],
+        CONTRACT_ADDRESS
+      );
+
       setWeb3Obj({
         web3,
         account,
+        contract,
       });
     } else {
       console.log("Please Install MetaMask🙇‍♂️");
