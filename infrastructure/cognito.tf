@@ -23,6 +23,12 @@ resource "aws_cognito_user_pool" "knowtfolio" {
     }
   }
 
+  lambda_config {
+    define_auth_challenge          = aws_lambda_function.define_auth_challenge.arn
+    create_auth_challenge          = aws_lambda_function.create_auth_challenge.arn
+    verify_auth_challenge_response = aws_lambda_function.verify_auth_challenge_response.arn
+  }
+
   auto_verified_attributes = ["email"]
 }
 
