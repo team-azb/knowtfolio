@@ -46,52 +46,66 @@ func (s nftsService) CreateForArticle(ctx context.Context, request *nfts.CreateN
 
 	// Find corresponding Article from DB
 	target := models.Article{ID: request.ArticleID}
-	result := s.DB.First(&target)
-	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-		return nil, nfts.MakeArticleNotFound(result.Error)
-	} else if result.Error != nil {
-		return nil, result.Error
-	}
-	if target.OriginalAuthorAddress != request.Address {
-		msg := fmt.Sprintf("Address %v is not the orignial owner of article %v.", request.Address, target.ID)
-		return nil, nfts.MakeUnauthorized(errors.New(msg))
-	}
 
-	// Mint Article token
-	opts, err := s.Contract.NewAdminTransactOpts()
-	if err != nil {
-		return nil, err
-	}
-	tx, err := s.Contract.MintNFT(
-		opts,
-		common.HexToAddress(request.Address),
-		target.ID)
-	if err != nil {
-		return nil, err
-	}
+	err = s.DB.Transaction(func(tx *gorm.DB) error {
+		// Get target Article and check the author
+		result := tx.First(&target)
+		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
+			return nfts.MakeArticleNotFound(result.Error)
+		} else if result.Error != nil {
+			return result.Error
+		}
+		if target.OriginalAuthorAddress != request.Address {
+			msg := fmt.Sprintf("Address %v is not the orignial owner of article %v.", request.Address, target.ID)
+			return nfts.MakeUnauthorized(errors.New(msg))
+		}
 
-	// Upload NFT metadata to S3
-	metadata := models.NewNFTMetadata(target)
-	metadataJson, err := metadata.ToJSON()
-	if err != nil {
-		return nil, err
-	}
+		// Mint Article token
+		opts, err := s.Contract.NewAdminTransactOpts()
+		if err != nil {
+			return err
+		}
+		mintTx, err := s.Contract.MintNFT(
+			opts,
+			common.HexToAddress(request.Address),
+			target.ID)
+		if err != nil {
+			return err
+		}
 
-	uploader := manager.NewUploader(s.S3Client)
-	_, err = uploader.Upload(ctx, &s3.PutObjectInput{
-		Body:        bytes.NewReader(metadataJson),
-		Bucket:      &config.S3BucketName,
-		ContentType: aws.String("application/json"),
-		Key:         aws.String(fmt.Sprintf("nfts/%v.json", target.ID)),
+		// Upload NFT metadata to S3
+		metadata := models.NewNFTMetadata(target)
+		metadataJson, err := metadata.ToJSON()
+		if err != nil {
+			return err
+		}
+
+		uploader := manager.NewUploader(s.S3Client)
+		_, err = uploader.Upload(ctx, &s3.PutObjectInput{
+			Body:        bytes.NewReader(metadataJson),
+			Bucket:      &config.S3BucketName,
+			ContentType: aws.String("application/json"),
+			Key:         aws.String(fmt.Sprintf("nfts/%v.json", target.ID)),
+		})
+		if err != nil {
+			return err
+		}
+
+		// Save tokenized state of the Article.
+		target.SetIsTokenized()
+		result = tx.Save(&target)
+		if result.Error != nil {
+			return result.Error
+		}
+
+		res = &nfts.CreateNftForArticleResult{
+			Hash: mintTx.Hash().String(),
+			Cost: mintTx.Cost().Int64(),
+		}
+		return nil
 	})
-	if err != nil {
-		return nil, err
-	}
 
-	return &nfts.CreateNftForArticleResult{
-		Hash: tx.Hash().String(),
-		Cost: tx.Cost().Int64(),
-	}, nil
+	return
 }
 
 // VerifySignature checks if `sign` is a signature that is signed by `addr` using `signedData`.

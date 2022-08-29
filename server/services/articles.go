@@ -14,7 +14,6 @@ import (
 	"github.com/team-azb/knowtfolio/server/models"
 	goahttp "goa.design/goa/v3/http"
 	"gorm.io/gorm"
-	"math/big"
 )
 
 type articleService struct {
@@ -123,15 +122,18 @@ func (a articleService) Delete(_ context.Context, request *articles.ArticleDelet
 }
 
 func (a articleService) AuthorizeEdit(editorAddr string, target models.Article, requireNFT bool) error {
-	owner, err := a.Contract.GetOwnerOfArticle(&bind.CallOpts{}, target.ID)
-	if err != nil {
-		return err
+	isAuthorized := false
+	if target.IsTokenized {
+		owner, err := a.Contract.GetOwnerOfArticle(&bind.CallOpts{}, target.ID)
+		if err != nil {
+			return err
+		}
+		isAuthorized = editorAddr == owner.String()
+	} else if !requireNFT {
+		isAuthorized = editorAddr == target.OriginalAuthorAddress
 	}
-	nftExists := owner != common.BigToAddress(big.NewInt(0))
-	isNftOwner := editorAddr == owner.String()
-	isOriginalAuthor := editorAddr == target.OriginalAuthorAddress
 
-	if isNftOwner || (!nftExists && !requireNFT && isOriginalAuthor) {
+	if isAuthorized {
 		return nil
 	} else {
 		msg := fmt.Sprintf("Address %v does not have the right to do the specified operation on article %v.", editorAddr, target.ID)

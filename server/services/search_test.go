@@ -5,6 +5,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/stretchr/testify/assert"
 	"github.com/team-azb/knowtfolio/server/gateways/api/gen/search"
+	"github.com/team-azb/knowtfolio/server/gateways/ethereum"
 	"github.com/team-azb/knowtfolio/server/models"
 	"go.uber.org/multierr"
 	"testing"
@@ -28,6 +29,21 @@ var (
 	tsEntry = search.SearchResultEntry{ID: tsArticle.ID, Title: tsArticle.Title, OwnerAddress: user1Addr}
 )
 
+func tokenizeTestTargetArticle(client *ethereum.ContractClient, target *models.Article, ownerAddr string) error {
+	opts, err := client.NewAdminTransactOpts()
+	if err != nil {
+		return err
+	}
+
+	transactionLock[opts.From.String()].Lock()
+	defer transactionLock[opts.From.String()].Unlock()
+
+	target.SetIsTokenized()
+	_, err = client.MintNFT(opts, common.HexToAddress(ownerAddr), target.ID)
+
+	return err
+}
+
 func prepareSearchService(t *testing.T) searchService {
 	t.Parallel()
 
@@ -40,26 +56,20 @@ func prepareSearchService(t *testing.T) searchService {
 		t.Fatal(err)
 	}
 
+	// Mint NFTs for the target articles.
+	err0 := tokenizeTestTargetArticle(service.Contract, goArticle, user0Addr)
+	err1 := tokenizeTestTargetArticle(service.Contract, rsArticle, user1Addr)
+	err2 := tokenizeTestTargetArticle(service.Contract, ktArticle, user1Addr)
+	err3 := tokenizeTestTargetArticle(service.Contract, jsArticle, user0Addr)
+	err = multierr.Combine(err0, err1, err2, err3)
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	// Insert targets
 	result := service.DB.Create([]models.Article{*goArticle, *rsArticle, *pyArticle, *ktArticle, *jsArticle, *tsArticle})
 	if result.Error != nil {
 		t.Fatal(result.Error)
-	}
-
-	// Mint NFTs for the targets.
-	opts, err := service.Contract.NewAdminTransactOpts()
-	if err != nil {
-		t.Fatal(err)
-	}
-	transactionLock[opts.From.String()].Lock()
-	defer transactionLock[opts.From.String()].Unlock()
-	_, err0 := service.Contract.MintNFT(opts, common.HexToAddress(user0Addr), goArticle.ID)
-	_, err1 := service.Contract.MintNFT(opts, common.HexToAddress(user1Addr), rsArticle.ID)
-	_, err2 := service.Contract.MintNFT(opts, common.HexToAddress(user1Addr), ktArticle.ID)
-	_, err3 := service.Contract.MintNFT(opts, common.HexToAddress(user0Addr), jsArticle.ID)
-	err = multierr.Combine(err0, err1, err2, err3)
-	if err != nil {
-		t.Fatal(err)
 	}
 
 	return service
@@ -94,9 +104,6 @@ func TestSearchForArticles(t *testing.T) {
 	})
 
 	t.Run("WithOwnedBy", func(t *testing.T) {
-		// TODO: Remove this after `isTokenized` is added and used to filter transferred articles.
-		t.Skip("Currently this condition is not met.")
-
 		service := prepareSearchService(t)
 
 		result, err := service.SearchForArticles(context.Background(), &search.SearchRequest{

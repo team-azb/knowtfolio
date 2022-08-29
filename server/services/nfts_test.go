@@ -88,6 +88,12 @@ func TestCreateNFTForArticle(t *testing.T) {
 	expectedJSON, jsonErr := metadata.ToJSON()
 	assert.NoError(t, reqErr, copyErr, jsonErr)
 	assert.JSONEq(t, string(expectedJSON), actualJSONBuf.String())
+
+	// Assert DB change.
+	target := models.Article{ID: article0.ID}
+	res := service.DB.First(&target)
+	assert.NoError(t, res.Error)
+	assert.True(t, target.IsTokenized)
 }
 
 func waitForNFTByHash(cli *ethereum.ContractClient, txHash string) bool {

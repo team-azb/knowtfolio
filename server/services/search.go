@@ -45,9 +45,10 @@ func (s searchService) SearchForArticles(_ context.Context, request *search.Sear
 			return nil, err
 		}
 		ownedByCond := s.DB.
+			// Articles that has been tokenized and whose token is owned by the user.
 			Where(`id IN ?`, ownedArticleIds).
-			// TODO: Add is_tokenized to avoid articles that has created by but not currently owned by `OwnedBy`.
-			Or(`original_author_address = ?`, *request.OwnedBy)
+			// Articles that hasn't been tokenized and is originally created by the user.
+			Or(s.DB.Where(`is_tokenized = 0`).Where(`original_author_address = ?`, *request.OwnedBy))
 		baseQuery = baseQuery.Where(ownedByCond)
 	}
 	if request.Keywords != nil {
