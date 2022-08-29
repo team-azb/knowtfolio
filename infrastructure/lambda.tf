@@ -30,7 +30,7 @@ resource "aws_lambda_permission" "define_auth_challenge" {
   action        = "lambda:InvokeFunction"
   function_name = aws_lambda_function.define_auth_challenge.function_name
   principal     = "cognito-idp.amazonaws.com"
-  source_arn    = "${aws_cognito_user_pool.knowtfolio.arn}/*/*"
+  source_arn    = aws_cognito_user_pool.knowtfolio.arn
 }
 
 data "archive_file" "create_auth_challenge" {
@@ -51,12 +51,6 @@ resource "aws_lambda_function" "create_auth_challenge" {
   runtime          = "go1.x"
 }
 
-resource "aws_lambda_permission" "create_auth_challenge" {
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.create_auth_challenge.function_name
-  principal     = "cognito-idp.amazonaws.com"
-  source_arn    = "${aws_cognito_user_pool.knowtfolio.arn}/*/*"
-}
 
 data "archive_file" "verify_auth_challenge_response" {
   type        = "zip"
@@ -74,13 +68,6 @@ resource "aws_lambda_function" "verify_auth_challenge_response" {
   source_code_hash = data.archive_file.verify_auth_challenge_response.output_base64sha256
   handler          = "verify"
   runtime          = "go1.x"
-}
-
-resource "aws_lambda_permission" "verify_auth_challenge_response" {
-  action        = "lambda:InvokeFunction"
-  function_name = aws_lambda_function.verify_auth_challenge_response.function_name
-  principal     = "cognito-idp.amazonaws.com"
-  source_arn    = "${aws_cognito_user_pool.knowtfolio.arn}/*/*"
 }
 
 resource "null_resource" "build_go_functions" {
