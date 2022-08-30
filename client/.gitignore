@@ -3,8 +3,5 @@ node_modules/
 # artifacts
 dist/
 
-# solidity artifacts
-artifacts/
-
 # credentials
 .env
