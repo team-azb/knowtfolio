@@ -9,6 +9,7 @@ import Header from "~/components/organisms/Header";
 import NotFoundPage from "~/components/pages/NofFoundPage";
 import NewArticlePage from "~/components/pages/NewArticlePage";
 import EditArticlePage from "~/components/pages/EditArticlePage";
+import IndexArticlesPage from "./components/pages/IndexArticlesPage";
 import Web3Provider from "~/components/organisms/providers/Web3Provider";
 
 const App = () => {
@@ -42,6 +43,7 @@ const App = () => {
             path="/articles/:articleId/edit"
             element={<EditArticlePage />}
           />
+          <Route path="/articles" element={<IndexArticlesPage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </Web3Provider>
