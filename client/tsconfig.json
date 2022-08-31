@@ -5,9 +5,6 @@
             "~/*": [
                 "src/*"
             ],
-            "@/*": [
-                "../blockchain/artifacts/*"
-            ]
         },
         "target": "esnext",
         "useDefineForClassFields": true,
