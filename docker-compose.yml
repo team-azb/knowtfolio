@@ -50,28 +50,6 @@ services:
       - db
       - hardhat
 
-  hardhat:
-    build:
-      context: .
-      dockerfile: blockchain/Dockerfile
-    ports:
-      - "8545:8545"
-    environment:
-      HOST_UID: ${HOST_UID}
-      HOST_GID: ${HOST_GID}
-    entrypoint: /entrypoint.sh
-    command: npm --prefix ./blockchain run node
-    volumes:
-      - type: bind
-        source: ./blockchain
-        target: /work/blockchain
-      - type: bind
-        source: ./server
-        target: /work/server
-      - type: bind
-        source: ./entrypoint.sh
-        target: /entrypoint.sh
-
   goa:
     build:
       context: server
@@ -107,3 +85,33 @@ services:
       - type: bind
         source: ./server
         target: /server
+
+  hardhat:
+    build:
+      context: .
+      dockerfile: blockchain/Dockerfile
+    ports:
+      - "8545:8545"
+    environment:
+      HOST_UID: ${HOST_UID}
+      HOST_GID: ${HOST_GID}
+    entrypoint: /entrypoint.sh
+    command: npm --prefix ./blockchain run node
+    volumes:
+      - type: bind
+        source: ./blockchain
+        target: /work/blockchain
+      - type: bind
+        source: ./server
+        target: /work/server
+      - type: bind
+        source: ./entrypoint.sh
+        target: /entrypoint.sh
+
+  terraform:
+    image: hashicorp/terraform:1.2.8
+    working_dir: /work
+    volumes:
+      - type: bind
+        source: ./infrastructure
+        target: /work
