@@ -7,6 +7,10 @@ This is because, in many services, articles have to be maintained by one author 
 Knowtfolio solves this problem by making it possible to transfer editing rights using NFT.
 
 ## Run
+```bash
+make app
+```
+This will start the client app at http://localhost:3000 and the server app at http://localhost:8080 or http://localhost:3000/api.
 
 ### Start Backend Server & Database
 ```bash
