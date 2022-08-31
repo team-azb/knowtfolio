@@ -1,3 +1,7 @@
+CLIENT_NODE_MODULES_DIR = client/node_modules
+CLIENT_SRC_DIR = client/src
+CLIENT_DIST_DIR = client/dist
+
 GOA_DIR = server/gateways/api
 GOA_DESIGN_DIR = $(GOA_DIR)/design
 GOA_GEN_DIR = $(GOA_DIR)/gen
@@ -19,6 +23,13 @@ HOST_GID = $(shell id -g ${USER})
 
 # This exports all the variables defined above.
 .EXPORT_ALL_VARIABLES:
+
+$(CLIENT_NODE_MODULES_DIR): ./client/package.json ./client/Dockerfile
+	docker-compose build client
+	docker-compose run client npm install
+
+$(CLIENT_DIST_DIR): $(CLIENT_NODE_MODULES_DIR) $(CLIENT_SRC_DIR) $(CONTRACT_JSON_FILE) ./client/webpack.config.js
+	docker-compose run client npm run build
 
 $(GOA_GEN_DIR): $(GOA_DESIGN_DIR) $(GOA_DOCKER_FILE) ./server/go.mod
 	docker-compose up --build goa
@@ -43,7 +54,22 @@ $(CONTRACT_BIN_FILE): $(CONTRACT_JSON_FILE)
 	docker-compose run hardhat \
     	/bin/bash -c "cat $(CONTRACT_JSON_FILE) | jq -r '.bytecode' > $(CONTRACT_BIN_FILE)"
 
-.PHONY: clean goa server test go-eth-binding
+.PHONY: client server goa test go-eth-binding clean
+
+app: client server
+	docker-compose logs -f client server
+
+
+### Client ###
+
+client: $(CLIENT_DIST_DIR)
+	docker-compose up -d --build client
+
+fmt-cl: $(CLIENT_NODE_MODULES_DIR) $(CLIENT_SRC_DIR)
+	docker-compose run client npm run format
+
+lint-cl: $(CLIENT_NODE_MODULES_DIR) $(CLIENT_SRC_DIR)
+	docker-compose run client npm run lint
 
 
 ### Server ###
@@ -53,7 +79,7 @@ go-eth-binding: $(GO_ETH_BINDING_PATH)
 goa: $(GOA_GEN_DIR)
 
 server: goa go-eth-binding
-	docker-compose up --build server
+	docker-compose up -d --build server
 
 test: goa go-eth-binding
 	docker-compose up --build test

@@ -1,5 +1,24 @@
 version: '3.0'
 services:
+  client:
+    build: client
+    ports:
+      - "3000:3000"
+    environment:
+      HOST_UID: ${HOST_UID}
+      HOST_GID: ${HOST_GID}
+    entrypoint: /entrypoint.sh
+    command: npm start
+    volumes:
+      - type: bind
+        source: ./client
+        target: /work
+      - type: bind
+        source: ./entrypoint.sh
+        target: /entrypoint.sh
+    depends_on:
+      - server
+
   server:
     build: server
     ports:
