@@ -32,13 +32,20 @@ export const signInToCognitoWithPassword = async (
   const cognitoUser = new AmazonCognitoIdentity.CognitoUser(userData);
 
   return new Promise<string>((resolve, reject) => {
-    cognitoUser.authenticateUser(authenticationDetails, {
+    cognitoUser.setAuthenticationFlowType("CUSTOM_AUTH");
+    cognitoUser.initiateAuth(authenticationDetails, {
       onSuccess(session) {
         const accessToken = session.getAccessToken().getJwtToken();
         resolve(accessToken);
       },
       onFailure(err) {
         reject(err.message || JSON.stringify(err));
+      },
+      customChallenge: function (challengeParameters) {
+        // User authentication depends on challenge response
+        console.log(challengeParameters);
+        const challengeResponses = "challenge-answer";
+        cognitoUser.sendCustomChallengeAnswer(challengeResponses, this);
       },
     });
   });
