@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto/rand"
 	"fmt"
 
 	"github.com/aws/aws-lambda-go/events"
@@ -9,8 +10,17 @@ import (
 
 func handler(event *events.CognitoEventUserPoolsCreateAuthChallenge) (*events.CognitoEventUserPoolsCreateAuthChallenge, error) {
 	fmt.Printf("Create Auth Challenge: %+v\n", event)
-	event.Response.PublicChallengeParameters = map[string]string{"hoge": "public"}
-	event.Response.PrivateChallengeParameters = map[string]string{"fuga": "private"}
+
+	nonceBytes := make([]byte, 32)
+	_, err := rand.Read(nonceBytes)
+	if err != nil {
+		return nil, fmt.Errorf("could not generate nonce")
+	}
+
+	signMessage := fmt.Sprintf("Sign in to Knowtfolio. (nonce: %x)", nonceBytes)
+	event.Response.PublicChallengeParameters = map[string]string{"sign_message": signMessage}
+	event.Response.PrivateChallengeParameters = map[string]string{"sign_message": signMessage}
+
 	return event, nil
 }
 
