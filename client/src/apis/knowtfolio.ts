@@ -68,20 +68,16 @@ type searchArticlesResponse = {
   results: SearchResultEntry[];
   total_count: number;
 };
-type searchQueries = {
+type searchQuery = {
   keywords?: string;
   owned_by?: string;
   sort_by?: "created_at" | "updated_at";
   page_num?: number;
   page_size?: number;
 };
-export const searchArticles = async (args: searchQueries = {}) => {
-  const queryString = Object.entries(args)
-    .map(([queryKey, queryValue]) => {
-      return `${queryKey}=${queryValue}`;
-    })
-    .join("&");
-  const url = queryString === "" ? "api/search" : `api/search?${queryString}`;
-  const { data } = await axios.get<searchArticlesResponse>(url);
+export const searchArticles = async (queryParams: searchQuery = {}) => {
+  const { data } = await axios.get<searchArticlesResponse>("api/search", {
+    params: queryParams,
+  });
   return data;
 };
