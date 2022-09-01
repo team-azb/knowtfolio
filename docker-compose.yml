@@ -133,7 +133,8 @@ services:
         target: /entrypoint.sh
 
   terraform:
-    image: hashicorp/terraform:1.2.8
+    build: infrastructure
+    platform: linux/amd64 # For M1 mac...
     working_dir: /work
     volumes:
       - type: bind
