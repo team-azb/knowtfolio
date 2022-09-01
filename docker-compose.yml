@@ -1,7 +1,9 @@
 version: '3.0'
 services:
   client:
-    build: client
+    build:
+      context: .
+      dockerfile: client/Dockerfile
     ports:
       - "3000:3000"
     environment:
@@ -12,7 +14,10 @@ services:
     volumes:
       - type: bind
         source: ./client
-        target: /work
+        target: /client
+      - type: bind
+        source: ./blockchain/artifacts/contracts
+        target: /blockchain/artifacts/contracts
       - type: bind
         source: ./entrypoint.sh
         target: /entrypoint.sh

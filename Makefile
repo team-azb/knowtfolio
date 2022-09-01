@@ -24,11 +24,11 @@ HOST_GID = $(shell id -g ${USER})
 # This exports all the variables defined above.
 .EXPORT_ALL_VARIABLES:
 
-$(CLIENT_NODE_MODULES_DIR): ./client/package.json ./client/Dockerfile
+$(CLIENT_NODE_MODULES_DIR): ./client/package.json ./client/Dockerfile $(CONTRACT_JSON_FILE)
 	docker-compose build client
 	docker-compose run client npm install
 
-$(CLIENT_DIST_DIR): $(CLIENT_NODE_MODULES_DIR) $(CLIENT_SRC_DIR) $(CONTRACT_JSON_FILE) ./client/webpack.config.js
+$(CLIENT_DIST_DIR): ./client/webpack.config.js $(CLIENT_NODE_MODULES_DIR) $(CLIENT_SRC_DIR)
 	docker-compose run client npm run build
 
 $(GOA_GEN_DIR): $(GOA_DESIGN_DIR) $(GOA_DOCKER_FILE) ./server/go.mod

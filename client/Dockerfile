@@ -1,6 +1,6 @@
 FROM node:18.0.0
 
-WORKDIR /work
+WORKDIR /client
 
 RUN apt update -y && \
     apt upgrade -y && \
