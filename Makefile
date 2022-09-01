@@ -97,5 +97,5 @@ apply-tf:
 	docker-compose run terraform apply
 
 clean:
-	rm -rf $(GOA_GEN_DIR) $(HARDHAT_BUILD_DIRS) $(GO_ETH_BINDING_PATH) $(BLOCKCHAIN_NODE_MODULES_DIR)
+	rm -rf $(GOA_GEN_DIR) $(HARDHAT_BUILD_DIRS) $(GO_ETH_BINDING_PATH) $(BLOCKCHAIN_NODE_MODULES_DIR) $(CLIENT_DIST_DIR) $(CLIENT_NODE_MODULES_DIR)
 	docker-compose down
