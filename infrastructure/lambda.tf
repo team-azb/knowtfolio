@@ -81,15 +81,27 @@ resource "null_resource" "build_go_functions" {
   provisioner "local-exec" {
     command     = "go build ./cmd/define"
     working_dir = local.auth_challenge_func_dir
+    environment = {
+      GOARCH = "amd64"
+      GOOS = "linux"
+    }
   }
 
   provisioner "local-exec" {
     command     = "go build ./cmd/create"
     working_dir = local.auth_challenge_func_dir
+    environment = {
+      GOARCH = "amd64"
+      GOOS = "linux"
+    }
   }
 
   provisioner "local-exec" {
     command     = "go build ./cmd/verify"
     working_dir = local.auth_challenge_func_dir
+    environment = {
+      GOARCH = "amd64"
+      GOOS = "linux"
+    }
   }
 }
