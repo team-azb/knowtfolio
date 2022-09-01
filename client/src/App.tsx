@@ -37,10 +37,21 @@ const App = () => {
               </AuthProvider>
             }
           />
-          <Route path="/articles/new" element={<NewArticlePage />} />
+          <Route
+            path="/articles/new"
+            element={
+              <AuthProvider>
+                <NewArticlePage />
+              </AuthProvider>
+            }
+          />
           <Route
             path="/articles/:articleId/edit"
-            element={<EditArticlePage />}
+            element={
+              <AuthProvider>
+                <EditArticlePage />
+              </AuthProvider>
+            }
           />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
