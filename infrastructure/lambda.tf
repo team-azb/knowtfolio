@@ -83,7 +83,7 @@ resource "null_resource" "build_go_functions" {
     working_dir = local.auth_challenge_func_dir
     environment = {
       GOARCH = "amd64"
-      GOOS = "linux"
+      GOOS   = "linux"
     }
   }
 
@@ -92,7 +92,7 @@ resource "null_resource" "build_go_functions" {
     working_dir = local.auth_challenge_func_dir
     environment = {
       GOARCH = "amd64"
-      GOOS = "linux"
+      GOOS   = "linux"
     }
   }
 
@@ -101,7 +101,7 @@ resource "null_resource" "build_go_functions" {
     working_dir = local.auth_challenge_func_dir
     environment = {
       GOARCH = "amd64"
-      GOOS = "linux"
+      GOOS   = "linux"
     }
   }
 }
