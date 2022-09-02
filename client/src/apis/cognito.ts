@@ -5,6 +5,7 @@ import {
 } from "amazon-cognito-identity-js";
 import * as AmazonCognitoIdentity from "amazon-cognito-identity-js";
 import { userPool } from "~/configs/cognito";
+import Web3 from "web3";
 
 export const signOutFromCognito = (cognitoUser: CognitoUser) => {
   return new Promise<void>((resolve) => {
@@ -14,13 +15,13 @@ export const signOutFromCognito = (cognitoUser: CognitoUser) => {
   });
 };
 
-export const signInToCognitoWithPassword = async (
+export const signInToCognitoWithWallet = async (
   username: string,
-  password: string
+  web3: Web3,
+  account: string
 ) => {
   const authenticationData = {
     Username: username,
-    Password: password,
   };
   const authenticationDetails = new AmazonCognitoIdentity.AuthenticationDetails(
     authenticationData
@@ -44,8 +45,12 @@ export const signInToCognitoWithPassword = async (
       customChallenge: function (challengeParameters) {
         // User authentication depends on challenge response
         console.log(challengeParameters);
-        const challengeResponses = "challenge-answer";
-        cognitoUser.sendCustomChallengeAnswer(challengeResponses, this);
+        const signedMessage = web3.eth.personal.sign(
+          challengeParameters["sign_message"],
+          account,
+          ""
+        );
+        cognitoUser.sendCustomChallengeAnswer(signedMessage, this);
       },
     });
   });
