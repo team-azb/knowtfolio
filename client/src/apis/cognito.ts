@@ -42,10 +42,10 @@ export const signInToCognitoWithWallet = async (
       onFailure(err) {
         reject(err.message || JSON.stringify(err));
       },
-      customChallenge: function (challengeParameters) {
+      customChallenge: async function (challengeParameters) {
         // User authentication depends on challenge response
         console.log(challengeParameters);
-        const signedMessage = web3.eth.personal.sign(
+        const signedMessage = await web3.eth.personal.sign(
           challengeParameters["sign_message"],
           account,
           ""
