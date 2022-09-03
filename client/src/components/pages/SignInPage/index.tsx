@@ -1,5 +1,6 @@
 import { useCallback, useState } from "react";
-import { signInToCognitoWithPassword } from "~/apis/cognito";
+import { signInToCognitoWithWallet } from "~/apis/cognito";
+import { useWeb3Context } from "~/components/organisms/providers/Web3Provider";
 
 type signInWithPasswordForm = {
   username: string;
@@ -7,6 +8,7 @@ type signInWithPasswordForm = {
 };
 
 const SignInPage = () => {
+  const { web3, account } = useWeb3Context();
   const [form, setForm] = useState<signInWithPasswordForm>({
     username: "",
     password: "",
@@ -30,7 +32,7 @@ const SignInPage = () => {
 
   const signIn = useCallback(async () => {
     try {
-      await signInToCognitoWithPassword(form.username, form.password);
+      await signInToCognitoWithWallet(form.username, web3, account);
       alert("サインイン成功");
       window.location.reload();
     } catch (error) {

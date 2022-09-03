@@ -40,3 +40,9 @@ resource "aws_iam_role" "knowtfolio_auth_challenge_lambda" {
   name               = "knowtfolio-lambda-auth-challenge"
   assume_role_policy = file("${path.module}/templates/iam/knowtfolio_auth_challenge_lambda_assume_policy.json")
 }
+
+resource "aws_iam_role_policy" "basic_lambda_policy" {
+  name   = "basic-lambda-policy"
+  role   = aws_iam_role.knowtfolio_auth_challenge_lambda.name
+  policy = file("${path.module}/templates/iam/basic_lambda_policy.json")
+}
