@@ -9,7 +9,7 @@ import (
 )
 
 func handler(event *events.CognitoEventUserPoolsCreateAuthChallenge) (*events.CognitoEventUserPoolsCreateAuthChallenge, error) {
-	fmt.Printf("Create Auth Challenge: %+v\n", event)
+	defer fmt.Printf("Create Auth Challenge: %+v\n", event)
 
 	nonceBytes := make([]byte, 32)
 	_, err := rand.Read(nonceBytes)
@@ -17,7 +17,7 @@ func handler(event *events.CognitoEventUserPoolsCreateAuthChallenge) (*events.Co
 		return nil, fmt.Errorf("could not generate nonce")
 	}
 
-	signMessage := fmt.Sprintf("Sign in to Knowtfolio. (nonce: %x)", nonceBytes)
+	signMessage := fmt.Sprintf("Sign in to Knowtfolio.\n(nonce: %x)", nonceBytes)
 	event.Response.PublicChallengeParameters = map[string]string{"sign_message": signMessage}
 	event.Response.PrivateChallengeParameters = map[string]string{"sign_message": signMessage}
 
