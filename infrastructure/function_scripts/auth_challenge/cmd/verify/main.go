@@ -12,9 +12,10 @@ import (
 )
 
 func handler(event *events.CognitoEventUserPoolsVerifyAuthChallenge) (*events.CognitoEventUserPoolsVerifyAuthChallenge, error) {
-	fmt.Printf("Verify Auth Challenge: %+v\n", event)
+	defer fmt.Printf("Verify Auth Challenge: %+v\n", event)
 
-	address := event.Request.UserAttributes["wallet_address"]
+	// `custom:wallet_address` should exist after passing the `define` phase.
+	address := event.Request.UserAttributes["custom:wallet_address"]
 	sign := event.Request.ChallengeAnswer.(string)
 	signedData := event.Request.PrivateChallengeParameters["sign_message"]
 
