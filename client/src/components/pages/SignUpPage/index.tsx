@@ -20,6 +20,7 @@ const SignUpPage = () => {
         case "email":
         case "password":
         case "username":
+        case "wallet_address":
           setForm((prev) => {
             return { ...prev, [event.target.name]: event.target.value };
           });
@@ -87,6 +88,16 @@ const SignUpPage = () => {
           name="password"
           onChange={changeForm}
           value={form.password}
+        />
+      </div>
+      <div>
+        wallet address(optional)
+        <input
+          disabled={hasSignUp}
+          type="text"
+          name="wallet_address"
+          onChange={changeForm}
+          value={form.wallet}
         />
       </div>
       <div>

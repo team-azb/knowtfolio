@@ -90,13 +90,18 @@ export type SignUpForm = {
   email: string;
   password: string;
   username: string;
+  wallet?: string;
 };
 
 export const signUpToCognito = (form: SignUpForm) => {
   const attributeList = [
-    new AmazonCognitoIdentity.CognitoUserAttribute({
+    new CognitoUserAttribute({
       Name: "email",
       Value: form.email,
+    }),
+    new CognitoUserAttribute({
+      Name: "custom:wallet_address",
+      Value: form.wallet || "",
     }),
   ];
   return new Promise<AmazonCognitoIdentity.CognitoUser>((resolve, reject) => {
