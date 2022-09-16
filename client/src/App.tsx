@@ -10,6 +10,7 @@ import NotFoundPage from "~/components/pages/NofFoundPage";
 import NewArticlePage from "~/components/pages/NewArticlePage";
 import EditArticlePage from "~/components/pages/EditArticlePage";
 import Web3Provider from "~/components/organisms/providers/Web3Provider";
+import ResetWalletPage from "./components/pages/ResetWalletPage";
 
 const App = () => {
   return (
@@ -21,6 +22,14 @@ const App = () => {
           <Route path="/" element={<TopPage />} />
           <Route path="/signup" element={<SignUpPage />} />
           <Route path="/signin" element={<SignInPage />} />
+          <Route
+            path="/reset-wallet"
+            element={
+              <AuthProvider>
+                <ResetWalletPage />
+              </AuthProvider>
+            }
+          />
           <Route
             path="/mypage"
             element={
