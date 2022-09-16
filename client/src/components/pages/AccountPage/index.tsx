@@ -24,7 +24,7 @@ const AccountPage = () => {
       <p>email: {email}</p>
       <p>
         wallet address: {walletAddress || "未登録"}{" "}
-        <Link to="/reset-wallet">変更/登録する</Link>{" "}
+        <Link to="/reset-wallet">変更/登録する</Link>
       </p>
       <button onClick={signOut}>sign out</button>
     </div>
