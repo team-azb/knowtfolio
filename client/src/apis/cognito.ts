@@ -15,6 +15,36 @@ export const signOutFromCognito = (cognitoUser: CognitoUser) => {
   });
 };
 
+export const signInToCognitoWithPassword = async (
+  username: string,
+  password: string
+) => {
+  const authenticationData = {
+    Username: username,
+    Password: password,
+  };
+  const authenticationDetails = new AmazonCognitoIdentity.AuthenticationDetails(
+    authenticationData
+  );
+  const userData = {
+    Username: username,
+    Pool: userPool,
+  };
+  const cognitoUser = new AmazonCognitoIdentity.CognitoUser(userData);
+
+  return new Promise<string>((resolve, reject) => {
+    cognitoUser.authenticateUser(authenticationDetails, {
+      onSuccess(session) {
+        const accessToken = session.getAccessToken().getJwtToken();
+        resolve(accessToken);
+      },
+      onFailure(err) {
+        reject(err.message || JSON.stringify(err));
+      },
+    });
+  });
+};
+
 export const signInToCognitoWithWallet = async (
   username: string,
   web3: Web3,

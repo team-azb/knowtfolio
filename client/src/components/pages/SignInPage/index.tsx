@@ -1,68 +1,33 @@
-import { useCallback, useState } from "react";
-import { signInToCognitoWithWallet } from "~/apis/cognito";
-import { useWeb3Context } from "~/components/organisms/providers/Web3Provider";
+import { useCallback, useMemo, useState } from "react";
+import PasswordSignInForm from "~/components/organisms/forms/PasswordSignInForm";
+import WalletSignInForm from "~/components/organisms/forms/WalletSignInForm";
 
-type signInWithPasswordForm = {
-  username: string;
-  password: string;
-};
+type signinMethod = "password" | "wallet";
 
 const SignInPage = () => {
-  const { web3, account } = useWeb3Context();
-  const [form, setForm] = useState<signInWithPasswordForm>({
-    username: "",
-    password: "",
-  });
+  const [signinMethod, setSigninMethod] = useState<signinMethod>("password");
 
-  const changeForm = useCallback<React.ChangeEventHandler<HTMLInputElement>>(
-    (event) => {
-      switch (event.target.name) {
-        case "username":
-        case "password":
-          setForm((prev) => {
-            return { ...prev, [event.target.name]: event.target.value };
-          });
-          break;
-        default:
-          break;
-      }
-    },
-    []
-  );
+  const changeSigninMethod = useCallback<
+    React.ChangeEventHandler<HTMLSelectElement>
+  >((event) => {
+    setSigninMethod(event.target.value as signinMethod);
+  }, []);
 
-  const signIn = useCallback(async () => {
-    try {
-      await signInToCognitoWithWallet(form.username, web3, account);
-      alert("サインイン成功");
-      window.location.reload();
-    } catch (error) {
-      console.error(error);
-      alert("サインイン失敗");
-    }
-  }, [form]);
+  const signinForm = useMemo(() => {
+    return signinMethod === "password" ? (
+      <PasswordSignInForm />
+    ) : (
+      <WalletSignInForm />
+    );
+  }, [signinMethod]);
+
   return (
     <div>
-      <div>
-        username
-        <input
-          name="username"
-          onChange={changeForm}
-          value={form.username}
-          type="text"
-        />
-      </div>
-      <div>
-        password
-        <input
-          name="password"
-          onChange={changeForm}
-          value={form.password}
-          type="password"
-        />
-      </div>
-      <div>
-        <button onClick={signIn}>sign in</button>
-      </div>
+      <select value={signinMethod} onChange={changeSigninMethod}>
+        <option value="password">パスワードでログイン</option>
+        <option value="wallet">ウォレットでログイン</option>
+      </select>
+      {signinForm}
     </div>
   );
 };
