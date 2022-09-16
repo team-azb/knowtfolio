@@ -1,29 +1,39 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import PasswordSignInForm from "~/components/organisms/forms/PasswordSignInForm";
 import WalletSignInForm from "~/components/organisms/forms/WalletSignInForm";
-
-type signinMethod = "password" | "wallet";
+import { useQuery } from "~/helpers/reactRouter";
 
 const SignInPage = () => {
-  const [signinMethod, setSigninMethod] = useState<signinMethod>("password");
+  const query = useQuery();
+  const signInMethod = useMemo(() => {
+    return query.get("method") || "password";
+  }, [query]);
+  const navigate = useNavigate();
 
   const changeSigninMethod = useCallback<
     React.ChangeEventHandler<HTMLSelectElement>
-  >((event) => {
-    setSigninMethod(event.target.value as signinMethod);
-  }, []);
+  >(
+    (event) => {
+      navigate(`/signin?method=${event.target.value}`);
+    },
+    [navigate]
+  );
 
   const signinForm = useMemo(() => {
-    return signinMethod === "password" ? (
-      <PasswordSignInForm />
-    ) : (
-      <WalletSignInForm />
-    );
-  }, [signinMethod]);
+    switch (signInMethod) {
+      case "password":
+        return <PasswordSignInForm />;
+      case "wallet":
+        return <WalletSignInForm />;
+      default:
+        return <PasswordSignInForm />;
+    }
+  }, [signInMethod]);
 
   return (
     <div>
-      <select value={signinMethod} onChange={changeSigninMethod}>
+      <select value={signInMethod} onChange={changeSigninMethod}>
         <option value="password">パスワードでログイン</option>
         <option value="wallet">ウォレットでログイン</option>
       </select>

@@ -40,7 +40,7 @@ const WalletSignInForm = () => {
           value={username}
         />
       </div>
-      <button onClick={signIn}>サインイン</button>
+      <button onClick={signIn}>sign in</button>
     </form>
   );
 };
