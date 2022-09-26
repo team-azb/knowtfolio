@@ -1,3 +1,4 @@
+import { useNavigate } from "react-router-dom";
 import AuthProvider, {
   useAuthContext,
 } from "~/components/organisms/providers/AuthProvider";
@@ -8,9 +9,17 @@ const AcountInfo = () => {
 };
 
 const Header = () => {
+  const navigate = useNavigate();
   return (
     <div>
-      <h1>knowtfolio</h1>
+      <h1
+        style={{ cursor: "pointer" }}
+        onClick={() => {
+          navigate("/");
+        }}
+      >
+        knowtfolio
+      </h1>
       <AuthProvider contentOnUnauthenticated={<p>未認証ユーザー</p>}>
         <AcountInfo />
       </AuthProvider>
