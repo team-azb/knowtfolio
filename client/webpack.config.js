@@ -104,7 +104,7 @@ module.exports = {
           if (path.includes("/api")) {
             return true;
           } else if (/\/articles\/.+/.test(path)) {
-            const editMatcher = /articles\/\w+\/edit/g;
+            const editMatcher = /\/articles\/.+\/edit/g;
             return !path.includes("/articles/new") && !path.match(editMatcher);
           } else {
             return false;
