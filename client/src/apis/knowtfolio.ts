@@ -76,7 +76,7 @@ type searchQuery = {
   page_size?: number;
 };
 export const searchArticles = async (queryParams: searchQuery = {}) => {
-  const { data } = await axios.get<searchArticlesResponse>("api/search", {
+  const { data } = await axios.get<searchArticlesResponse>("/api/search", {
     params: queryParams,
   });
   return data;
