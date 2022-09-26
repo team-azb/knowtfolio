@@ -4,6 +4,7 @@ import {
   SignUpForm,
   confirmSigningUpToCognito,
 } from "~/apis/cognito";
+import { useWeb3Context } from "~/components/organisms/providers/Web3Provider";
 
 const SignUpPage = () => {
   const [form, setForm] = useState<SignUpForm>({
@@ -13,6 +14,7 @@ const SignUpPage = () => {
   });
   const [hasSignUp, setHasSignUp] = useState(false);
   const [code, setCode] = useState("");
+  const { account } = useWeb3Context();
 
   const changeForm = useCallback<React.ChangeEventHandler<HTMLInputElement>>(
     (event) => {
@@ -20,16 +22,26 @@ const SignUpPage = () => {
         case "email":
         case "password":
         case "username":
-        case "wallet_address":
           setForm((prev) => {
             return { ...prev, [event.target.name]: event.target.value };
           });
+          break;
+        case "wallet":
+          if (event.target.checked) {
+            setForm((prev) => {
+              return { ...prev, wallet: account };
+            });
+          } else {
+            setForm((prev) => {
+              return { ...prev, wallet: undefined };
+            });
+          }
           break;
         default:
           break;
       }
     },
-    []
+    [account]
   );
 
   const submitForm = useCallback(async () => {
@@ -91,14 +103,15 @@ const SignUpPage = () => {
         />
       </div>
       <div>
-        wallet address(optional)
         <input
-          disabled={hasSignUp}
-          type="text"
-          name="wallet_address"
+          type="checkbox"
+          name="wallet"
+          id="wallet"
           onChange={changeForm}
-          value={form.wallet}
         />
+        <label htmlFor="wallet">
+          <b>{account}</b>をwallet addressとして登録する(オプション)
+        </label>
       </div>
       <div>
         <button onClick={submitForm}>submit</button>
