@@ -5,6 +5,9 @@ import { TINY_MCE_API_KEY } from "~/configs/tinymce";
 import { useCallback, useEffect, useState } from "react";
 import { getArticle, putArticle } from "~/apis/knowtfolio";
 import { useWeb3Context } from "~/components/organisms/providers/Web3Provider";
+import { ARTICLE_RESOURCES_S3_BUCKET } from "~/configs/s3";
+import { PutObjectCommand } from "@aws-sdk/client-s3";
+import { useS3Client } from "~/apis/s3";
 
 const ArticleEditForm = () => {
   const { articleId } = useParams();
@@ -16,6 +19,7 @@ const ArticleEditForm = () => {
     setContent(value);
   }, []);
   const { web3, account } = useWeb3Context();
+  const s3Client = useS3Client();
 
   useEffect(() => {
     (async () => {
@@ -64,7 +68,20 @@ const ArticleEditForm = () => {
           menubar: true,
           content_style:
             "body { font-family:Helvetica,Arial,sans-serif; font-size:14px }",
+          images_upload_handler: async (blobInfo) => {
+            const timestamp = new Date().getTime();
+            const filename = `${timestamp}_${blobInfo.filename()}`;
+            const command = new PutObjectCommand({
+              Bucket: ARTICLE_RESOURCES_S3_BUCKET,
+              Key: `images/${filename}`,
+              Body: blobInfo.blob(),
+              ContentType: blobInfo.blob().type,
+            });
+            await s3Client.send(command);
+            return `https://knowtfolio.com/images/${filename}`;
+          },
         }}
+        plugins={["image"]}
       />
       <p>preview</p>
       <div>{content}</div>
