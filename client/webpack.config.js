@@ -100,12 +100,16 @@ module.exports = {
     port: 3000,
     proxy: [
       {
-        context: [
-          "/api/**",
-          "/articles/**",
-          "!/articles/new",
-          "!/articles/**/edit",
-        ],
+        context: (path) => {
+          if (path.includes("/api")) {
+            return true;
+          } else if (/\/articles\/.+/.test(path)) {
+            const editMatcher = /articles\/\w+\/edit/g;
+            return !path.includes("/articles/new") && !path.match(editMatcher);
+          } else {
+            return false;
+          }
+        },
         target: "http://server:8080",
       },
     ],
