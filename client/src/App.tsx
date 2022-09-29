@@ -4,7 +4,7 @@ import SignUpPage from "~/components/pages/SignUpPage";
 import SignInPage from "~/components/pages/SignInPage";
 import AccountPage from "~/components/pages/AccountPage";
 import AuthProvider from "~/components/organisms/providers/AuthProvider";
-import ImageUploadPage from "~/components/pages/ImageUploadPage";
+import UploadImagePage from "~/components/pages/UploadImagePage";
 import Header from "~/components/organisms/Header";
 import NotFoundPage from "~/components/pages/NofFoundPage";
 import NewArticlePage from "~/components/pages/NewArticlePage";
@@ -39,10 +39,10 @@ const App = () => {
             }
           />
           <Route
-            path="/image-upload"
+            path="/upload-image"
             element={
               <AuthProvider>
-                <ImageUploadPage />
+                <UploadImagePage />
               </AuthProvider>
             }
           />
