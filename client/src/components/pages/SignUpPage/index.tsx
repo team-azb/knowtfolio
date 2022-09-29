@@ -16,7 +16,7 @@ const SignUpPage = () => {
   const [code, setCode] = useState("");
   const { account } = useWeb3Context();
 
-  const changeForm = useCallback<React.ChangeEventHandler<HTMLInputElement>>(
+  const onChangeForm = useCallback<React.ChangeEventHandler<HTMLInputElement>>(
     (event) => {
       switch (event.target.name) {
         case "email":
@@ -79,7 +79,7 @@ const SignUpPage = () => {
           disabled={hasSignUp}
           type="text"
           name="username"
-          onChange={changeForm}
+          onChange={onChangeForm}
         />
       </div>
       <div>
@@ -88,7 +88,7 @@ const SignUpPage = () => {
           disabled={hasSignUp}
           type="text"
           name="email"
-          onChange={changeForm}
+          onChange={onChangeForm}
           value={form.email}
         />
       </div>
@@ -98,7 +98,7 @@ const SignUpPage = () => {
           disabled={hasSignUp}
           type="text"
           name="password"
-          onChange={changeForm}
+          onChange={onChangeForm}
           value={form.password}
         />
       </div>
@@ -107,7 +107,7 @@ const SignUpPage = () => {
           type="checkbox"
           name="wallet"
           id="wallet"
-          onChange={changeForm}
+          onChange={onChangeForm}
         />
         <label htmlFor="wallet">
           <b>{account}</b>をwallet addressとして登録する(オプション)

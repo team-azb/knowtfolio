@@ -11,7 +11,7 @@ const SignInPage = () => {
   }, [query]);
   const navigate = useNavigate();
 
-  const changeSigninMethod = useCallback<
+  const onChangeSigninMethodSelect = useCallback<
     React.ChangeEventHandler<HTMLSelectElement>
   >(
     (event) => {
@@ -33,7 +33,7 @@ const SignInPage = () => {
 
   return (
     <div>
-      <select value={signInMethod} onChange={changeSigninMethod}>
+      <select value={signInMethod} onChange={onChangeSigninMethodSelect}>
         <option value="password">パスワードでログイン</option>
         <option value="wallet">ウォレットでログイン</option>
       </select>

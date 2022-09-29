@@ -12,7 +12,7 @@ const PasswordSignInForm = () => {
     password: "",
   });
 
-  const changeForm = useCallback<React.ChangeEventHandler<HTMLInputElement>>(
+  const onChangeForm = useCallback<React.ChangeEventHandler<HTMLInputElement>>(
     (event) => {
       switch (event.target.name) {
         case "username":
@@ -49,7 +49,7 @@ const PasswordSignInForm = () => {
         username
         <input
           name="username"
-          onChange={changeForm}
+          onChange={onChangeForm}
           value={form.username}
           type="text"
         />
@@ -58,7 +58,7 @@ const PasswordSignInForm = () => {
         password
         <input
           name="password"
-          onChange={changeForm}
+          onChange={onChangeForm}
           value={form.password}
           type="password"
         />

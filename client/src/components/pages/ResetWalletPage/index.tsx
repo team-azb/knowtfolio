@@ -37,7 +37,7 @@ const ResetWalletPage = () => {
     }
   }, [user, walletAddressInput]);
 
-  const changeWalletAddressInput = useCallback<
+  const onChangeWalletAddressInput = useCallback<
     React.ChangeEventHandler<HTMLInputElement>
   >(
     (event) => {
@@ -62,7 +62,7 @@ const ResetWalletPage = () => {
             name="wallet"
             id="wallet_address"
             checked={walletAddressInput !== null}
-            onChange={changeWalletAddressInput}
+            onChange={onChangeWalletAddressInput}
           />
           <label htmlFor="wallet_address">
             <b>{account}</b>を登録する
@@ -74,7 +74,7 @@ const ResetWalletPage = () => {
             name="wallet"
             id="none"
             checked={walletAddressInput === null}
-            onChange={changeWalletAddressInput}
+            onChange={onChangeWalletAddressInput}
           />
           <label htmlFor="none">wallet addressを登録解除する</label>
         </div>

@@ -6,7 +6,7 @@ const WalletSignInForm = () => {
   const [username, setUsername] = useState("");
   const { web3, account } = useWeb3Context();
 
-  const changeUsername = useCallback<
+  const onChangeUsernameInput = useCallback<
     React.ChangeEventHandler<HTMLInputElement>
   >((event) => {
     setUsername(event.target.value);
@@ -36,7 +36,7 @@ const WalletSignInForm = () => {
           name="username"
           type="text"
           placeholder="username"
-          onChange={changeUsername}
+          onChange={onChangeUsernameInput}
           value={username}
         />
       </div>
