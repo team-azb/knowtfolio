@@ -54,16 +54,16 @@ $(CONTRACT_BIN_FILE): $(CONTRACT_JSON_FILE)
 	docker-compose run hardhat \
     	/bin/bash -c "cat $(CONTRACT_JSON_FILE) | jq -r '.bytecode' > $(CONTRACT_BIN_FILE)"
 
-.PHONY: client server goa test go-eth-binding clean
+.PHONY: app client server goa test go-eth-binding clean
 
-app: client server
-	docker-compose logs -f client server
+app:
+	docker-compose up --build client server
 
 
 ### Client ###
 
 client: $(CLIENT_DIST_DIR)
-	docker-compose up -d --build client
+	docker-compose up --build client
 
 fmt-cl: $(CLIENT_NODE_MODULES_DIR) $(CLIENT_SRC_DIR)
 	docker-compose run client npm run format
@@ -79,7 +79,7 @@ go-eth-binding: $(GO_ETH_BINDING_PATH)
 goa: $(GOA_GEN_DIR)
 
 server: goa go-eth-binding
-	docker-compose up -d --build server
+	docker-compose up --build server
 
 test: goa go-eth-binding
 	docker-compose up --build test
