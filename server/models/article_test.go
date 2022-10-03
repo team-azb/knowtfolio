@@ -36,10 +36,14 @@ func TestSetContentIfPresent(t *testing.T) {
 }
 
 func TestToHtml(t *testing.T) {
+	rawContent := `
+		<div> Hello HTML! </div>
+		<img src="https://i.imgur.com/Ru0JifT.jpeg" alt="basketball legend" width="410" height="213">
+	`
 	src := Article{
 		ID:        "abcdefghijk",
 		Title:     "Hello Knowtfolio!",
-		Content:   []byte("<div> Hello HTML! </div>"),
+		Content:   []byte(rawContent),
 		CreatedAt: time.Time{},
 		UpdatedAt: time.Time{},
 	}
@@ -54,6 +58,7 @@ func TestToHtml(t *testing.T) {
 			<body>
 				<h1> Hello Knowtfolio! </h1>
 				<div> Hello HTML! </div>
+				<img src="https://i.imgur.com/Ru0JifT.jpeg" alt="basketball legend" width="410" height="213">
 			</body>`
 
 	assert.Equal(t, strings.Fields(expected), strings.Fields(string(actual)))
