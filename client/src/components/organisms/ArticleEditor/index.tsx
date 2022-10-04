@@ -33,7 +33,7 @@ const ArticleEditor = ({ onEditorChange, value }: articleEditorProps) => {
             ContentType: blobInfo.blob().type,
           });
           await s3Client.send(command);
-          return `https://knowtfolio.com/images/${filename}`;
+          return encodeURI(`https://knowtfolio.com/images/${filename}`);
         },
         text_patterns: [
           { start: "*", end: "*", format: "italic" },
