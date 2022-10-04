@@ -421,6 +421,202 @@ paths:
                         application/vnd.goa.error+json:
                             schema:
                                 $ref: '#/components/schemas/Error'
+    /api/questions/{id}/answers:
+        post:
+            tags:
+                - questions
+            summary: Create Answer questions
+            description: Create an answer for a question.
+            operationId: questions#Create Answer
+            parameters:
+                - name: id
+                  in: path
+                  description: 質問のID
+                  required: true
+                  schema:
+                    type: string
+                    description: 質問のID
+                    example: exampleId01
+                    pattern: ^[A-Za-z0-9_-]+$
+                    minLength: 11
+                    maxLength: 11
+                  example: exampleId01
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/CreateAnswerRequestBody'
+                        example:
+                            content: <h1> Hello World! </h1>
+            responses:
+                "200":
+                    description: OK response.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/CreateAnswerResponseBody'
+                            example:
+                                answer_id: exampleId01
+                                content: <h1> Hello World! </h1>
+                                question_id: exampleId01
+                "404":
+                    description: 'not_found: IDに対応するリソースが見つからなかった場合'
+                    content:
+                        application/vnd.goa.error+json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+    /api/questions/{id}/answers/{answer_id}:
+        delete:
+            tags:
+                - questions
+            summary: Delete Answer questions
+            description: Delete an answer for a question.
+            operationId: questions#Delete Answer
+            parameters:
+                - name: id
+                  in: path
+                  description: 質問のID
+                  required: true
+                  schema:
+                    type: string
+                    description: 質問のID
+                    example: exampleId01
+                    pattern: ^[A-Za-z0-9_-]+$
+                    minLength: 11
+                    maxLength: 11
+                  example: exampleId01
+                - name: answer_id
+                  in: path
+                  description: 回答のID
+                  required: true
+                  schema:
+                    type: string
+                    description: 回答のID
+                    example: exampleId01
+                    pattern: ^[A-Za-z0-9_-]+$
+                    minLength: 11
+                    maxLength: 11
+                  example: exampleId01
+            responses:
+                "200":
+                    description: OK response.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/DeleteAnswerResponseBodyOnlyID'
+                            example:
+                                answer_id: exampleId01
+                "404":
+                    description: 'not_found: IDに対応するリソースが見つからなかった場合'
+                    content:
+                        application/vnd.goa.error+json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+        get:
+            tags:
+                - questions
+            summary: Read Answer questions
+            description: Read an answer for a question.
+            operationId: questions#Read Answer
+            parameters:
+                - name: id
+                  in: path
+                  description: 質問のID
+                  required: true
+                  schema:
+                    type: string
+                    description: 質問のID
+                    example: exampleId01
+                    pattern: ^[A-Za-z0-9_-]+$
+                    minLength: 11
+                    maxLength: 11
+                  example: exampleId01
+                - name: answer_id
+                  in: path
+                  description: 回答のID
+                  required: true
+                  schema:
+                    type: string
+                    description: 回答のID
+                    example: exampleId01
+                    pattern: ^[A-Za-z0-9_-]+$
+                    minLength: 11
+                    maxLength: 11
+                  example: exampleId01
+            responses:
+                "200":
+                    description: OK response.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/CreateAnswerResponseBody'
+                            example:
+                                answer_id: exampleId01
+                                content: <h1> Hello World! </h1>
+                                question_id: exampleId01
+                "404":
+                    description: 'not_found: IDに対応するリソースが見つからなかった場合'
+                    content:
+                        application/vnd.goa.error+json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
+        put:
+            tags:
+                - questions
+            summary: Update Answer questions
+            description: Update an answer for a question.
+            operationId: questions#Update Answer
+            parameters:
+                - name: id
+                  in: path
+                  description: 質問のID
+                  required: true
+                  schema:
+                    type: string
+                    description: 質問のID
+                    example: exampleId01
+                    pattern: ^[A-Za-z0-9_-]+$
+                    minLength: 11
+                    maxLength: 11
+                  example: exampleId01
+                - name: answer_id
+                  in: path
+                  description: 回答のID
+                  required: true
+                  schema:
+                    type: string
+                    description: 回答のID
+                    example: exampleId01
+                    pattern: ^[A-Za-z0-9_-]+$
+                    minLength: 11
+                    maxLength: 11
+                  example: exampleId01
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/CreateAnswerRequestBody'
+                        example:
+                            content: <h1> Hello World! </h1>
+            responses:
+                "200":
+                    description: OK response.
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/CreateAnswerResponseBody'
+                            example:
+                                answer_id: exampleId01
+                                content: <h1> Hello World! </h1>
+                                question_id: exampleId01
+                "404":
+                    description: 'not_found: IDに対応するリソースが見つからなかった場合'
+                    content:
+                        application/vnd.goa.error+json:
+                            schema:
+                                $ref: '#/components/schemas/Error'
     /api/search:
         get:
             tags:
@@ -469,9 +665,9 @@ paths:
                     type: integer
                     description: 取得したい位置のページ番号（1-indexed）
                     default: 1
-                    example: 16071452616888724726
+                    example: 13692916563268264376
                     minimum: 1
-                  example: 12492156145710707969
+                  example: 17930849223655672614
                 - name: page_size
                   in: query
                   description: 1ページあたりのコンテンツ数
@@ -480,10 +676,10 @@ paths:
                     type: integer
                     description: 1ページあたりのコンテンツ数
                     default: 10
-                    example: 61
+                    example: 66
                     minimum: 1
                     maximum: 100
-                  example: 22
+                  example: 39
             responses:
                 "200":
                     description: OK response.
@@ -538,21 +734,62 @@ paths:
                                 $ref: '#/components/schemas/Error'
 components:
     schemas:
+        CreateAnswerRequestBody:
+            type: object
+            properties:
+                content:
+                    type: string
+                    description: 本文のHTML
+                    example: <h1> Hello World! </h1>
+            example:
+                content: <h1> Hello World! </h1>
+            required:
+                - content
+        CreateAnswerResponseBody:
+            type: object
+            properties:
+                answer_id:
+                    type: string
+                    description: 回答のID
+                    example: exampleId01
+                    pattern: ^[A-Za-z0-9_-]+$
+                    minLength: 11
+                    maxLength: 11
+                content:
+                    type: string
+                    description: 本文のHTML
+                    example: <h1> Hello World! </h1>
+                question_id:
+                    type: string
+                    description: 質問のID
+                    example: exampleId01
+                    pattern: ^[A-Za-z0-9_-]+$
+                    minLength: 11
+                    maxLength: 11
+            description: Create AnswerResponseBody result type (default view)
+            example:
+                answer_id: exampleId01
+                content: <h1> Hello World! </h1>
+                question_id: exampleId01
+            required:
+                - answer_id
+                - question_id
+                - content
         CreateNftForArticleResult:
             type: object
             properties:
                 cost:
                     type: integer
                     description: トークン発行にかかったコスト
-                    example: 8029691757945361066
+                    example: 2494340203643141981
                     format: int64
                 hash:
                     type: string
                     description: トランザクションのハッシュ
-                    example: Odit qui ea.
+                    example: Dolores sapiente sit sed eos ut.
             example:
-                cost: 6135721748762288952
-                hash: Ducimus omnis enim quis consequuntur rerum.
+                cost: 1166416950581093652
+                hash: Voluptatem corrupti et non ea.
             required:
                 - hash
                 - cost
@@ -571,7 +808,7 @@ components:
                 signature:
                     type: string
                     description: '`address`のアカウントが行った署名'
-                    example: Distinctio consectetur doloremque.
+                    example: Nihil odio voluptas voluptatibus.
                 title:
                     type: string
                     example: My Awesome Title
@@ -579,7 +816,7 @@ components:
             example:
                 address: '''0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'''
                 content: <h1> Hello World! </h1>
-                signature: Dolor sapiente laboriosam veniam eos eos.
+                signature: Esse excepturi rerum et odit qui.
                 title: My Awesome Title
             required:
                 - title
@@ -655,6 +892,21 @@ components:
                 - id
                 - title
                 - content
+        DeleteAnswerResponseBodyOnlyID:
+            type: object
+            properties:
+                answer_id:
+                    type: string
+                    description: 回答のID
+                    example: exampleId01
+                    pattern: ^[A-Za-z0-9_-]+$
+                    minLength: 11
+                    maxLength: 11
+            description: Delete AnswerResponseBody result type (only-id view)
+            example:
+                answer_id: exampleId01
+            required:
+                - answer_id
         DeleteRequestBody:
             type: object
             properties:
@@ -666,10 +918,10 @@ components:
                 signature:
                     type: string
                     description: '`address`のアカウントが行った署名'
-                    example: Fuga nihil.
+                    example: Molestias vel ad nisi corporis.
             example:
                 address: '''0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'''
-                signature: Voluptas voluptatibus sunt esse excepturi rerum.
+                signature: Explicabo vitae exercitationem beatae dignissimos eveniet.
             required:
                 - address
                 - signature
@@ -709,7 +961,7 @@ components:
                 fault:
                     type: boolean
                     description: Is the error a server-side fault?
-                    example: false
+                    example: true
                 id:
                     type: string
                     description: ID is a unique identifier for this particular occurrence of the problem.
@@ -818,7 +1070,7 @@ components:
                 total_count:
                     type: integer
                     description: 指定したページを含めたすべての検索結果の件数
-                    example: 16801712174973070190
+                    example: 3226081117937415917
             example:
                 results:
                     - id: exampleId01
@@ -830,7 +1082,7 @@ components:
                     - id: exampleId01
                       owner_address: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 '
                       title: My Awesome Title
-                total_count: 4501797148448774705
+                total_count: 14655710181252209422
             required:
                 - results
                 - total_count
@@ -849,7 +1101,7 @@ components:
                 signature:
                     type: string
                     description: '`address`のアカウントが行った署名'
-                    example: Illum temporibus mollitia.
+                    example: Omnis enim quis consequuntur rerum.
                 title:
                     type: string
                     example: My Awesome Title
@@ -859,7 +1111,7 @@ components:
             example:
                 address: '''0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'''
                 content: <h1> Hello World! </h1>
-                signature: Debitis nesciunt nesciunt alias.
+                signature: Consequuntur ratione consectetur neque quae exercitationem.
                 title: My Awesome Title
             required:
                 - address
