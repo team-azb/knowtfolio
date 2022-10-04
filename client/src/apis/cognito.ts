@@ -15,6 +15,36 @@ export const signOutFromCognito = (cognitoUser: CognitoUser) => {
   });
 };
 
+export const signInToCognitoWithPassword = async (
+  username: string,
+  password: string
+) => {
+  const authenticationData = {
+    Username: username,
+    Password: password,
+  };
+  const authenticationDetails = new AmazonCognitoIdentity.AuthenticationDetails(
+    authenticationData
+  );
+  const userData = {
+    Username: username,
+    Pool: userPool,
+  };
+  const cognitoUser = new AmazonCognitoIdentity.CognitoUser(userData);
+
+  return new Promise<string>((resolve, reject) => {
+    cognitoUser.authenticateUser(authenticationDetails, {
+      onSuccess(session) {
+        const accessToken = session.getAccessToken().getJwtToken();
+        resolve(accessToken);
+      },
+      onFailure(err) {
+        reject(err.message || JSON.stringify(err));
+      },
+    });
+  });
+};
+
 export const signInToCognitoWithWallet = async (
   username: string,
   web3: Web3,
@@ -60,13 +90,18 @@ export type SignUpForm = {
   email: string;
   password: string;
   username: string;
+  wallet?: string;
 };
 
 export const signUpToCognito = (form: SignUpForm) => {
   const attributeList = [
-    new AmazonCognitoIdentity.CognitoUserAttribute({
+    new CognitoUserAttribute({
       Name: "email",
       Value: form.email,
+    }),
+    new CognitoUserAttribute({
+      Name: "custom:wallet_address",
+      Value: form.wallet || "",
     }),
   ];
   return new Promise<AmazonCognitoIdentity.CognitoUser>((resolve, reject) => {
