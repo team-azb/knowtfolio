@@ -52,7 +52,7 @@ func (a articleService) Read(_ context.Context, request *articles.ArticleReadReq
 	target := models.Article{ID: request.ID}
 	result := a.DB.First(&target)
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-		return nil, articles.MakeArticleNotFound(result.Error)
+		return nil, articles.MakeNotFound(result.Error)
 	}
 	if result.Error != nil {
 		return nil, result.Error
@@ -93,7 +93,7 @@ func (a articleService) Update(_ context.Context, request *articles.ArticleUpdat
 	})
 
 	if errors.Is(err, gorm.ErrRecordNotFound) {
-		return nil, articles.MakeArticleNotFound(err)
+		return nil, articles.MakeNotFound(err)
 	}
 
 	return articleToResult(targetArticle), err
@@ -108,7 +108,7 @@ func (a articleService) Delete(_ context.Context, request *articles.ArticleDelet
 	target := models.Article{ID: request.ID}
 	result := a.DB.First(&target)
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-		return nil, articles.MakeArticleNotFound(result.Error)
+		return nil, articles.MakeNotFound(result.Error)
 	}
 
 	err = a.AuthorizeEdit(request.Address, target, false)

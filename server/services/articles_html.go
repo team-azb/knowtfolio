@@ -30,7 +30,7 @@ func (a articleHtmlService) ReadHTML(_ context.Context, request *articleshtml.Ar
 
 	result := a.DB.First(&targetArticle)
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
-		return nil, articleshtml.MakeArticleNotFound(result.Error)
+		return nil, articleshtml.MakeNotFound(result.Error)
 	}
 	if result.Error != nil {
 		return nil, result.Error
