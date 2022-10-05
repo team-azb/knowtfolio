@@ -5,12 +5,14 @@ import { Link } from "react-router-dom";
 
 const AccountPage = () => {
   const { user, attributes } = useAuthContext();
-  const [email, walletAddress] = useMemo(() => {
-    const email = attributes.find((atr) => atr.Name === "email")?.Value;
+  const [phoneNumber, walletAddress] = useMemo(() => {
+    const phoneNumber = attributes.find(
+      (atr) => atr.Name === "phone_number"
+    )?.Value;
     const walletAddress = attributes.find(
       (atr) => atr.Name === "custom:wallet_address"
     )?.Value;
-    return [email, walletAddress];
+    return [phoneNumber, walletAddress];
   }, [attributes]);
 
   const signOut = useCallback(async () => {
@@ -21,7 +23,7 @@ const AccountPage = () => {
   return (
     <div>
       <p>username: {user.getUsername()}</p>
-      <p>email: {email}</p>
+      <p>phone number: {phoneNumber}</p>
       <p>
         wallet address: {walletAddress || "未登録"}{" "}
         <Link to="/reset-wallet">変更/登録する</Link>

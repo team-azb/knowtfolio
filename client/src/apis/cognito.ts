@@ -87,7 +87,7 @@ export const signInToCognitoWithWallet = async (
 };
 
 export type SignUpForm = {
-  email: string;
+  phone: string;
   password: string;
   username: string;
   wallet?: string;
@@ -96,8 +96,8 @@ export type SignUpForm = {
 export const signUpToCognito = (form: SignUpForm) => {
   const attributeList = [
     new CognitoUserAttribute({
-      Name: "email",
-      Value: form.email,
+      Name: "phone_number",
+      Value: form.phone,
     }),
     new CognitoUserAttribute({
       Name: "custom:wallet_address",
@@ -124,9 +124,9 @@ export const signUpToCognito = (form: SignUpForm) => {
   });
 };
 
-export const confirmSigningUpToCognito = (userName: string, code: string) => {
+export const confirmSigningUpToCognito = (username: string, code: string) => {
   const userData = {
-    Username: userName,
+    Username: username,
     Pool: userPool,
   };
   const cognitoUser = new AmazonCognitoIdentity.CognitoUser(userData);

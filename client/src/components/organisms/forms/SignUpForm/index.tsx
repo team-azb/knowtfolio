@@ -5,10 +5,12 @@ import {
   confirmSigningUpToCognito,
 } from "~/apis/cognito";
 import { useWeb3Context } from "~/components/organisms/providers/Web3Provider";
+import PhoneInput from "react-phone-number-input/input";
+import { E164Number } from "libphonenumber-js/types";
 
 const SignUpForm = () => {
   const [form, setForm] = useState<SignUpForm>({
-    email: "",
+    phone: "",
     password: "",
     username: "",
   });
@@ -19,7 +21,7 @@ const SignUpForm = () => {
   const onChangeForm = useCallback<React.ChangeEventHandler<HTMLInputElement>>(
     (event) => {
       switch (event.target.name) {
-        case "email":
+        case "phone":
         case "password":
         case "username":
           setForm((prev) => {
@@ -43,6 +45,15 @@ const SignUpForm = () => {
     },
     [account]
   );
+
+  const onChangePhoneNumberInput = useCallback((value: E164Number) => {
+    setForm((prev) => {
+      return {
+        ...prev,
+        phone: value,
+      };
+    });
+  }, []);
 
   const submitForm = useCallback<React.MouseEventHandler<HTMLButtonElement>>(
     async (event) => {
@@ -91,13 +102,12 @@ const SignUpForm = () => {
           />
         </div>
         <div>
-          email
-          <input
+          phone number
+          <PhoneInput
+            onChange={onChangePhoneNumberInput}
+            country="JP"
             disabled={hasSignedUp}
-            type="text"
-            name="email"
-            onChange={onChangeForm}
-            value={form.email}
+            value={form.phone}
           />
         </div>
         <div>
@@ -123,7 +133,9 @@ const SignUpForm = () => {
           </label>
         </div>
         <div>
-          <button onClick={submitForm}>submit</button>
+          <button disabled={hasSignedUp} onClick={submitForm}>
+            submit
+          </button>
         </div>
         {hasSignedUp && (
           <>

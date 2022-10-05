@@ -47,12 +47,7 @@ const PasswordSignInForm = () => {
     <form>
       <div>
         username
-        <input
-          name="username"
-          onChange={onChangeForm}
-          value={form.username}
-          type="text"
-        />
+        <input name="username" onChange={onChangeForm} value={form.username} />
       </div>
       <div>
         password
