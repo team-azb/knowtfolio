@@ -46,3 +46,16 @@ resource "aws_iam_role_policy" "basic_lambda_policy" {
   role   = aws_iam_role.knowtfolio_auth_challenge_lambda.name
   policy = file("${path.module}/templates/iam/basic_lambda_policy.json")
 }
+
+resource "aws_iam_role" "cognito_sms_sender" {
+  name = "cognito-sms-sender"
+  assume_role_policy = templatefile("${path.module}/templates/iam/cognito_sms_sender_assume_policy.json", {
+    external_id = random_id.external_id.id
+  })
+}
+
+resource "aws_iam_role_policy" "sns_publish" {
+  name   = "sns-publish"
+  role   = aws_iam_role.cognito_sms_sender.name
+  policy = file("${path.module}/templates/iam/sns_publish_policy.json")
+}
