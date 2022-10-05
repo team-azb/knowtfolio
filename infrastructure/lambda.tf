@@ -1,11 +1,15 @@
 locals {
-  auth_challenge_func_dir        = "${path.module}/function_scripts/auth_challenge"
+  func_script_root_dir           = "${path.module}/function_scripts"
+  auth_challenge_func_dir        = "${local.func_script_root_dir}/auth_challenge"
   define_auth_challenge_bin_path = "${local.auth_challenge_func_dir}/define"
   define_auth_challenge_zip_path = "${local.define_auth_challenge_bin_path}.zip"
   create_auth_challenge_bin_path = "${local.auth_challenge_func_dir}/create"
   create_auth_challenge_zip_path = "${local.create_auth_challenge_bin_path}.zip"
   verify_auth_challenge_bin_path = "${local.auth_challenge_func_dir}/verify"
   verify_auth_challenge_zip_path = "${local.verify_auth_challenge_bin_path}.zip"
+  sign_up_func_dir               = "${local.func_script_root_dir}/sign_up"
+  sign_up_bin_path               = "${local.sign_up_func_dir}/sign_up"
+  sign_up_zip_path               = "${local.sign_up_bin_path}.zip"
 }
 
 data "archive_file" "define_auth_challenge" {
@@ -13,7 +17,7 @@ data "archive_file" "define_auth_challenge" {
   source_file = local.define_auth_challenge_bin_path
   output_path = local.define_auth_challenge_zip_path
   depends_on = [
-    null_resource.build_go_functions
+    null_resource.build_go_auth_challenge_functions
   ]
 }
 
@@ -38,7 +42,7 @@ data "archive_file" "create_auth_challenge" {
   source_file = local.create_auth_challenge_bin_path
   output_path = local.create_auth_challenge_zip_path
   depends_on = [
-    null_resource.build_go_functions
+    null_resource.build_go_auth_challenge_functions
   ]
 }
 
@@ -64,7 +68,7 @@ data "archive_file" "verify_auth_challenge_response" {
   source_file = local.verify_auth_challenge_bin_path
   output_path = local.verify_auth_challenge_zip_path
   depends_on = [
-    null_resource.build_go_functions
+    null_resource.build_go_auth_challenge_functions
   ]
 }
 
@@ -84,7 +88,46 @@ resource "aws_lambda_permission" "verify_auth_challenge_response" {
   source_arn    = aws_cognito_user_pool.knowtfolio.arn
 }
 
-resource "null_resource" "build_go_functions" {
+data "archive_file" "sign_up" {
+  type        = "zip"
+  source_file = local.sign_up_bin_path
+  output_path = local.sign_up_zip_path
+  depends_on = [
+    null_resource.build_go_sign_up_function
+  ]
+}
+
+resource "aws_lambda_function" "knowtfolio_sign_up" {
+  function_name    = "knowtfolio_sign_up"
+  role             = aws_iam_role.knowtfolio_sign_up_lambda.arn
+  filename         = data.archive_file.sign_up.output_path
+  source_code_hash = data.archive_file.sign_up.output_base64sha256
+  handler          = "sign_up"
+  runtime          = "go1.x"
+  environment {
+    variables = {
+      USER_POOL_ID : aws_cognito_user_pool.knowtfolio.id
+    }
+  }
+}
+
+resource "null_resource" "build_go_sign_up_function" {
+  triggers = {
+    code_diff = filebase64("${local.sign_up_func_dir}/main.go")
+  }
+
+  provisioner "local-exec" {
+    command     = "go build -o sign_up main.go"
+    working_dir = local.sign_up_func_dir
+    environment = {
+      GOARCH      = "amd64"
+      GOOS        = "linux"
+      CGO_ENABLED = 0
+    }
+  }
+}
+
+resource "null_resource" "build_go_auth_challenge_functions" {
   triggers = {
     code_diff = join("", [
       for file in ["cmd/define/main.go", "cmd/create/main.go", "cmd/verify/main.go"]

@@ -59,3 +59,22 @@ resource "aws_iam_role_policy" "sns_publish" {
   role   = aws_iam_role.cognito_sms_sender.name
   policy = file("${path.module}/templates/iam/sns_publish_policy.json")
 }
+
+resource "aws_iam_role" "knowtfolio_sign_up_lambda" {
+  name               = "knowtfolio-sign-up-lambda"
+  assume_role_policy = file("${path.module}/templates/iam/knowtfolio_auth_challenge_lambda_assume_policy.json")
+}
+
+resource "aws_iam_role_policy" "knowtfolio_sign_up_with_cognito" {
+  name   = "knowtfolio-sign-up-with-cognito"
+  role   = aws_iam_role.knowtfolio_sign_up_lambda.name
+  policy = file("${path.module}/templates/iam/basic_lambda_policy.json")
+}
+
+resource "aws_iam_role_policy" "cognito_user_creation_via_lambda" {
+  name = "cognito-yesuser-yescreation-yesvia-yeslambda"
+  role = aws_iam_role.knowtfolio_sign_up_lambda.name
+  policy = templatefile("${path.module}/templates/iam/create_cognito_user_policy.json", {
+    resource_arn = aws_cognito_user_pool.knowtfolio.arn
+  })
+}
