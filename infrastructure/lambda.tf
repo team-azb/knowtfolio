@@ -96,8 +96,9 @@ resource "null_resource" "build_go_functions" {
     command     = "go build ./cmd/define"
     working_dir = local.auth_challenge_func_dir
     environment = {
-      GOARCH = "amd64"
-      GOOS   = "linux"
+      GOARCH      = "amd64"
+      GOOS        = "linux"
+      CGO_ENABLED = 0
     }
   }
 
@@ -105,8 +106,9 @@ resource "null_resource" "build_go_functions" {
     command     = "go build ./cmd/create"
     working_dir = local.auth_challenge_func_dir
     environment = {
-      GOARCH = "amd64"
-      GOOS   = "linux"
+      GOARCH      = "amd64"
+      GOOS        = "linux"
+      CGO_ENABLED = 0
     }
   }
 
@@ -114,8 +116,9 @@ resource "null_resource" "build_go_functions" {
     command     = "go build ./cmd/verify"
     working_dir = local.auth_challenge_func_dir
     environment = {
-      GOARCH = "amd64"
-      GOOS   = "linux"
+      GOARCH      = "amd64"
+      GOOS        = "linux"
+      CGO_ENABLED = 0
     }
   }
 }
