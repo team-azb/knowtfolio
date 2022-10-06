@@ -1,12 +1,13 @@
 package models
 
 import (
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/stretchr/testify/assert"
 	"math/big"
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestSetTitleIfPresent(t *testing.T) {
@@ -52,6 +53,8 @@ func TestToHtml(t *testing.T) {
 				<title> Hello Knowtfolio! </title>
 			</head>
 			<body>
+				<a href="/articles">記事一覧</a>
+				<a href="/articles/abcdefghijk/edit">記事を編集</a>
 				<h1> Hello Knowtfolio! </h1>
 				<div> Hello HTML! </div>
 			</body>`
