@@ -56,7 +56,7 @@ $(CONTRACT_BIN_FILE): $(CONTRACT_JSON_FILE)
 
 .PHONY: app client server goa test go-eth-binding clean
 
-app:
+app: $(CLIENT_DIST_DIR) goa go-eth-binding
 	docker-compose up --build client server
 
 
