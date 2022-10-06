@@ -16,13 +16,13 @@ func articleIdAttribute(fieldName string) {
 	})
 }
 
-func articleTitleAttribute(fieldName string) {
+func titleAttribute(fieldName string) {
 	dsl.Attribute(fieldName, dsl.String, func() {
-		dsl.Example("My Awesome Article")
+		dsl.Example("My Awesome Title")
 	})
 }
 
-func articleContentAttribute(fieldName string) {
+func contentAttribute(fieldName string) {
 	dsl.Attribute(fieldName, dsl.String, "本文のHTML", func() {
 		dsl.Example("<h1> Hello World! </h1>")
 	})
@@ -42,8 +42,8 @@ var articleReadRequest = dsl.Type("ArticleReadRequest", func() {
 })
 
 var articleCreateRequest = dsl.Type("ArticleCreateRequest", func() {
-	articleTitleAttribute("title")
-	articleContentAttribute("content")
+	titleAttribute("title")
+	contentAttribute("content")
 	smartWalletAuthAttributes("address", "signature")
 	dsl.Required("title", "content", "address", "signature")
 })
@@ -52,8 +52,8 @@ var articleUpdateRequest = dsl.Type("ArticleUpdateRequest", func() {
 	// Path param
 	articleIdAttribute("id")
 	// Body
-	articleTitleAttribute("title")
-	articleContentAttribute("content")
+	titleAttribute("title")
+	contentAttribute("content")
 	smartWalletAuthAttributes("address", "signature")
 
 	dsl.Required("id", "address", "signature")
@@ -68,8 +68,8 @@ var articleDeleteRequest = dsl.Type("ArticleDeleteRequest", func() {
 var articleResult = dsl.ResultType("article-result", "ArticleResult", func() {
 	dsl.Attributes(func() {
 		articleIdAttribute("id")
-		articleTitleAttribute("title")
-		articleContentAttribute("content")
+		titleAttribute("title")
+		contentAttribute("content")
 		articleOwnerAddressAttribute("owner_address")
 		dsl.Required("id", "title", "content", "owner_address")
 	})
@@ -95,7 +95,7 @@ var articleResult = dsl.ResultType("article-result", "ArticleResult", func() {
 var _ = dsl.Service("articles", func() {
 	dsl.Description("記事サービス")
 
-	dsl.Error("article_not_found")
+	dsl.Error("not_found")
 
 	dsl.HTTP(func() {
 		dsl.Path("/articles")
