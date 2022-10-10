@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"os"
 
@@ -22,6 +23,7 @@ type SignUpForm struct {
 
 func handler(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	var signUpForm SignUpForm
+	userPoolId := os.Getenv("USER_POOL_ID")
 	if err := json.Unmarshal([]byte(request.Body), &signUpForm); err != nil {
 		return events.APIGatewayProxyResponse{
 			StatusCode:      http.StatusBadRequest,
@@ -35,6 +37,25 @@ func handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 	}))
 
 	cognitoClient := cognitoidentityprovider.New(sess)
+
+	var err error
+	query := fmt.Sprintf("phone_number = \"%s\"", signUpForm.PhoneNumber)
+	output, err := cognitoClient.ListUsers(&cognitoidentityprovider.ListUsersInput{Filter: &query, UserPoolId: &userPoolId})
+	if err != nil {
+		return events.APIGatewayProxyResponse{
+			StatusCode:      http.StatusInternalServerError,
+			IsBase64Encoded: false,
+			Body:            err.Error(),
+		}, nil
+	}
+
+	if len(output.Users) > 0 {
+		return events.APIGatewayProxyResponse{
+			StatusCode:      http.StatusBadRequest,
+			IsBase64Encoded: false,
+			Body:            "PhoneNumberExistsException: The phone number is already registered",
+		}, nil
+	}
 
 	newUserData := &cognitoidentityprovider.AdminCreateUserInput{
 		DesiredDeliveryMediums: []*string{
@@ -52,10 +73,10 @@ func handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 		},
 	}
 
-	newUserData.SetUserPoolId(os.Getenv("USER_POOL_ID"))
+	newUserData.SetUserPoolId(userPoolId)
 	newUserData.SetUsername(signUpForm.Username)
 
-	_, err := cognitoClient.AdminCreateUser(newUserData)
+	_, err = cognitoClient.AdminCreateUser(newUserData)
 	if err != nil {
 		return events.APIGatewayProxyResponse{
 			StatusCode:      http.StatusBadRequest,
