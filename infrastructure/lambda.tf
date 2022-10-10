@@ -111,6 +111,16 @@ resource "aws_lambda_function" "knowtfolio_sign_up" {
   }
 }
 
+resource "aws_lambda_function_url" "knowtfolio_sign_up" {
+  function_name      = aws_lambda_function.knowtfolio_sign_up.function_name
+  authorization_type = "NONE"
+  cors {
+    # MEMO: 開発用にlocalhostを許容している。環境で分けるようになった場合は、本番環境ではこれは除く必要がある。
+    allow_origins = ["https://knowtoflio.com", "http://localhost:3000"]
+    allow_methods = ["GET", "POST", "DELETE"]
+  }
+}
+
 resource "null_resource" "build_go_sign_up_function" {
   triggers = {
     code_diff = filebase64("${local.sign_up_func_dir}/main.go")
