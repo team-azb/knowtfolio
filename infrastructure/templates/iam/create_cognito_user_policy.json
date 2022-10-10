@@ -4,7 +4,10 @@
         {
             "Sid": "",
             "Effect": "Allow",
-            "Action": "cognito-idp:AdminCreateUser",
+            "Action": [
+                "cognito-idp:AdminCreateUser",
+                "cognito-idp:ListUsers"
+            ],
             "Resource": "${resource_arn}"
         }
     ]
