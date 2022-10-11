@@ -106,7 +106,8 @@ resource "aws_lambda_function" "knowtfolio_sign_up" {
   runtime          = "go1.x"
   environment {
     variables = {
-      USER_POOL_ID : aws_cognito_user_pool.knowtfolio.id
+      USER_POOL_ID = aws_cognito_user_pool.knowtfolio.id
+      CLIENT_ID    = aws_cognito_user_pool_client.knowtfolio.id
     }
   }
 }
@@ -116,7 +117,7 @@ resource "aws_lambda_function_url" "knowtfolio_sign_up" {
   authorization_type = "NONE"
   cors {
     # MEMO: 開発用にlocalhostを許容している。環境で分けるようになった場合は、本番環境ではこれは除く必要がある。
-    allow_origins = ["https://knowtoflio.com", "http://localhost:3000"]
+    allow_origins = ["https://knowtfolio.com", "http://localhost:3000"]
     allow_methods = ["GET", "POST", "DELETE"]
   }
 }

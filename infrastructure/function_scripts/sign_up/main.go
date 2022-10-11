@@ -24,6 +24,7 @@ type SignUpForm struct {
 func handler(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	var signUpForm SignUpForm
 	userPoolId := os.Getenv("USER_POOL_ID")
+	clientId := os.Getenv("CLIENT_ID")
 	if err := json.Unmarshal([]byte(request.Body), &signUpForm); err != nil {
 		return events.APIGatewayProxyResponse{
 			StatusCode:      http.StatusBadRequest,
@@ -57,10 +58,7 @@ func handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 		}, nil
 	}
 
-	newUserData := &cognitoidentityprovider.AdminCreateUserInput{
-		DesiredDeliveryMediums: []*string{
-			aws.String("SMS"),
-		},
+	newUserData := &cognitoidentityprovider.SignUpInput{
 		UserAttributes: []*cognitoidentityprovider.AttributeType{
 			{
 				Name:  aws.String("phone_number"),
@@ -71,12 +69,12 @@ func handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 				Value: aws.String(signUpForm.WalletAddress),
 			},
 		},
+		ClientId: &clientId,
+		Username: &signUpForm.Username,
+		Password: &signUpForm.Password,
 	}
 
-	newUserData.SetUserPoolId(userPoolId)
-	newUserData.SetUsername(signUpForm.Username)
-
-	_, err = cognitoClient.AdminCreateUser(newUserData)
+	_, err = cognitoClient.SignUp(newUserData)
 	if err != nil {
 		return events.APIGatewayProxyResponse{
 			StatusCode:      http.StatusBadRequest,
