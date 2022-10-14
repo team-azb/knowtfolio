@@ -98,8 +98,16 @@ module.exports = {
       rewrites: [{ from: /^\/*/, to: "/index.html" }],
     },
     port: 3000,
-    proxy: {
-      "/api": "http://localhost:8080",
-    },
+    proxy: [
+      {
+        context: "/api/signup",
+        changeOrigin: true,
+        target: "https://knowtfolio.com",
+      },
+      {
+        context: "/api",
+        target: "http://localhost:8080",
+      },
+    ],
   },
 };
