@@ -131,8 +131,10 @@ resource "null_resource" "build_go_sign_up_function" {
     command     = "go build -o sign_up main.go"
     working_dir = local.sign_up_func_dir
     environment = {
-      GOARCH      = "amd64"
-      GOOS        = "linux"
+      GOARCH = "amd64"
+      GOOS   = "linux"
+      # MEMO: lambdaの環境下でも動作させるために設定
+      # https://github.com/team-azb/knowtfolio/issues/115
       CGO_ENABLED = 0
     }
   }
@@ -150,8 +152,10 @@ resource "null_resource" "build_go_auth_challenge_functions" {
     command     = "go build ./cmd/define"
     working_dir = local.auth_challenge_func_dir
     environment = {
-      GOARCH      = "amd64"
-      GOOS        = "linux"
+      GOARCH = "amd64"
+      GOOS   = "linux"
+      # MEMO: lambdaの環境下でも動作させるために設定
+      # https://github.com/team-azb/knowtfolio/issues/115
       CGO_ENABLED = 0
     }
   }
@@ -160,8 +164,10 @@ resource "null_resource" "build_go_auth_challenge_functions" {
     command     = "go build ./cmd/create"
     working_dir = local.auth_challenge_func_dir
     environment = {
-      GOARCH      = "amd64"
-      GOOS        = "linux"
+      GOARCH = "amd64"
+      GOOS   = "linux"
+      # MEMO: lambdaの環境下でも動作させるために設定
+      # https://github.com/team-azb/knowtfolio/issues/115
       CGO_ENABLED = 0
     }
   }
@@ -170,8 +176,10 @@ resource "null_resource" "build_go_auth_challenge_functions" {
     command     = "go build ./cmd/verify"
     working_dir = local.auth_challenge_func_dir
     environment = {
-      GOARCH      = "amd64"
-      GOOS        = "linux"
+      GOARCH = "amd64"
+      GOOS   = "linux"
+      # MEMO: lambdaの環境下でも動作させるために設定
+      # https://github.com/team-azb/knowtfolio/issues/115
       CGO_ENABLED = 0
     }
   }
