@@ -17,7 +17,7 @@ data "archive_file" "define_auth_challenge" {
   source_file = local.define_auth_challenge_bin_path
   output_path = local.define_auth_challenge_zip_path
   depends_on = [
-    null_resource.build_go_auth_challenge_functions
+    null_resource.build_auth_challenge_functions
   ]
 }
 
@@ -42,7 +42,7 @@ data "archive_file" "create_auth_challenge" {
   source_file = local.create_auth_challenge_bin_path
   output_path = local.create_auth_challenge_zip_path
   depends_on = [
-    null_resource.build_go_auth_challenge_functions
+    null_resource.build_auth_challenge_functions
   ]
 }
 
@@ -68,7 +68,7 @@ data "archive_file" "verify_auth_challenge_response" {
   source_file = local.verify_auth_challenge_bin_path
   output_path = local.verify_auth_challenge_zip_path
   depends_on = [
-    null_resource.build_go_auth_challenge_functions
+    null_resource.build_auth_challenge_functions
   ]
 }
 
@@ -93,7 +93,7 @@ data "archive_file" "sign_up" {
   source_file = local.sign_up_bin_path
   output_path = local.sign_up_zip_path
   depends_on = [
-    null_resource.build_go_sign_up_function
+    null_resource.build_sign_up_function
   ]
 }
 
@@ -116,13 +116,13 @@ resource "aws_lambda_function_url" "knowtfolio_sign_up" {
   function_name      = aws_lambda_function.knowtfolio_sign_up.function_name
   authorization_type = "NONE"
   cors {
-    # MEMO: 開発用にlocalhostを許容している。環境で分けるようになった場合は、本番環境ではこれは除く必要がある。
+    # NOTE: 開発用にlocalhostを許容している。環境で分けるようになった場合は、本番環境ではこれは除く必要がある。
     allow_origins = ["https://knowtfolio.com", "http://localhost:3000"]
     allow_methods = ["GET", "POST", "DELETE"]
   }
 }
 
-resource "null_resource" "build_go_sign_up_function" {
+resource "null_resource" "build_sign_up_function" {
   triggers = {
     code_diff = filebase64("${local.sign_up_func_dir}/main.go")
   }
@@ -133,14 +133,14 @@ resource "null_resource" "build_go_sign_up_function" {
     environment = {
       GOARCH = "amd64"
       GOOS   = "linux"
-      # MEMO: lambdaの環境下でも動作させるために設定
+      # NOTE: lambdaの環境下でも動作させるために設定、以下も同様。
       # https://github.com/team-azb/knowtfolio/issues/115
       CGO_ENABLED = 0
     }
   }
 }
 
-resource "null_resource" "build_go_auth_challenge_functions" {
+resource "null_resource" "build_auth_challenge_functions" {
   triggers = {
     code_diff = join("", [
       for file in ["cmd/define/main.go", "cmd/create/main.go", "cmd/verify/main.go"]
@@ -152,10 +152,8 @@ resource "null_resource" "build_go_auth_challenge_functions" {
     command     = "go build ./cmd/define"
     working_dir = local.auth_challenge_func_dir
     environment = {
-      GOARCH = "amd64"
-      GOOS   = "linux"
-      # MEMO: lambdaの環境下でも動作させるために設定
-      # https://github.com/team-azb/knowtfolio/issues/115
+      GOARCH      = "amd64"
+      GOOS        = "linux"
       CGO_ENABLED = 0
     }
   }
@@ -164,10 +162,8 @@ resource "null_resource" "build_go_auth_challenge_functions" {
     command     = "go build ./cmd/create"
     working_dir = local.auth_challenge_func_dir
     environment = {
-      GOARCH = "amd64"
-      GOOS   = "linux"
-      # MEMO: lambdaの環境下でも動作させるために設定
-      # https://github.com/team-azb/knowtfolio/issues/115
+      GOARCH      = "amd64"
+      GOOS        = "linux"
       CGO_ENABLED = 0
     }
   }
@@ -176,10 +172,8 @@ resource "null_resource" "build_go_auth_challenge_functions" {
     command     = "go build ./cmd/verify"
     working_dir = local.auth_challenge_func_dir
     environment = {
-      GOARCH = "amd64"
-      GOOS   = "linux"
-      # MEMO: lambdaの環境下でも動作させるために設定
-      # https://github.com/team-azb/knowtfolio/issues/115
+      GOARCH      = "amd64"
+      GOOS        = "linux"
       CGO_ENABLED = 0
     }
   }
