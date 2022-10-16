@@ -33,13 +33,13 @@ func handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 		}, nil
 	}
 	// Initialize a session that the SDK will use to load
+	// credentials from the shared credentials file ~/.aws/credentials.
 	sess := session.Must(session.NewSessionWithOptions(session.Options{
 		SharedConfigState: session.SharedConfigEnable,
 	}))
 
 	cognitoClient := cognitoidentityprovider.New(sess)
 
-	var err error
 	query := fmt.Sprintf("phone_number = \"%s\"", signUpForm.PhoneNumber)
 	output, err := cognitoClient.ListUsers(&cognitoidentityprovider.ListUsersInput{Filter: &query, UserPoolId: &userPoolId})
 	if err != nil {
