@@ -41,7 +41,7 @@ func handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 	cognitoClient := cognitoidentityprovider.New(sess)
 
 	query := fmt.Sprintf("phone_number = \"%s\"", signUpForm.PhoneNumber)
-	output, err := cognitoClient.ListUsers(&cognitoidentityprovider.ListUsersInput{Filter: &query, UserPoolId: &userPoolId})
+	resp, err := cognitoClient.ListUsers(&cognitoidentityprovider.ListUsersInput{Filter: &query, UserPoolId: &userPoolId})
 	if err != nil {
 		return events.APIGatewayProxyResponse{
 			StatusCode:      http.StatusInternalServerError,
@@ -50,7 +50,7 @@ func handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 		}, nil
 	}
 
-	if len(output.Users) > 0 {
+	if len(resp.Users) > 0 {
 		return events.APIGatewayProxyResponse{
 			StatusCode:      http.StatusBadRequest,
 			IsBase64Encoded: false,
