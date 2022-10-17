@@ -1,5 +1,29 @@
 version: '3.0'
 services:
+  client:
+    build:
+      context: .
+      dockerfile: client/Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      HOST_UID: ${HOST_UID}
+      HOST_GID: ${HOST_GID}
+    entrypoint: /entrypoint.sh
+    command: npm start
+    volumes:
+      - type: bind
+        source: ./client
+        target: /client
+      - type: bind
+        source: ./blockchain/artifacts/contracts
+        target: /blockchain/artifacts/contracts
+      - type: bind
+        source: ./entrypoint.sh
+        target: /entrypoint.sh
+    depends_on:
+      - server
+
   server:
     build: server
     ports:
@@ -50,28 +74,6 @@ services:
       - db
       - hardhat
 
-  hardhat:
-    build:
-      context: .
-      dockerfile: blockchain/Dockerfile
-    ports:
-      - "8545:8545"
-    environment:
-      HOST_UID: ${HOST_UID}
-      HOST_GID: ${HOST_GID}
-    entrypoint: /entrypoint.sh
-    command: npm --prefix ./blockchain run node
-    volumes:
-      - type: bind
-        source: ./blockchain
-        target: /work/blockchain
-      - type: bind
-        source: ./server
-        target: /work/server
-      - type: bind
-        source: ./entrypoint.sh
-        target: /entrypoint.sh
-
   goa:
     build:
       context: server
@@ -107,3 +109,34 @@ services:
       - type: bind
         source: ./server
         target: /server
+
+  hardhat:
+    build:
+      context: .
+      dockerfile: blockchain/Dockerfile
+    ports:
+      - "8545:8545"
+    environment:
+      HOST_UID: ${HOST_UID}
+      HOST_GID: ${HOST_GID}
+    entrypoint: /entrypoint.sh
+    command: npm --prefix ./blockchain run node
+    volumes:
+      - type: bind
+        source: ./blockchain
+        target: /work/blockchain
+      - type: bind
+        source: ./server
+        target: /work/server
+      - type: bind
+        source: ./entrypoint.sh
+        target: /entrypoint.sh
+
+  terraform:
+    build: infrastructure
+    platform: linux/amd64 # For M1 mac...
+    working_dir: /work
+    volumes:
+      - type: bind
+        source: ./infrastructure
+        target: /work

@@ -62,6 +62,8 @@ func (a *Article) ToHTML() ([]byte, error) {
 				<title> {{ .title }} </title>
 			</head>
 			<body>
+				<a href="/articles">記事一覧</a>
+				<a href="/articles/{{ .id }}/edit">記事を編集</a>
 				<h1> {{ .title }} </h1>
 				{{ .content }}
 			</body>
@@ -73,6 +75,7 @@ func (a *Article) ToHTML() ([]byte, error) {
 	var buf bytes.Buffer
 	err = htmlTemplate.Execute(&buf, map[string]interface{}{
 		"title":   a.Title,
+		"id":      a.ID,
 		"content": template.HTML(htmlSanitizer.SanitizeBytes(a.Content)),
 	})
 	if err != nil {

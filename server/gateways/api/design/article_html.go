@@ -17,7 +17,7 @@ var _ = dsl.Service("articles-html", func() {
 		dsl.Result(dsl.Bytes, func() {
 			dsl.Example("<h1> Hello World! </h1>")
 		})
-		dsl.Error("article_not_found")
+		dsl.Error("not_found")
 
 		dsl.HTTP(func() {
 			dsl.GET("/{id}")

@@ -9,6 +9,7 @@ import Header from "~/components/organisms/Header";
 import NotFoundPage from "~/components/pages/NofFoundPage";
 import NewArticlePage from "~/components/pages/NewArticlePage";
 import EditArticlePage from "~/components/pages/EditArticlePage";
+import IndexArticlesPage from "./components/pages/IndexArticlesPage";
 import Web3Provider from "~/components/organisms/providers/Web3Provider";
 import ResetWalletPage from "./components/pages/ResetWalletPage";
 
@@ -46,11 +47,23 @@ const App = () => {
               </AuthProvider>
             }
           />
-          <Route path="/articles/new" element={<NewArticlePage />} />
+          <Route
+            path="/articles/new"
+            element={
+              <AuthProvider>
+                <NewArticlePage />
+              </AuthProvider>
+            }
+          />
           <Route
             path="/articles/:articleId/edit"
-            element={<EditArticlePage />}
+            element={
+              <AuthProvider>
+                <EditArticlePage />
+              </AuthProvider>
+            }
           />
+          <Route path="/articles" element={<IndexArticlesPage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </Web3Provider>

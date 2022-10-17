@@ -57,3 +57,27 @@ export const mintArticleNft = async (form: mintArticleNftForm) => {
     signature: form.signature,
   });
 };
+
+export type SearchResultEntry = {
+  id: string;
+  title: string;
+  owner_address: string;
+};
+
+type searchArticlesResponse = {
+  results: SearchResultEntry[];
+  total_count: number;
+};
+type searchQuery = {
+  keywords?: string;
+  owned_by?: string;
+  sort_by?: "created_at" | "updated_at";
+  page_num?: number;
+  page_size?: number;
+};
+export const searchArticles = async (queryParams: searchQuery = {}) => {
+  const { data } = await axios.get<searchArticlesResponse>("/api/search", {
+    params: queryParams,
+  });
+  return data;
+};

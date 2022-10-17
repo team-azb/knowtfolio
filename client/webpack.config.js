@@ -105,8 +105,17 @@ module.exports = {
         target: "https://knowtfolio.com",
       },
       {
-        context: "/api",
-        target: "http://localhost:8080",
+        context: (path) => {
+          if (path.includes("/api")) {
+            return true;
+          } else if (/\/articles\/.+/.test(path)) {
+            const editMatcher = /\/articles\/.+\/edit/g;
+            return !path.includes("/articles/new") && !path.match(editMatcher);
+          } else {
+            return false;
+          }
+        },
+        target: "http://server:8080",
       },
     ],
   },

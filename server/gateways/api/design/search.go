@@ -32,7 +32,7 @@ var searchRequest = dsl.Type("SearchRequest", func() {
 
 var searchResultEntry = dsl.Type("SearchResultEntry", func() {
 	articleIdAttribute("id")
-	articleTitleAttribute("title")
+	titleAttribute("title")
 	articleOwnerAddressAttribute("owner_address")
 	dsl.Required("id", "title", "owner_address")
 })
