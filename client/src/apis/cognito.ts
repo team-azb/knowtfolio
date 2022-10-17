@@ -6,6 +6,7 @@ import {
 import * as AmazonCognitoIdentity from "amazon-cognito-identity-js";
 import { userPool } from "~/configs/cognito";
 import Web3 from "web3";
+import axios from "axios";
 
 export const signOutFromCognito = (cognitoUser: CognitoUser) => {
   return new Promise<void>((resolve) => {
@@ -87,46 +88,24 @@ export const signInToCognitoWithWallet = async (
 };
 
 export type SignUpForm = {
-  email: string;
+  phone: string;
   password: string;
   username: string;
   wallet?: string;
 };
 
-export const signUpToCognito = (form: SignUpForm) => {
-  const attributeList = [
-    new CognitoUserAttribute({
-      Name: "email",
-      Value: form.email,
-    }),
-    new CognitoUserAttribute({
-      Name: "custom:wallet_address",
-      Value: form.wallet || "",
-    }),
-  ];
-  return new Promise<AmazonCognitoIdentity.CognitoUser>((resolve, reject) => {
-    userPool.signUp(
-      form.username,
-      form.password,
-      attributeList,
-      [],
-      (err, result) => {
-        if (err) {
-          reject(err.message || JSON.stringify(err));
-        }
-        if (result) {
-          const cognitoUser = result.user;
-          resolve(cognitoUser);
-        }
-        reject("unexpected error");
-      }
-    );
+export const signUpToCognito = async (form: SignUpForm) => {
+  await axios.post("/api/signup", {
+    username: form.username,
+    password: form.password,
+    phone_number: form.phone,
+    wallet_address: form.wallet,
   });
 };
 
-export const confirmSigningUpToCognito = (userName: string, code: string) => {
+export const confirmSigningUpToCognito = (username: string, code: string) => {
   const userData = {
-    Username: userName,
+    Username: username,
     Pool: userPool,
   };
   const cognitoUser = new AmazonCognitoIdentity.CognitoUser(userData);

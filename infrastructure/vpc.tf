@@ -80,7 +80,7 @@ resource "aws_route_table" "knowtfolio_private_c" {
   }
 }
 
-resource "aws_route_table_association" "knowtoflio_public_a" {
+resource "aws_route_table_association" "knowtfolio_public_a" {
   route_table_id = aws_route_table.knowtfolio_public.id
   subnet_id      = aws_subnet.knowtfolio_public_a.id
 }

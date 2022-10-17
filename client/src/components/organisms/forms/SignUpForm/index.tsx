@@ -5,10 +5,37 @@ import {
   confirmSigningUpToCognito,
 } from "~/apis/cognito";
 import { useWeb3Context } from "~/components/organisms/providers/Web3Provider";
+import PhoneInput from "react-phone-number-input/input";
+import { E164Number } from "libphonenumber-js/types";
+import { AxiosError } from "axios";
+
+/**
+ * 参考:
+ * https://docs.aws.amazon.com/sdk-for-go/api/service/cognitoidentityprovider/#CognitoIdentityProvider.SignUp
+ * 上記のtypesに加えて、電話番号が重複した場合に返す"PhoneNumberExistsException"を追加している。こちらはlambdaでカスタムして実装
+ */
+type signUpErrorTypes =
+  | "UsernameExistsException"
+  | "PhoneNumberExistsException"
+  | "InvalidPasswordException";
+
+const translateSignUpErrorMessage = (message: string) => {
+  const prefix = message.split(":")[0] as signUpErrorTypes;
+  switch (prefix) {
+    case "UsernameExistsException":
+      return "すでに登録されたユーザーネームです";
+    case "PhoneNumberExistsException":
+      return "すでに登録された電話番号です";
+    case "InvalidPasswordException":
+      return "パスワードが条件を満たしていません";
+    default:
+      return message;
+  }
+};
 
 const SignUpForm = () => {
   const [form, setForm] = useState<SignUpForm>({
-    email: "",
+    phone: "",
     password: "",
     username: "",
   });
@@ -19,7 +46,7 @@ const SignUpForm = () => {
   const onChangeForm = useCallback<React.ChangeEventHandler<HTMLInputElement>>(
     (event) => {
       switch (event.target.name) {
-        case "email":
+        case "phone":
         case "password":
         case "username":
           setForm((prev) => {
@@ -44,6 +71,15 @@ const SignUpForm = () => {
     [account]
   );
 
+  const onChangePhoneNumberInput = useCallback((value: E164Number) => {
+    setForm((prev) => {
+      return {
+        ...prev,
+        phone: value,
+      };
+    });
+  }, []);
+
   const submitForm = useCallback<React.MouseEventHandler<HTMLButtonElement>>(
     async (event) => {
       event.preventDefault();
@@ -52,8 +88,14 @@ const SignUpForm = () => {
         alert("successfully signed up!");
         setHasSignedUp(true);
       } catch (error) {
-        alert("sign-up failed...");
-        console.error(error);
+        if (error instanceof AxiosError) {
+          const message = translateSignUpErrorMessage(
+            String(error.response?.data)
+          );
+          alert(message);
+        } else {
+          alert("sign up failed...");
+        }
       }
     },
     [form]
@@ -91,13 +133,12 @@ const SignUpForm = () => {
           />
         </div>
         <div>
-          email
-          <input
+          phone number
+          <PhoneInput
+            onChange={onChangePhoneNumberInput}
+            country="JP"
             disabled={hasSignedUp}
-            type="text"
-            name="email"
-            onChange={onChangeForm}
-            value={form.email}
+            value={form.phone}
           />
         </div>
         <div>
@@ -123,7 +164,9 @@ const SignUpForm = () => {
           </label>
         </div>
         <div>
-          <button onClick={submitForm}>submit</button>
+          <button disabled={hasSignedUp} onClick={submitForm}>
+            submit
+          </button>
         </div>
         {hasSignedUp && (
           <>
