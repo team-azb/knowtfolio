@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"github.com/aidarkhanov/nanoid/v2"
-	"github.com/microcosm-cc/bluemonday"
 )
 
 type Article struct {
@@ -19,9 +18,6 @@ type Article struct {
 	CreatedAt             time.Time
 	UpdatedAt             time.Time
 }
-
-var htmlSanitizer = bluemonday.UGCPolicy()
-var rawTextSanitizer = bluemonday.StripTagsPolicy()
 
 func NewArticle(title string, content []byte, authorAddress string) *Article {
 	id, _ := nanoid.GenerateString(nanoid.DefaultAlphabet, 11)

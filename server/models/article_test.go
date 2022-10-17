@@ -1,40 +1,12 @@
 package models
 
 import (
-	"math/big"
 	"strings"
 	"testing"
 	"time"
 
-	"github.com/ethereum/go-ethereum/common"
 	"github.com/stretchr/testify/assert"
 )
-
-func TestSetTitleIfPresent(t *testing.T) {
-	orgTitle := "Hello Knowtfolio!"
-	content := []byte("<div> Hello HTML! </div>")
-	actual := NewArticle(orgTitle, content, common.BigToAddress(big.NewInt(0)).String())
-
-	actual.SetTitleIfPresent(nil)
-	assert.Equal(t, orgTitle, actual.Title, "Title should not be changed when nil is given.")
-
-	newTitle := "New Title!"
-	actual.SetTitleIfPresent(&newTitle)
-	assert.Equal(t, newTitle, actual.Title, "Title should be set by SetTitleIfPresent.")
-}
-
-func TestSetContentIfPresent(t *testing.T) {
-	title := "Hello Knowtfolio!"
-	orgContent := "<div> Hello HTML! </div>"
-	actual := NewArticle(title, []byte(orgContent), common.BigToAddress(big.NewInt(0)).String())
-
-	actual.SetContentIfPresent(nil)
-	assert.Equal(t, []byte(orgContent), actual.Content, "Content should not be changed when nil is given.")
-
-	newContent := "<div> New Content! </div>"
-	actual.SetContentIfPresent(&newContent)
-	assert.Equal(t, newContent, string(actual.Content), "Content should be set by SetContentIfPresent.")
-}
 
 func TestToHtml(t *testing.T) {
 	rawContent := `
