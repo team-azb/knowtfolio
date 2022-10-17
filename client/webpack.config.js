@@ -100,6 +100,11 @@ module.exports = {
     port: 3000,
     proxy: [
       {
+        context: "/api/signup",
+        changeOrigin: true,
+        target: "https://knowtfolio.com",
+      },
+      {
         context: (path) => {
           if (path.includes("/api")) {
             return true;

@@ -4,13 +4,14 @@ import SignUpPage from "~/components/pages/SignUpPage";
 import SignInPage from "~/components/pages/SignInPage";
 import AccountPage from "~/components/pages/AccountPage";
 import AuthProvider from "~/components/organisms/providers/AuthProvider";
-import ImageUploadPage from "~/components/pages/ImageUploadPage";
+import UploadImagePage from "~/components/pages/UploadImagePage";
 import Header from "~/components/organisms/Header";
 import NotFoundPage from "~/components/pages/NofFoundPage";
 import NewArticlePage from "~/components/pages/NewArticlePage";
 import EditArticlePage from "~/components/pages/EditArticlePage";
 import IndexArticlesPage from "./components/pages/IndexArticlesPage";
 import Web3Provider from "~/components/organisms/providers/Web3Provider";
+import ResetWalletPage from "./components/pages/ResetWalletPage";
 
 const App = () => {
   return (
@@ -23,6 +24,14 @@ const App = () => {
           <Route path="/signup" element={<SignUpPage />} />
           <Route path="/signin" element={<SignInPage />} />
           <Route
+            path="/reset-wallet"
+            element={
+              <AuthProvider>
+                <ResetWalletPage />
+              </AuthProvider>
+            }
+          />
+          <Route
             path="/mypage"
             element={
               <AuthProvider>
@@ -31,10 +40,10 @@ const App = () => {
             }
           />
           <Route
-            path="/image-upload"
+            path="/upload-image"
             element={
               <AuthProvider>
-                <ImageUploadPage />
+                <UploadImagePage />
               </AuthProvider>
             }
           />

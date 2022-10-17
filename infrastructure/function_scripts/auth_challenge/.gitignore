@@ -1,0 +1,8 @@
+create
+define
+verify
+!cmd/create
+!cmd/define
+!cmd/verify
+
+*.zip

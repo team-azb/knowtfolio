@@ -15,7 +15,7 @@ type imageForm = {
   name: string;
 };
 
-const ImageUploadPage = () => {
+const UploadImagePage = () => {
   const [imageForm, setImageForm] = useState<imageForm | null>(null);
   const { session } = useAuthContext();
   const s3Client = useMemo(() => {
@@ -91,4 +91,4 @@ const ImageUploadPage = () => {
   );
 };
 
-export default ImageUploadPage;
+export default UploadImagePage;

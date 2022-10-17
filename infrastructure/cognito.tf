@@ -1,14 +1,18 @@
+resource "random_id" "external_id" {
+  byte_length = 12
+}
+
 resource "aws_cognito_user_pool" "knowtfolio" {
   name = "dev-knowtfolio"
   admin_create_user_config {
     allow_admin_create_user_only = false
   }
   schema {
-    name                = "email"
+    name                = "phone_number"
     attribute_data_type = "String"
     required            = true
     string_attribute_constraints {
-      min_length = 5
+      min_length = 1
       max_length = 256
     }
   }
@@ -23,7 +27,18 @@ resource "aws_cognito_user_pool" "knowtfolio" {
     }
   }
 
-  auto_verified_attributes = ["email"]
+  lambda_config {
+    define_auth_challenge          = aws_lambda_function.define_auth_challenge.arn
+    create_auth_challenge          = aws_lambda_function.create_auth_challenge.arn
+    verify_auth_challenge_response = aws_lambda_function.verify_auth_challenge_response.arn
+  }
+
+  sms_configuration {
+    sns_caller_arn = aws_iam_role.cognito_sms_sender.arn
+    external_id    = random_id.external_id.id
+  }
+
+  auto_verified_attributes = ["phone_number"]
 }
 
 resource "aws_cognito_user_pool_client" "knowtfolio" {
