@@ -15,6 +15,7 @@ const AcountInfo = () => {
         navigate("/mypage");
       }}
       variant="outlined"
+      style={{ fontSize: "1.4rem" }}
     >
       {user.getUsername()}
     </Button>
@@ -32,6 +33,7 @@ const AuthButtons = () => {
             navigate("/signup");
           }}
           variant="outlined"
+          style={{ fontSize: "1.4rem" }}
         >
           sign up
         </Button>{" "}
@@ -42,6 +44,7 @@ const AuthButtons = () => {
             navigate("/signin");
           }}
           variant="outlined"
+          style={{ fontSize: "1.4rem" }}
         >
           sign in
         </Button>
@@ -83,6 +86,7 @@ const Header = () => {
                 onClick={() => {
                   navigate("/articles/new");
                 }}
+                style={{ fontSize: "1.4rem" }}
               >
                 create article
               </Button>
