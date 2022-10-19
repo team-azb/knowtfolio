@@ -1,24 +1,23 @@
 package models
 
 import (
+	"github.com/stretchr/testify/assert"
 	"strings"
 	"testing"
-	"time"
-
-	"github.com/stretchr/testify/assert"
 )
 
 func TestToHtml(t *testing.T) {
+	id := "abcdefghijk"
+	title := "Hello Knowtfolio!"
 	rawContent := `
 		<div> Hello HTML! </div>
 		<img src="https://i.imgur.com/Ru0JifT.jpeg" alt="basketball legend" width="410" height="213">
+		<a href="javascript:alert('XSS1')" onmouseover="alert('XSS2')"> XSS <a>
 	`
+	doc := NewDocument(id, ArticleType, title, []byte(rawContent))
 	src := Article{
-		ID:        "abcdefghijk",
-		Title:     "Hello Knowtfolio!",
-		Content:   []byte(rawContent),
-		CreatedAt: time.Time{},
-		UpdatedAt: time.Time{},
+		ID:       id,
+		Document: *doc,
 	}
 	actual, err := src.ToHTML()
 	assert.NoError(t, err)
@@ -34,6 +33,7 @@ func TestToHtml(t *testing.T) {
 				<h1> Hello Knowtfolio! </h1>
 				<div> Hello HTML! </div>
 				<img src="https://i.imgur.com/Ru0JifT.jpeg" alt="basketball legend" width="410" height="213">
+				XSS
 			</body>`
 
 	assert.Equal(t, strings.Fields(expected), strings.Fields(string(actual)))
