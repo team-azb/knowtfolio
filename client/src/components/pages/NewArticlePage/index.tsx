@@ -1,10 +1,9 @@
-import { Editor } from "@tinymce/tinymce-react";
 import { Editor as TinyMCEEditor } from "tinymce";
-import { TINY_MCE_API_KEY } from "~/configs/tinymce";
 import { useCallback, useState } from "react";
 import { mintArticleNft, postArticle } from "~/apis/knowtfolio";
 import { useNavigate } from "react-router-dom";
 import { useWeb3Context } from "~/components/organisms/providers/Web3Provider";
+import ArticleEditor from "~/components/organisms/ArticleEditor";
 
 const NewArticlePage = () => {
   const [content, setContent] = useState("");
@@ -60,17 +59,7 @@ const NewArticlePage = () => {
         title:{" "}
         <input type="text" onChange={changeTitleInput} value={titleInput} />
       </p>
-      <Editor
-        onEditorChange={handleEditorChange}
-        value={content}
-        apiKey={TINY_MCE_API_KEY}
-        init={{
-          height: 500,
-          menubar: true,
-          content_style:
-            "body { font-family:Helvetica,Arial,sans-serif; font-size:14px }",
-        }}
-      />
+      <ArticleEditor onEditorChange={handleEditorChange} value={content} />
       <p>preview</p>
       <div>{content}</div>
       <button onClick={handlePost}>create article</button>

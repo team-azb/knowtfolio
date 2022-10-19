@@ -38,6 +38,18 @@ resource "aws_cloudfront_distribution" "knowtfolio" {
     }
   }
 
+  origin {
+    domain_name = "${aws_lambda_function_url.knowtfolio_sign_up.url_id}.lambda-url.ap-northeast-1.on.aws"
+    origin_id   = aws_lambda_function_url.knowtfolio_sign_up.url_id
+
+    custom_origin_config {
+      http_port              = 80
+      https_port             = 443
+      origin_protocol_policy = "https-only"
+      origin_ssl_protocols   = ["TLSv1"]
+    }
+  }
+
   comment             = "CDN for knowtfolio static files hosting"
   enabled             = true
   is_ipv6_enabled     = false
@@ -76,6 +88,17 @@ resource "aws_cloudfront_distribution" "knowtfolio" {
     target_origin_id       = aws_s3_bucket.knowtfolio_article_resources.id
     cache_policy_id        = "658327ea-f89d-4fab-a63d-7e88639e58f6" // CachingOptimized
     compress               = true
+  }
+
+  ordered_cache_behavior {
+    path_pattern             = "/api/signup"
+    allowed_methods          = ["GET", "HEAD", "OPTIONS", "PUT", "POST", "PATCH", "DELETE"]
+    cached_methods           = ["GET", "HEAD", "OPTIONS"]
+    viewer_protocol_policy   = "allow-all"
+    target_origin_id         = aws_lambda_function_url.knowtfolio_sign_up.url_id
+    cache_policy_id          = "4135ea2d-6df8-44a3-9df3-4b5a84be39ad" // CachingDisabled
+    origin_request_policy_id = aws_cloudfront_origin_request_policy.lambda_function_url_request.id
+    compress                 = true
   }
 
   ordered_cache_behavior {
@@ -140,6 +163,19 @@ resource "aws_cloudfront_distribution" "knowtfolio" {
     acm_certificate_arn            = aws_acm_certificate.knowtfolio.arn
     minimum_protocol_version       = "TLSv1.2_2018"
     ssl_support_method             = "sni-only"
+  }
+}
+
+resource "aws_cloudfront_origin_request_policy" "lambda_function_url_request" {
+  name = "lambda-function-url-request"
+  cookies_config {
+    cookie_behavior = "all"
+  }
+  headers_config {
+    header_behavior = "none"
+  }
+  query_strings_config {
+    query_string_behavior = "all"
   }
 }
 
