@@ -22,7 +22,7 @@ func main() {
 	logger.Err(err)
 
 	// Connect to DB
-	db, err := gorm.Open(mysql.Open("root:password@tcp(db:3306)/knowtfolio-db?parseTime=true"), &gorm.Config{})
+	db, err := gorm.Open(mysql.Open("root:password@tcp(db:3306)/knowtfolio-db?parseTime=true"), &gorm.Config{FullSaveAssociations: true})
 	if err != nil {
 		logger.Fatal().Msgf("Failed to connect with DB: %v", err)
 	}

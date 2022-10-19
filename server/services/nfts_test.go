@@ -34,11 +34,6 @@ func prepareNftsService(t *testing.T) nftsService {
 		S3Client: s3.NewFromConfig(cfg),
 	}
 
-	err = service.DB.AutoMigrate(models.Article{})
-	if err != nil {
-		t.Fatal(err)
-	}
-
 	return service
 }
 
