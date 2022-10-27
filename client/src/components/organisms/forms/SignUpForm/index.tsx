@@ -15,6 +15,7 @@ import Checkbox from "~/components/atoms/authForm/Checkbox";
 import Form from "~/components/atoms/authForm/Form";
 import { truncate } from "~/helpers/utils";
 import Spacer from "~/components/atoms/Spacer";
+import JetBrainsMono from "~/components/atoms/JetBrainsMono";
 
 /**
  * 参考:
@@ -171,8 +172,10 @@ const SignUpForm = () => {
           onChange={onChangeForm}
           label={
             <>
-              <b>{truncate(account, 8, 4)}</b>をwallet
-              addressとして登録する(option)
+              <JetBrainsMono style={{ fontWeight: "bold" }}>
+                {truncate(account, 8, 4)}
+              </JetBrainsMono>
+              をwallet addressとして登録する(option)
             </>
           }
         />

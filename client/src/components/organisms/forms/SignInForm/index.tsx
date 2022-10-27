@@ -7,6 +7,7 @@ import {
 import Form from "~/components/atoms/authForm/Form";
 import Input from "~/components/atoms/authForm/Input";
 import Label from "~/components/atoms/authForm/Label";
+import JetBrainsMono from "~/components/atoms/JetBrainsMono";
 import Spacer from "~/components/atoms/Spacer";
 import metamaskSvg from "~/components/organisms/forms/SignInForm/metamask.svg";
 import { useWeb3Context } from "~/components/organisms/providers/Web3Provider";
@@ -119,7 +120,9 @@ const SignInForm = () => {
           <Grid item container xs={5}>
             <Grid item container>
               <Label>Connected wallet address</Label>
-              <p style={{ margin: 0 }}>{account}</p>
+              <JetBrainsMono style={{ fontSize: "1.4rem" }}>
+                {account}
+              </JetBrainsMono>
             </Grid>
             <Grid item container alignItems="center" justifyContent="center">
               <Button

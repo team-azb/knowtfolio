@@ -3,7 +3,6 @@ import { Grid, Button } from "@mui/material";
 import AuthProvider, {
   useAuthContext,
 } from "~/components/organisms/providers/AuthProvider";
-import logo from "~/components/organisms/Header/logo.png";
 import { grey } from "@mui/material/colors";
 
 const AcountInfo = () => {
@@ -67,13 +66,20 @@ const Header = () => {
       }}
     >
       <Grid xs={6}>
-        <img
-          style={{ cursor: "pointer", width: 250 }}
+        <p
+          style={{
+            padding: "1rem",
+            fontSize: "4.5rem",
+            fontWeight: 600,
+            cursor: "pointer",
+            letterSpacing: "0.1rem",
+          }}
           onClick={() => {
             navigate("/");
           }}
-          src={logo}
-        />
+        >
+          Knowtfolio
+        </p>
       </Grid>
       <Grid xs={6}>
         <Grid container direction="row-reverse" alignItems="center">
