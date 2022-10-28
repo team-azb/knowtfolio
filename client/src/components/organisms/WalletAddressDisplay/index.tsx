@@ -19,6 +19,12 @@ type walletAddressDisplayProps = {
   style?: React.CSSProperties;
 };
 
+/**
+ * wallet addressを表示するためのコンポーネント
+ * @address 表示するaddress
+ * @isTrancated addressを短縮して表示するかどうか
+ * @style 適用するstyle
+ */
 const WalletAddressDisplay = ({
   address,
   style,
