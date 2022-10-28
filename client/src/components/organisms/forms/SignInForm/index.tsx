@@ -7,10 +7,10 @@ import {
 import Form from "~/components/atoms/authForm/Form";
 import Input from "~/components/atoms/authForm/Input";
 import Label from "~/components/atoms/authForm/Label";
-import JetBrainsMono from "~/components/atoms/JetBrainsMono";
 import Spacer from "~/components/atoms/Spacer";
 import { useWeb3Context } from "~/components/organisms/providers/Web3Provider";
 import metamaskSvg from "~/assets/metamask.svg";
+import WalletAddressDisplay from "../../WalletAddressDisplay";
 
 type signInWithPasswordForm = {
   username: string;
@@ -118,11 +118,13 @@ const SignInForm = () => {
             <b>OR</b>
           </Grid>
           <Grid item container xs={5}>
-            <Grid item container>
+            <Grid item container direction="column">
               <Label>Connected wallet address</Label>
-              <JetBrainsMono style={{ fontSize: "1.4rem" }}>
-                {account}
-              </JetBrainsMono>
+              <WalletAddressDisplay
+                isTrancated={false}
+                address={account}
+                style={{ fontSize: "1.4rem" }}
+              />
             </Grid>
             <Grid item container alignItems="center" justifyContent="center">
               <Button

@@ -13,7 +13,6 @@ const JetBrainsMono = (
       {...props}
       style={{
         ...props.style,
-        display: "inline",
         fontFamily: "JetBrains Mono",
       }}
     >
