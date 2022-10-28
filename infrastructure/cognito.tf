@@ -59,7 +59,7 @@ resource "aws_cognito_identity_pool" "knowtfolio" {
 
 resource "aws_cognito_identity_pool_roles_attachment" "knowtfolio" {
   identity_pool_id = aws_cognito_identity_pool.knowtfolio.id
-  roles            = {
+  roles = {
     "authenticated"   = aws_iam_role.knowtfolio_article_writer.arn
     "unauthenticated" = aws_iam_role.knowtfolio_viewer.arn
   }

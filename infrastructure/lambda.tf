@@ -6,11 +6,11 @@ locals {
     create_auth_challenge          = ""
     verify_auth_challenge_response = ""
   }
-  sign_up_functions        = {
+  sign_up_functions = {
     sign_up               = ""
     validate_sign_up_form = ""
   }
-  golang_functions         = merge(local.auth_challenge_functions, local.sign_up_functions)
+  golang_functions = merge(local.auth_challenge_functions, local.sign_up_functions)
 }
 
 resource "null_resource" "build_golang_functions" {
@@ -23,8 +23,8 @@ resource "null_resource" "build_golang_functions" {
     command     = "go build -o ./bin/${each.key} ./cmd/${each.key}"
     working_dir = local.func_script_root_dir
     environment = {
-      GOARCH      = "amd64"
-      GOOS        = "linux"
+      GOARCH = "amd64"
+      GOOS   = "linux"
       # NOTE: lambdaの環境下でも動作させるために設定。
       # https://docs.aws.amazon.com/ja_jp/lambda/latest/dg/golang-package.html#golang-package-mac-linux
       CGO_ENABLED = 0
@@ -37,7 +37,7 @@ data "archive_file" "zipped_golang_functions" {
   type        = "zip"
   source_file = "${local.func_script_root_dir}/bin/${each.key}"
   output_path = "${local.func_script_root_dir}/archive/${each.key}.zip"
-  depends_on  = [
+  depends_on = [
     null_resource.build_golang_functions
   ]
 }
