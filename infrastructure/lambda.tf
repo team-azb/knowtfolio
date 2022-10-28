@@ -25,8 +25,8 @@ resource "null_resource" "build_golang_functions" {
     environment = {
       GOARCH      = "amd64"
       GOOS        = "linux"
-      # NOTE: lambdaの環境下でも動作させるために設定、以下も同様。
-      # https://github.com/team-azb/knowtfolio/issues/115
+      # NOTE: lambdaの環境下でも動作させるために設定。
+      # https://docs.aws.amazon.com/ja_jp/lambda/latest/dg/golang-package.html#golang-package-mac-linux
       CGO_ENABLED = 0
     }
   }
