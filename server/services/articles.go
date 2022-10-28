@@ -22,7 +22,7 @@ type articleService struct {
 }
 
 func NewArticlesService(db *gorm.DB, contract *ethereum.ContractClient, handler HttpHandler) *server.Server {
-	err := db.Migrator().AutoMigrate(models.Article{})
+	err := db.Migrator().AutoMigrate(models.Article{}, models.Document{})
 	if err != nil {
 		panic(err.(any))
 	}
@@ -50,7 +50,7 @@ func (a articleService) Create(_ context.Context, request *articles.ArticleCreat
 
 func (a articleService) Read(_ context.Context, request *articles.ArticleReadRequest) (res *articles.ArticleResult, err error) {
 	target := models.Article{ID: request.ID}
-	result := a.DB.First(&target)
+	result := a.DB.Preload("Document").First(&target)
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 		return nil, articles.MakeNotFound(result.Error)
 	}
@@ -72,22 +72,22 @@ func (a articleService) Update(_ context.Context, request *articles.ArticleUpdat
 		return nil, articles.MakeUnauthenticated(err)
 	}
 
-	targetArticle := models.Article{ID: request.ID}
+	target := models.Article{ID: request.ID}
 
 	err = a.DB.Transaction(func(tx *gorm.DB) error {
-		result := tx.First(&targetArticle)
+		result := tx.Preload("Document").First(&target)
 		if result.Error != nil {
 			return result.Error
 		}
 
-		err = a.AuthorizeEdit(request.Address, targetArticle, true)
+		err = a.AuthorizeEdit(request.Address, target, true)
 		if err != nil {
 			return err
 		}
 
-		targetArticle.SetTitleIfPresent(request.Title)
-		targetArticle.SetContentIfPresent(request.Content)
-		result = tx.Save(&targetArticle)
+		target.Document.SetTitleIfPresent(request.Title)
+		target.Document.SetContentIfPresent(request.Content)
+		result = tx.Save(&target)
 
 		return result.Error
 	})
@@ -96,7 +96,7 @@ func (a articleService) Update(_ context.Context, request *articles.ArticleUpdat
 		return nil, articles.MakeNotFound(err)
 	}
 
-	return articleToResult(targetArticle), err
+	return articleToResult(target), err
 }
 
 func (a articleService) Delete(_ context.Context, request *articles.ArticleDeleteRequest) (res *articles.ArticleResult, err error) {
@@ -144,8 +144,8 @@ func (a articleService) AuthorizeEdit(editorAddr string, target models.Article, 
 func articleToResult(src models.Article) *articles.ArticleResult {
 	return &articles.ArticleResult{
 		ID:      src.ID,
-		Title:   src.Title,
-		Content: string(src.Content),
+		Title:   src.Document.Title,
+		Content: string(src.Document.Content),
 	}
 }
 
@@ -157,12 +157,12 @@ func articleIdToResult(src string) *articles.ArticleResult {
 }
 
 func articleWithOwnerAddressToResult(src models.Article, owner common.Address) *articles.ArticleResult {
-	contentStr := string(src.Content)
+	contentStr := string(src.Document.Content)
 	ownerAddressStr := owner.String()
 	return articles.NewArticleResult(&articlesviews.ArticleResult{
 		Projected: &articlesviews.ArticleResultView{
 			ID:           &src.ID,
-			Title:        &src.Title,
+			Title:        &src.Document.Title,
 			Content:      &contentStr,
 			OwnerAddress: &ownerAddressStr,
 		},

@@ -21,12 +21,12 @@ var (
 )
 
 var (
-	goEntry = search.SearchResultEntry{ID: goArticle.ID, Title: goArticle.Title, OwnerAddress: user0Addr}
-	rsEntry = search.SearchResultEntry{ID: rsArticle.ID, Title: rsArticle.Title, OwnerAddress: user1Addr}
-	pyEntry = search.SearchResultEntry{ID: pyArticle.ID, Title: pyArticle.Title, OwnerAddress: user0Addr}
-	ktEntry = search.SearchResultEntry{ID: ktArticle.ID, Title: ktArticle.Title, OwnerAddress: user1Addr}
-	jsEntry = search.SearchResultEntry{ID: jsArticle.ID, Title: jsArticle.Title, OwnerAddress: user0Addr}
-	tsEntry = search.SearchResultEntry{ID: tsArticle.ID, Title: tsArticle.Title, OwnerAddress: user1Addr}
+	goEntry = search.SearchResultEntry{ID: goArticle.ID, Title: goArticle.Document.Title, OwnerAddress: user0Addr}
+	rsEntry = search.SearchResultEntry{ID: rsArticle.ID, Title: rsArticle.Document.Title, OwnerAddress: user1Addr}
+	pyEntry = search.SearchResultEntry{ID: pyArticle.ID, Title: pyArticle.Document.Title, OwnerAddress: user0Addr}
+	ktEntry = search.SearchResultEntry{ID: ktArticle.ID, Title: ktArticle.Document.Title, OwnerAddress: user1Addr}
+	jsEntry = search.SearchResultEntry{ID: jsArticle.ID, Title: jsArticle.Document.Title, OwnerAddress: user0Addr}
+	tsEntry = search.SearchResultEntry{ID: tsArticle.ID, Title: tsArticle.Document.Title, OwnerAddress: user1Addr}
 )
 
 func tokenizeTestTargetArticle(client *ethereum.ContractClient, target *models.Article, ownerAddr string) error {
@@ -51,17 +51,13 @@ func prepareSearchService(t *testing.T) searchService {
 		DB:       initTestDB(t),
 		Contract: initTestContractClient(t),
 	}
-	err := service.DB.AutoMigrate(models.Article{})
-	if err != nil {
-		t.Fatal(err)
-	}
 
 	// Mint NFTs for the target articles.
 	err0 := tokenizeTestTargetArticle(service.Contract, goArticle, user0Addr)
 	err1 := tokenizeTestTargetArticle(service.Contract, rsArticle, user1Addr)
 	err2 := tokenizeTestTargetArticle(service.Contract, ktArticle, user1Addr)
 	err3 := tokenizeTestTargetArticle(service.Contract, jsArticle, user0Addr)
-	err = multierr.Combine(err0, err1, err2, err3)
+	err := multierr.Combine(err0, err1, err2, err3)
 	if err != nil {
 		t.Fatal(err)
 	}

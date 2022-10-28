@@ -2,50 +2,25 @@ package models
 
 import (
 	"bytes"
-	"html/template"
-	"time"
-
 	"github.com/aidarkhanov/nanoid/v2"
-	"github.com/microcosm-cc/bluemonday"
+	"html/template"
 )
 
 type Article struct {
-	ID                    string `gorm:"primarykey"`
-	Title                 string `gorm:"index:search_idx,class:FULLTEXT"`
-	Content               []byte
-	RawText               string `gorm:"index:search_idx,class:FULLTEXT"`
-	OriginalAuthorAddress string
-	IsTokenized           bool
-	CreatedAt             time.Time
-	UpdatedAt             time.Time
+	ID                    string   `gorm:"primarykey"`
+	Document              Document `gorm:"polymorphic:Owner; polymorphicValue:ARTICLE"`
+	OriginalAuthorAddress string   `gorm:"not null"`
+	IsTokenized           bool     `gorm:"not null"`
 }
-
-var htmlSanitizer = bluemonday.UGCPolicy()
-var rawTextSanitizer = bluemonday.StripTagsPolicy()
 
 func NewArticle(title string, content []byte, authorAddress string) *Article {
 	id, _ := nanoid.GenerateString(nanoid.DefaultAlphabet, 11)
-	rawText := rawTextSanitizer.Sanitize(string(content))
+	doc := NewDocument(id, ArticleType, title, content)
 	return &Article{
 		ID:                    id,
-		Title:                 title,
-		Content:               content,
-		RawText:               rawText,
+		Document:              *doc,
 		OriginalAuthorAddress: authorAddress,
 		IsTokenized:           false,
-	}
-}
-
-func (a *Article) SetTitleIfPresent(title *string) {
-	if title != nil {
-		a.Title = *title
-	}
-}
-
-func (a *Article) SetContentIfPresent(content *string) {
-	if content != nil {
-		a.Content = []byte(*content)
-		a.RawText = rawTextSanitizer.Sanitize(*content)
 	}
 }
 
@@ -74,9 +49,9 @@ func (a *Article) ToHTML() ([]byte, error) {
 
 	var buf bytes.Buffer
 	err = htmlTemplate.Execute(&buf, map[string]interface{}{
-		"title":   a.Title,
+		"title":   a.Document.Title,
 		"id":      a.ID,
-		"content": template.HTML(htmlSanitizer.SanitizeBytes(a.Content)),
+		"content": template.HTML(a.Document.SanitizedContent()),
 	})
 	if err != nil {
 		return nil, err

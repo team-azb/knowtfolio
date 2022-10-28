@@ -7,6 +7,7 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/team-azb/knowtfolio/server/config"
 	"github.com/team-azb/knowtfolio/server/gateways/ethereum"
+	"github.com/team-azb/knowtfolio/server/models"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"strings"
@@ -43,8 +44,13 @@ func initTestDB(t *testing.T) (db *gorm.DB) {
 	t.Logf("[%v] Created temporary DB %v!", t.Name(), dbName)
 
 	// Connect to the temporary database.
-	db, err = gorm.Open(mysql.Open(fmt.Sprintf("root:password@tcp(db:3306)/%v?parseTime=true", dbName)))
+	db, err = gorm.Open(mysql.Open(fmt.Sprintf("root:password@tcp(db:3306)/%v?parseTime=true", dbName)), &gorm.Config{FullSaveAssociations: true})
 	fatalfIfError(t, err, "Connection to Created DB %v failed", dbName)
+
+	err = db.AutoMigrate(models.Article{}, models.Document{})
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	return
 }

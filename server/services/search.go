@@ -46,7 +46,7 @@ func (s searchService) SearchForArticles(_ context.Context, request *search.Sear
 		}
 		ownedByCond := s.DB.
 			// Articles that has been tokenized and whose token is owned by the user.
-			Where(`id IN ?`, ownedArticleIds).
+			Where(`articles.id IN ?`, ownedArticleIds).
 			// Articles that hasn't been tokenized and is originally created by the user.
 			Or(s.DB.Where(`is_tokenized = 0`).Where(`original_author_address = ?`, *request.OwnedBy))
 		baseQuery = baseQuery.Where(ownedByCond)
@@ -63,7 +63,8 @@ func (s searchService) SearchForArticles(_ context.Context, request *search.Sear
 	offset := int((request.PageNum - 1) * request.PageSize)
 	limit := int(request.PageSize)
 	loadQuery := baseQuery.
-		Select("id", "title", "original_author_address").
+		Select("articles.id", "original_author_address").
+		Joins("Document").
 		Offset(offset).Limit(limit).Order(request.SortBy)
 	countQuery := baseQuery.Model(&models.Article{})
 
@@ -97,7 +98,7 @@ func (s searchService) SearchForArticles(_ context.Context, request *search.Sear
 		}
 		entries[i] = &search.SearchResultEntry{
 			ID:           target.ID,
-			Title:        target.Title,
+			Title:        target.Document.Title,
 			OwnerAddress: ownerAddr,
 		}
 	}

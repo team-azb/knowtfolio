@@ -19,10 +19,6 @@ func prepareArticlesService(t *testing.T) articleService {
 		DB:       initTestDB(t),
 		Contract: initTestContractClient(t),
 	}
-	err := service.DB.AutoMigrate(models.Article{})
-	if err != nil {
-		t.Fatal(err)
-	}
 
 	return service
 }
@@ -40,9 +36,7 @@ var (
 	article1          = *models.NewArticle("Article1", []byte("<div> content1 </div>"), user0Addr)
 	tokenizedArticle0 = models.Article{
 		ID:                    article0.ID,
-		Title:                 article0.Title,
-		Content:               article0.Content,
-		RawText:               article0.RawText,
+		Document:              article0.Document,
 		OriginalAuthorAddress: article0.OriginalAuthorAddress,
 		IsTokenized:           true,
 	}
@@ -52,24 +46,24 @@ func TestCreateArticle(t *testing.T) {
 	service := prepareArticlesService(t)
 
 	result, err := service.Create(context.Background(), &articles.ArticleCreateRequest{
-		Title:     article0.Title,
-		Content:   string(article0.Content),
+		Title:     article0.Document.Title,
+		Content:   string(article0.Document.Content),
 		Address:   user0Addr,
 		Signature: user0CreateSign,
 	})
 
 	// Assert request body.
 	assert.NoError(t, err)
-	assert.Equal(t, article0.Title, result.Title)
-	assert.Equal(t, string(article0.Content), result.Content)
+	assert.Equal(t, article0.Document.Title, result.Title)
+	assert.Equal(t, string(article0.Document.Content), result.Content)
 
 	// Assert DB contents.
 	target := models.Article{ID: result.ID}
-	res := service.DB.First(&target)
+	res := service.DB.Preload("Document").First(&target)
 	assert.NoError(t, res.Error)
 	assert.Equal(t, result.ID, target.ID)
-	assert.Equal(t, article0.Title, target.Title)
-	assert.Equal(t, article0.Content, target.Content)
+	assert.Equal(t, article0.Document.Title, target.Document.Title)
+	assert.Equal(t, article0.Document.Content, target.Document.Content)
 }
 
 func TestReadArticle(t *testing.T) {
@@ -83,9 +77,9 @@ func TestReadArticle(t *testing.T) {
 		// Assert request body.
 		assert.NoError(t, err)
 		assert.Equal(t, article0.ID, result.ID)
-		assert.Equal(t, article0.Title, result.Title)
+		assert.Equal(t, article0.Document.Title, result.Title)
 		assert.Equal(t, article0.OriginalAuthorAddress, result.OwnerAddress)
-		assert.Equal(t, string(article0.Content), result.Content)
+		assert.Equal(t, string(article0.Document.Content), result.Content)
 	})
 
 	t.Run("WithNFT", func(t *testing.T) {
@@ -100,15 +94,15 @@ func TestReadArticle(t *testing.T) {
 		// Assert request body.
 		assert.NoError(t, err)
 		assert.Equal(t, tokenizedArticle0.ID, result.ID)
-		assert.Equal(t, tokenizedArticle0.Title, result.Title)
+		assert.Equal(t, tokenizedArticle0.Document.Title, result.Title)
 		assert.Equal(t, user1Addr, result.OwnerAddress)
-		assert.Equal(t, string(tokenizedArticle0.Content), result.Content)
+		assert.Equal(t, string(tokenizedArticle0.Document.Content), result.Content)
 	})
 }
 
 func TestUpdateArticle(t *testing.T) {
-	newTitle := article1.Title
-	newContentStr := string(article1.Content)
+	newTitle := article1.Document.Title
+	newContentStr := string(article1.Document.Content)
 	updateRequestByUser0 := articles.ArticleUpdateRequest{
 		ID:        article0.ID,
 		Title:     &newTitle,
@@ -146,11 +140,11 @@ func TestUpdateArticle(t *testing.T) {
 		// Assert DB contents.
 		tokenizedArticle0.ID = result.ID
 		target := models.Article{ID: tokenizedArticle0.ID}
-		res := service.DB.First(&target)
+		res := service.DB.Preload("Document").First(&target)
 		assert.NoError(t, res.Error)
 		assert.Equal(t, expected.ID, target.ID)
-		assert.Equal(t, expected.Title, target.Title)
-		assert.Equal(t, []byte(expected.Content), target.Content)
+		assert.Equal(t, expected.Title, target.Document.Title)
+		assert.Equal(t, []byte(expected.Content), target.Document.Content)
 	})
 
 	t.Run("FailWithoutNFT", func(t *testing.T) {
