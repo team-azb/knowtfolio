@@ -17,6 +17,9 @@ type inputProps = React.DetailedHTMLProps<
   label?: string;
 };
 
+/**
+ * 認証用フォームのためのスタイルが適用されたInput要素
+ */
 const Input = ({
   name,
   type,

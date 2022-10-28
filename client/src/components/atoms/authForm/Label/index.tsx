@@ -1,3 +1,6 @@
+/**
+ * 認証用フォームのためのスタイルが適用されたLabel要素
+ */
 const Label = ({
   htmlFor,
   children,

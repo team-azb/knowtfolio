@@ -1,3 +1,7 @@
+/**
+ * テキストにJetBrainsMonoフォントを適用するコンポーネント
+ * @props pタグと同様
+ */
 const JetBrainsMono = (
   props: React.DetailedHTMLProps<
     React.HTMLAttributes<HTMLParagraphElement>,

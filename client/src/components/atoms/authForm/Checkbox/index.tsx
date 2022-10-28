@@ -7,6 +7,9 @@ type checkboxProps = React.DetailedHTMLProps<
   label?: JSX.Element;
 };
 
+/**
+ * 認証用フォームのためのスタイルが適用されたCheckbox要素
+ */
 const Checkbox = ({ name, id, disabled, onChange, label }: checkboxProps) => {
   return (
     <Grid item container alignItems="center">
