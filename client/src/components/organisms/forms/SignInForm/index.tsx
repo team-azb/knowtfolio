@@ -9,8 +9,8 @@ import Input from "~/components/atoms/authForm/Input";
 import Label from "~/components/atoms/authForm/Label";
 import JetBrainsMono from "~/components/atoms/JetBrainsMono";
 import Spacer from "~/components/atoms/Spacer";
-import metamaskSvg from "~/components/organisms/forms/SignInForm/metamask.svg";
 import { useWeb3Context } from "~/components/organisms/providers/Web3Provider";
+import metamaskSvg from "~/assets/metamask.svg";
 
 type signInWithPasswordForm = {
   username: string;

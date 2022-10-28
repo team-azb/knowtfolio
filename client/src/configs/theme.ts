@@ -3,7 +3,7 @@ import { grey } from "@mui/material/colors";
 
 export const theme = createTheme({
   typography: {
-    fontFamily: 'Ubuntu',
+    fontFamily: "Ubuntu",
   },
   palette: {
     primary: {
