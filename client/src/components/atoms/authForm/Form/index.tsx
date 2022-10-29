@@ -1,7 +1,5 @@
 /**
  * 認証用フォームのためのスタイルが適用されたForm要素
- * @param param0
- * @returns
  */
 const Form = ({
   style,

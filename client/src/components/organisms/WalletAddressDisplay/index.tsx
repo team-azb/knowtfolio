@@ -15,24 +15,24 @@ export const truncate = (str: string, m: number, n: number) => {
 
 type walletAddressDisplayProps = {
   address: string;
-  isTrancated?: boolean;
+  shouldTruncate?: boolean;
   style?: React.CSSProperties;
 };
 
 /**
  * wallet addressを表示するためのコンポーネント
  * @address 表示するaddress
- * @isTrancated addressを短縮して表示するかどうか
+ * @shouldTruncate addressを短縮して表示するかどうか
  * @style 適用するstyle
  */
 const WalletAddressDisplay = ({
   address,
   style,
-  isTrancated = true,
+  shouldTruncate = true,
 }: walletAddressDisplayProps) => {
   return (
     <JetBrainsMono style={style}>
-      {isTrancated ? truncate(address, 8, 4) : address}
+      {shouldTruncate ? truncate(address, 8, 4) : address}
     </JetBrainsMono>
   );
 };

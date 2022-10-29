@@ -121,7 +121,7 @@ const SignInForm = () => {
             <Grid item container direction="column">
               <Label>Connected wallet address</Label>
               <WalletAddressDisplay
-                isTrancated={false}
+                shouldTruncate={false}
                 address={account}
                 style={{ fontSize: "1.4rem" }}
               />
