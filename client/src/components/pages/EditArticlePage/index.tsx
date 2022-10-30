@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
-import ArticleEditForm from "~/components/organisms/ArticleEditForm";
+import Spacer from "~/components/atoms/Spacer";
+import EditArticleForm from "~/components/organisms/forms/EditArticleForm";
 import { useWeb3Context } from "~/components/organisms/providers/Web3Provider";
 
 const EditArticlePage = () => {
@@ -14,12 +15,18 @@ const EditArticlePage = () => {
   const content = useMemo(() => {
     if (ownerIdOfArticle === null) {
       return <div>編集権限を照会中です</div>;
-    } else if (isAuthorized) {
-      return <ArticleEditForm />;
+    } else if (isAuthorized && articleId) {
+      return (
+        <>
+          <h2>Edit article: {articleId}</h2>
+          <Spacer height="3rem" />
+          <EditArticleForm articleId={articleId} />
+        </>
+      );
     } else {
       return <div>編集権限がありません</div>;
     }
-  }, [isAuthorized, ownerIdOfArticle]);
+  }, [articleId, isAuthorized, ownerIdOfArticle]);
 
   useEffect(() => {
     (async () => {
@@ -30,7 +37,11 @@ const EditArticlePage = () => {
     })();
   }, [articleId, contract.methods]);
 
-  return <>{content}</>;
+  return (
+    <div style={{ padding: "100px 400px" }}>
+      {content}
+    </div>
+  );
 };
 
 export default EditArticlePage;
