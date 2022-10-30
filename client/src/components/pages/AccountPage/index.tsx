@@ -5,6 +5,9 @@ import WalletAddressDisplay from "~/components/organisms/WalletAddressDisplay";
 import { useNavigate } from "react-router-dom";
 import { Button, Grid } from "@mui/material";
 
+/**
+ * "/mypage"のページコンポーネント
+ */
 const AccountPage = () => {
   const { user, attributes } = useAuthContext();
   const [phoneNumber, walletAddress] = useMemo(() => {
