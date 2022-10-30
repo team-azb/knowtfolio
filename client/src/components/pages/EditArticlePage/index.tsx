@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import Spacer from "~/components/atoms/Spacer";
 import EditArticleForm from "~/components/organisms/forms/EditArticleForm";
 import { useWeb3Context } from "~/components/organisms/providers/Web3Provider";
@@ -24,7 +24,17 @@ const EditArticlePage = () => {
         </>
       );
     } else {
-      return <div>編集権限がありません</div>;
+      return (
+        <div>
+          <h2>サインイン中のアカウントに記事の編集権限がありません</h2>
+          <p>
+            <Link to="/mypage" style={{ color: "#000" }}>
+              マイページ
+            </Link>
+            にてアカウント情報をご確認ください
+          </p>
+        </div>
+      );
     }
   }, [articleId, isAuthorized, ownerIdOfArticle]);
 
@@ -37,11 +47,7 @@ const EditArticlePage = () => {
     })();
   }, [articleId, contract.methods]);
 
-  return (
-    <div style={{ padding: "100px 400px" }}>
-      {content}
-    </div>
-  );
+  return <div style={{ padding: "100px 400px" }}>{content}</div>;
 };
 
 export default EditArticlePage;
