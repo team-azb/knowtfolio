@@ -1,3 +1,5 @@
+import JetBrainsMono from "~/components/atoms/JetBrainsMono";
+
 /**
  * trancate long string
  * @param str original string
@@ -13,10 +15,26 @@ export const truncate = (str: string, m: number, n: number) => {
 
 type walletAddressDisplayProps = {
   address: string;
+  shouldTruncate?: boolean;
+  style?: React.CSSProperties;
 };
 
-const WalletAddressDisplay = ({ address }: walletAddressDisplayProps) => {
-  return <strong>{truncate(address, 8, 4)}</strong>;
+/**
+ * wallet addressを表示するためのコンポーネント
+ * @address 表示するaddress
+ * @shouldTruncate addressを短縮して表示するかどうか
+ * @style 適用するstyle
+ */
+const WalletAddressDisplay = ({
+  address,
+  style,
+  shouldTruncate = true,
+}: walletAddressDisplayProps) => {
+  return (
+    <JetBrainsMono style={style}>
+      {shouldTruncate ? truncate(address, 8, 4) : address}
+    </JetBrainsMono>
+  );
 };
 
 export default WalletAddressDisplay;

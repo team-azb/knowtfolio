@@ -12,12 +12,14 @@ import EditArticlePage from "~/components/pages/EditArticlePage";
 import IndexArticlesPage from "./components/pages/IndexArticlesPage";
 import Web3Provider from "~/components/organisms/providers/Web3Provider";
 import ResetWalletPage from "./components/pages/ResetWalletPage";
+import { ThemeProvider } from "@mui/material";
+import { theme } from "~/configs/theme";
+import "~/global.css";
 
 const App = () => {
   return (
-    <>
+    <ThemeProvider theme={theme}>
       <Header />
-      <hr />
       <Web3Provider>
         <Routes>
           <Route path="/" element={<TopPage />} />
@@ -67,7 +69,7 @@ const App = () => {
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </Web3Provider>
-    </>
+    </ThemeProvider>
   );
 };
 

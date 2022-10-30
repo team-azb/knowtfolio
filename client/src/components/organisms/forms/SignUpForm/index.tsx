@@ -8,6 +8,13 @@ import { useWeb3Context } from "~/components/organisms/providers/Web3Provider";
 import PhoneInput from "react-phone-number-input/input";
 import { E164Number } from "libphonenumber-js/types";
 import { AxiosError } from "axios";
+import { Button, Grid } from "@mui/material";
+import Input, { InputStyle } from "~/components/atoms/authForm/Input";
+import Label from "~/components/atoms/authForm/Label";
+import Checkbox from "~/components/atoms/authForm/Checkbox";
+import Form from "~/components/atoms/authForm/Form";
+import Spacer from "~/components/atoms/Spacer";
+import WalletAddressDisplay from "~/components/organisms/WalletAddressDisplay";
 
 /**
  * 参考:
@@ -121,66 +128,98 @@ const SignUpForm = () => {
   );
 
   return (
-    <>
-      <form>
-        <div>
-          username
-          <input
-            disabled={hasSignedUp}
-            type="text"
-            name="username"
-            onChange={onChangeForm}
-          />
-        </div>
-        <div>
-          phone number
+    <Form>
+      <h2>サインアップ</h2>
+      <hr />
+      <Spacer height="3rem" />
+      <Grid container direction="column" spacing={3}>
+        <Input
+          label="Username"
+          disabled={hasSignedUp}
+          type="text"
+          name="username"
+          id="username"
+          onChange={onChangeForm}
+          placeholder="Name used as display name"
+        />
+        <Grid item container direction="column">
+          <Label htmlFor="phone_number">Phone number</Label>
           <PhoneInput
             onChange={onChangePhoneNumberInput}
             country="JP"
+            id="phone_number"
             disabled={hasSignedUp}
             value={form.phone}
+            style={InputStyle}
+            placeholder="Phone number"
           />
-        </div>
-        <div>
-          password
-          <input
+        </Grid>
+        <Input
+          label="Password"
+          disabled={hasSignedUp}
+          type="password"
+          name="password"
+          id="password"
+          onChange={onChangeForm}
+          value={form.password}
+          placeholder="Password"
+        />
+        <Checkbox
+          id="wallet"
+          name="wallet"
+          disabled={hasSignedUp}
+          onChange={onChangeForm}
+          label={
+            <>
+              <WalletAddressDisplay
+                address={account}
+                style={{ display: "inline" }}
+              />
+              をwallet addressとして登録する(option)
+            </>
+          }
+        />
+        <Grid item container justifyContent="center">
+          <Button
+            variant="outlined"
             disabled={hasSignedUp}
-            type="text"
-            name="password"
-            onChange={onChangeForm}
-            value={form.password}
-          />
-        </div>
-        <div>
-          <input
-            disabled={hasSignedUp}
-            type="checkbox"
-            name="wallet"
-            id="wallet"
-            onChange={onChangeForm}
-          />
-          <label htmlFor="wallet">
-            <b>{account}</b>をwallet addressとして登録する(オプション)
-          </label>
-        </div>
-        <div>
-          <button disabled={hasSignedUp} onClick={submitForm}>
-            submit
-          </button>
-        </div>
+            onClick={submitForm}
+            style={{ fontSize: "1.4rem" }}
+          >
+            Submit
+          </Button>
+        </Grid>
         {hasSignedUp && (
-          <>
-            <div>
-              confirmation code
-              <input onChange={onChangeCodeInput} type="text" value={code} />
-            </div>
-            <div>
-              <button onClick={verifyCode}>verify</button>
-            </div>
-          </>
+          <Grid
+            item
+            container
+            justifyContent="center"
+            alignItems="center"
+            spacing={1}
+          >
+            <Grid item>
+              <Input
+                type="text"
+                name="confirmation_code"
+                id="confirmation_code"
+                onChange={onChangeCodeInput}
+                value={code}
+                placeholder="Confirmation code"
+              />
+            </Grid>
+            <Grid item>
+              <Button
+                variant="outlined"
+                onClick={verifyCode}
+                style={{ fontSize: "1.4rem" }}
+              >
+                verify
+              </Button>
+            </Grid>
+          </Grid>
         )}
-      </form>
-    </>
+      </Grid>
+    </Form>
   );
 };
 

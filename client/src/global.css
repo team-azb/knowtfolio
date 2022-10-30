@@ -1,0 +1,22 @@
+/* bodyタグなどの全体に適用されるスタイルを指定する */
+body {
+  margin: 0;
+}
+
+html {
+  font-family: "Ubuntu";
+  font-size: 10px;
+}
+
+button,
+div,
+p {
+  margin: 0;
+  padding: 0;
+  font-size: 1.6rem;
+}
+
+h1,
+h2 {
+  margin: 0;
+}

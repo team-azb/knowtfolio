@@ -2,7 +2,11 @@ import SignUpForm from "~/components/organisms/forms/SignUpForm";
 
 const SignUpPage = () => {
   return (
-    <div>
+    <div
+      style={{
+        padding: "100px 400px",
+      }}
+    >
       <SignUpForm />
     </div>
   );
