@@ -9,6 +9,9 @@ import { Button, Grid } from "@mui/material";
 import Spacer from "~/components/atoms/Spacer";
 import { useNavigate } from "react-router-dom";
 
+/**
+ * walletを再設定するためのフォーム
+ */
 const ResetWalletForm = () => {
   const [walletAddressInput, setWalletAddressInput] = useState<string>("");
   const { user, attributes } = useAuthContext();
