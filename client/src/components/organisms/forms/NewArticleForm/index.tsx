@@ -54,7 +54,7 @@ const NewArticleForm = () => {
   }, [account, content, navigate, titleInput, web3.eth.personal]);
   return (
     <Grid container direction="column" spacing={1}>
-      <Grid item container>
+      <Grid item>
         <input
           style={{
             border: "2px solid #eee",
