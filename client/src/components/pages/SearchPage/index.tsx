@@ -6,9 +6,15 @@ const SearchPage = () => {
   return (
     <div style={{ padding: "100px 400px" }}>
       <Grid container direction="column" spacing={2}>
-      <Grid item><h2>Search</h2></Grid>
-      <Grid item><SearchForm /></Grid>
-      <Grid item><SearchResultTable /></Grid>
+        <Grid item>
+          <h2>Search</h2>
+        </Grid>
+        <Grid item>
+          <SearchForm />
+        </Grid>
+        <Grid item>
+          <SearchResultTable />
+        </Grid>
       </Grid>
     </div>
   );

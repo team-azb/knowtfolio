@@ -24,7 +24,11 @@ const OwnedArticleCard = (props: ownedArticleCardProps) => {
       }}
       {...props}
     >
-      <Grid item style={{ height: "10rem" }}>
+      <Grid
+        item
+        style={{ height: "10rem", cursor: "pointer" }}
+        onClick={() => (location.href = `/articles/${props.article.id}`)}
+      >
         <h3 style={{ fontWeight: "normal" }}>
           <TrancatedText str={props.article.title} m={25} n={5} />
         </h3>
@@ -33,7 +37,9 @@ const OwnedArticleCard = (props: ownedArticleCardProps) => {
         <hr />
         <Button
           variant="outlined"
-          onClick={() => navigate(`/articles/${props.article.id}/edit`)}
+          onClick={() => {
+            navigate(`/articles/${props.article.id}/edit`);
+          }}
         >
           Edit
         </Button>

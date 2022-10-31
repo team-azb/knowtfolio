@@ -1,26 +1,33 @@
 import { Grid } from "@mui/material";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { searchArticles, SearchResultEntry } from "~/apis/knowtfolio";
-import { useWeb3Context } from "~/components/organisms/providers/Web3Provider";
 import OwnedArticleCard from "~/components/organisms/cards/OwnedArticleCard";
+import { useAuthContext } from "~/components/organisms/providers/AuthProvider";
 
 /**
  * ユーザーが所有している記事を一覧表示できるテーブル
  */
 const OwnedArticleTable = () => {
-  const { account } = useWeb3Context();
+  const { attributes } = useAuthContext();
   const [articles, setArticles] = useState<SearchResultEntry[]>([]);
+  const walletAddress = useMemo(() => {
+    const walletAddress = attributes.find(
+      (atr) => atr.Name === "custom:wallet_address"
+    )?.Value;
+    return walletAddress || "";
+  }, [attributes]);
+
   useEffect(() => {
     (async () => {
       const { results } = await searchArticles({
-        owned_by: account,
+        owned_by: walletAddress,
         sort_by: "updated_at",
         page_num: 1,
         page_size: 10,
       });
       setArticles(results);
     })();
-  }, [account]);
+  }, [walletAddress]);
 
   return (
     <Grid item container direction="column" spacing={2}>
