@@ -27,7 +27,7 @@ const authContext = createContext<AuthContext>({} as AuthContext);
 type props = {
   children: React.ReactNode;
   contentOnUnauthenticated?: React.ReactNode;
-  contentOnLoadingSesstion?: React.ReactNode;
+  contentWhileLoadingSession?: React.ReactNode;
 };
 
 const defaultContentOnUnauthenticated = (
@@ -46,7 +46,7 @@ const defaultContentOnUnauthenticated = (
 const AuthProvider = ({
   children,
   contentOnUnauthenticated = defaultContentOnUnauthenticated,
-  contentOnLoadingSesstion = <LoadingDisplay message="ローディング中" />,
+  contentWhileLoadingSession = <LoadingDisplay message="ローディング中" />,
 }: props) => {
   const [auth, setAuth] = useState<AuthContext | null>(null);
   const [hasLoadedSession, setHasLoadedSession] = useState(false);
@@ -61,8 +61,8 @@ const AuthProvider = ({
         session: session,
         attributes: attributes,
       });
-      setHasLoadedSession(true);
     }
+    setHasLoadedSession(true);
   }, []);
 
   useEffect(() => {
@@ -75,7 +75,7 @@ const AuthProvider = ({
 
   const content = useMemo(() => {
     if (!hasLoadedSession) {
-      return contentOnLoadingSesstion;
+      return contentWhileLoadingSession;
     } else if (auth) {
       return (
         <authContext.Provider value={auth}>{children}</authContext.Provider>
@@ -86,7 +86,7 @@ const AuthProvider = ({
   }, [
     auth,
     children,
-    contentOnLoadingSesstion,
+    contentWhileLoadingSession,
     contentOnUnauthenticated,
     hasLoadedSession,
   ]);
