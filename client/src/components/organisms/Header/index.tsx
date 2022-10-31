@@ -5,19 +5,32 @@ import AuthProvider, {
 } from "~/components/organisms/providers/AuthProvider";
 import { grey } from "@mui/material/colors";
 import LoadingDisplay from "~/components/atoms/LoadingDisplay";
+import WalletAddressDisplay from "~/components/organisms/WalletAddressDisplay";
+import { useMemo } from "react";
 
 const AcountInfo = () => {
-  const { user } = useAuthContext();
+  const { user, attributes } = useAuthContext();
   const navigate = useNavigate();
+  const walletAddress = useMemo(() => {
+    const walletAddress = attributes.find(
+      (atr) => atr.Name === "custom:wallet_address"
+    )?.Value;
+    return walletAddress || "";
+  }, [attributes]);
+
   return (
     <Button
       onClick={() => {
         navigate("/mypage");
       }}
       variant="outlined"
-      style={{ fontSize: "1.4rem" }}
+      style={{ fontSize: "1.4rem", flexDirection: "column" }}
     >
       {user.getUsername()}
+      <WalletAddressDisplay
+        address={walletAddress}
+        style={{ fontSize: "1rem" }}
+      />
     </Button>
   );
 };
