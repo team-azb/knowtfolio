@@ -4,6 +4,7 @@ import AuthProvider, {
   useAuthContext,
 } from "~/components/organisms/providers/AuthProvider";
 import { grey } from "@mui/material/colors";
+import LoadingDisplay from "~/components/atoms/LoadingDisplay";
 
 const AcountInfo = () => {
   const { user } = useAuthContext();
@@ -52,6 +53,14 @@ const AuthButtons = () => {
   );
 };
 
+const LoadingAuthDisplay = () => {
+  return (
+    <Grid container direction="row-reverse">
+      <LoadingDisplay xs={4} />
+    </Grid>
+  );
+};
+
 const Header = () => {
   const navigate = useNavigate();
   return (
@@ -83,7 +92,10 @@ const Header = () => {
       </Grid>
       <Grid xs={6}>
         <Grid container direction="row-reverse" alignItems="center">
-          <AuthProvider contentOnUnauthenticated={<AuthButtons />}>
+          <AuthProvider
+            contentOnUnauthenticated={<AuthButtons />}
+            contentOnLoadingSesstion={<LoadingAuthDisplay />}
+          >
             <Grid xs={2}>
               <AcountInfo />
             </Grid>
