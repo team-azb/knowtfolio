@@ -91,15 +91,15 @@ const Header = () => {
         </p>
       </Grid>
       <Grid xs={6}>
-        <Grid container direction="row-reverse" alignItems="center">
+        <Grid container direction="row-reverse" alignItems="center" spacing={1}>
           <AuthProvider
             contentOnUnauthenticated={<AuthButtons />}
             contentWhileLoadingSession={<LoadingAuthDisplay />}
           >
-            <Grid xs={2}>
+            <Grid item xs={2}>
               <AcountInfo />
             </Grid>
-            <Grid xs={2}>
+            <Grid item xs={2}>
               <Button
                 onClick={() => {
                   navigate("/articles/new");
@@ -107,6 +107,16 @@ const Header = () => {
                 style={{ fontSize: "1.4rem" }}
               >
                 create article
+              </Button>
+            </Grid>
+            <Grid item>
+              <Button
+                onClick={() => {
+                  navigate("/search");
+                }}
+                style={{ fontSize: "1.4rem" }}
+              >
+                search
               </Button>
             </Grid>
           </AuthProvider>
