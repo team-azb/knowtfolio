@@ -45,7 +45,7 @@ const ArticleEditor = ({ onEditorChange, value }: articleEditorProps) => {
       value={value}
       apiKey={TINY_MCE_API_KEY}
       init={{
-        height: 500,
+        height: 800,
         menubar: true,
         content_style:
           "body { font-family:Helvetica,Arial,sans-serif; font-size:14px }",
