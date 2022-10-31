@@ -2,15 +2,25 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import Spacer from "~/components/atoms/Spacer";
 import EditArticleForm from "~/components/organisms/forms/EditArticleForm";
+import { useAuthContext } from "~/components/organisms/providers/AuthProvider";
 import { useWeb3Context } from "~/components/organisms/providers/Web3Provider";
 
 const EditArticlePage = () => {
   const { articleId } = useParams();
-  const { account, contract } = useWeb3Context();
+  const { contract } = useWeb3Context();
+  const { attributes } = useAuthContext();
   const [ownerIdOfArticle, setOwnerIdOfArticle] = useState<null | string>(null);
+
+  const walletAddress = useMemo(() => {
+    const walletAddress = attributes.find(
+      (atr) => atr.Name === "custom:wallet_address"
+    )?.Value;
+    return walletAddress || "";
+  }, [attributes]);
+
   const isAuthorized = useMemo(() => {
-    return ownerIdOfArticle === account;
-  }, [account, ownerIdOfArticle]);
+    return ownerIdOfArticle === walletAddress;
+  }, [walletAddress, ownerIdOfArticle]);
 
   const content = useMemo(() => {
     if (ownerIdOfArticle === null) {
