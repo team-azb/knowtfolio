@@ -94,7 +94,7 @@ const Header = () => {
         <Grid container direction="row-reverse" alignItems="center">
           <AuthProvider
             contentOnUnauthenticated={<AuthButtons />}
-            contentOnLoadingSesstion={<LoadingAuthDisplay />}
+            contentWhileLoadingSession={<LoadingAuthDisplay />}
           >
             <Grid xs={2}>
               <AcountInfo />
