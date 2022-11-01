@@ -3,6 +3,7 @@ package services
 import (
 	"context"
 	"errors"
+
 	articleshtml "github.com/team-azb/knowtfolio/server/gateways/api/gen/articles_html"
 	"github.com/team-azb/knowtfolio/server/gateways/api/gen/http/articles_html/server"
 	"github.com/team-azb/knowtfolio/server/models"
@@ -28,7 +29,7 @@ func NewArticlesHtmlService(db *gorm.DB, handler HttpHandler) *server.Server {
 func (a articleHtmlService) ReadHTML(_ context.Context, request *articleshtml.ArticleReadRequest) (res []byte, err error) {
 	targetArticle := models.Article{ID: request.ID}
 
-	result := a.DB.First(&targetArticle)
+	result := a.DB.Preload("Document").First(&targetArticle)
 	if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 		return nil, articleshtml.MakeNotFound(result.Error)
 	}
