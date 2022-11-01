@@ -1,9 +1,9 @@
 package models
 
 import (
+	"time"
 	"github.com/aidarkhanov/nanoid/v2"
 	"github.com/microcosm-cc/bluemonday"
-	"time"
 )
 
 type DocumentType string
@@ -18,7 +18,7 @@ type Document struct {
 	OwnerType DocumentType `gorm:"not null; enum('ARTICLE')"`
 	Title     string       `gorm:"not null; index:search_idx,class:FULLTEXT"`
 	Content   []byte       `gorm:"not null"`
-	RawText   string       `gorm:"not null; index:search_idx,class:FULLTEXT"`
+	RawText   string       `gorm:"type:text not null; index:search_idx,class:FULLTEXT"`
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }
