@@ -69,7 +69,7 @@ const App = () => {
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </Web3Provider>
-      <ToastContainer />
+      <ToastContainer style={{ top: 100 }} />
     </ThemeProvider>
   );
 };
