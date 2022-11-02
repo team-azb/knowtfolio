@@ -4,83 +4,75 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"net/http"
-	"os"
-
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
-	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/cognitoidentityprovider"
+	"github.com/aws/aws-sdk-go-v2/aws"
+	servicelambda "github.com/aws/aws-sdk-go-v2/service/lambda"
+	"github.com/team-azb/knowtfolio/infrastructure/function_scripts/pkg/aws_utils"
+	"github.com/team-azb/knowtfolio/infrastructure/function_scripts/pkg/models"
+	"net/http"
 )
 
-type SignUpForm struct {
-	Username      string `json:"username"`
-	Password      string `json:"password"`
-	PhoneNumber   string `json:"phone_number"`
-	WalletAddress string `json:"wallet_address"`
+type lambdaPayload struct {
+	Body string `json:"body"`
+}
+
+func invokeValidationLambda(ctx context.Context, form models.SignUpForm) (fieldErrs []models.FieldError, internalErr error) {
+	bodyJson, internalErr := json.Marshal(form)
+	if internalErr != nil {
+		return
+	}
+	payload, internalErr := json.Marshal(lambdaPayload{Body: string(bodyJson)})
+	if internalErr != nil {
+		return
+	}
+
+	res, internalErr := aws_utils.LambdaClient.Invoke(ctx, &servicelambda.InvokeInput{
+		FunctionName: aws.String("validate_sign_up_form"),
+		Payload:      payload,
+	})
+	if internalErr != nil {
+		return
+	}
+
+	var resp lambdaPayload
+	internalErr = json.Unmarshal(res.Payload, &resp)
+	if internalErr != nil {
+		return
+	}
+	internalErr = json.Unmarshal([]byte(resp.Body), &fieldErrs)
+	if internalErr != nil {
+		return
+	}
+	return
 }
 
 func handler(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-	var signUpForm SignUpForm
-	userPoolId := os.Getenv("USER_POOL_ID")
-	clientId := os.Getenv("CLIENT_ID")
-	if err := json.Unmarshal([]byte(request.Body), &signUpForm); err != nil {
+	fmt.Printf("Sign Up: %+v\n", request)
+
+	var form models.SignUpForm
+	if err := json.Unmarshal([]byte(request.Body), &form); err != nil {
 		return events.APIGatewayProxyResponse{
-			StatusCode:      http.StatusBadRequest,
-			IsBase64Encoded: false,
-			Body:            err.Error(),
+			StatusCode: http.StatusBadRequest,
+			Body:       err.Error(),
 		}, nil
 	}
-	// Initialize a session that the SDK will use to load
-	// credentials from the shared credentials file ~/.aws/credentials.
-	sess := session.Must(session.NewSessionWithOptions(session.Options{
-		SharedConfigState: session.SharedConfigEnable,
-	}))
 
-	cognitoClient := cognitoidentityprovider.New(sess)
+	fieldErrs, internalErr := invokeValidationLambda(ctx, form)
+	if internalErr != nil {
+		return events.APIGatewayProxyResponse{}, internalErr
+	}
+	if len(fieldErrs) > 0 {
+		fieldErrsJson, _ := json.Marshal(fieldErrs)
+		return events.APIGatewayProxyResponse{
+			StatusCode: http.StatusBadRequest,
+			Body:       string(fieldErrsJson),
+		}, nil
+	}
 
-	query := fmt.Sprintf("phone_number = \"%s\"", signUpForm.PhoneNumber)
-	resp, err := cognitoClient.ListUsers(&cognitoidentityprovider.ListUsersInput{Filter: &query, UserPoolId: &userPoolId})
+	_, err := aws_utils.CognitoClient.SignUp(ctx, form.ToCognitoInput())
 	if err != nil {
-		return events.APIGatewayProxyResponse{
-			StatusCode:      http.StatusInternalServerError,
-			IsBase64Encoded: false,
-			Body:            err.Error(),
-		}, nil
-	}
-
-	if len(resp.Users) > 0 {
-		return events.APIGatewayProxyResponse{
-			StatusCode:      http.StatusBadRequest,
-			IsBase64Encoded: false,
-			Body:            "PhoneNumberExistsException: The phone number is already registered",
-		}, nil
-	}
-
-	newUserData := &cognitoidentityprovider.SignUpInput{
-		UserAttributes: []*cognitoidentityprovider.AttributeType{
-			{
-				Name:  aws.String("phone_number"),
-				Value: aws.String(signUpForm.PhoneNumber),
-			},
-			{
-				Name:  aws.String("custom:wallet_address"),
-				Value: aws.String(signUpForm.WalletAddress),
-			},
-		},
-		ClientId: &clientId,
-		Username: &signUpForm.Username,
-		Password: &signUpForm.Password,
-	}
-
-	_, err = cognitoClient.SignUp(newUserData)
-	if err != nil {
-		return events.APIGatewayProxyResponse{
-			StatusCode:      http.StatusBadRequest,
-			IsBase64Encoded: false,
-			Body:            err.Error(),
-		}, nil
+		return events.APIGatewayProxyResponse{}, err
 	}
 
 	return events.APIGatewayProxyResponse{
