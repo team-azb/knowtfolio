@@ -51,7 +51,7 @@ const AccountPage = () => {
         <Grid xs={10}>
           <WalletAddressDisplay
             style={{ display: "inline" }}
-            address={walletAddress || "未登録"}
+            address={walletAddress}
             shouldTruncate={false}
           />
           <Button
