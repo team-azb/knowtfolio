@@ -14,7 +14,7 @@ export const truncate = (str: string, m: number, n: number) => {
 };
 
 type walletAddressDisplayProps = {
-  address: string;
+  address?: string;
   shouldTruncate?: boolean;
   style?: React.CSSProperties;
 };
@@ -31,9 +31,15 @@ const WalletAddressDisplay = ({
   shouldTruncate = true,
 }: walletAddressDisplayProps) => {
   return (
-    <JetBrainsMono style={style}>
-      {shouldTruncate ? truncate(address, 8, 4) : address}
-    </JetBrainsMono>
+    <>
+      {address ? (
+        <JetBrainsMono style={style}>
+          {shouldTruncate ? truncate(address, 8, 4) : address}
+        </JetBrainsMono>
+      ) : (
+        "未登録"
+      )}
+    </>
   );
 };
 
