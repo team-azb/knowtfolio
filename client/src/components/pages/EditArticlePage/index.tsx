@@ -1,8 +1,31 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
+import LoadingDisplay from "~/components/atoms/LoadingDisplay";
 import Spacer from "~/components/atoms/Spacer";
 import EditArticleForm from "~/components/organisms/forms/EditArticleForm";
 import { useWeb3Context } from "~/components/organisms/providers/Web3Provider";
+
+const ContentOnEditable = ({ articleId }: { articleId: string }) => {
+  return (
+    <div>
+      <h2>Edit article: {articleId}</h2>
+      <Spacer height="3rem" />
+      <EditArticleForm articleId={articleId} />
+    </div>
+  );
+};
+
+const contentOnNotEditable = (
+  <div>
+    <h2>サインイン中のアカウントに記事の編集権限がありません</h2>
+    <p>
+      <Link to="/mypage" style={{ color: "#000" }}>
+        マイページ
+      </Link>
+      にてアカウント情報をご確認ください
+    </p>
+  </div>
+);
 
 /**
  * "/articles/:ariticleId/edit"で表示されるページコンポーネント
@@ -17,27 +40,11 @@ const EditArticlePage = () => {
 
   const content = useMemo(() => {
     if (ownerIdOfArticle === null) {
-      return <div>編集権限を照会中です</div>;
+      return <LoadingDisplay message="編集権限を照会中" />;
     } else if (isAuthorized && articleId) {
-      return (
-        <>
-          <h2>Edit article: {articleId}</h2>
-          <Spacer height="3rem" />
-          <EditArticleForm articleId={articleId} />
-        </>
-      );
+      return <ContentOnEditable articleId={articleId} />;
     } else {
-      return (
-        <div>
-          <h2>サインイン中のアカウントに記事の編集権限がありません</h2>
-          <p>
-            <Link to="/mypage" style={{ color: "#000" }}>
-              マイページ
-            </Link>
-            にてアカウント情報をご確認ください
-          </p>
-        </div>
-      );
+      return contentOnNotEditable;
     }
   }, [articleId, isAuthorized, ownerIdOfArticle]);
 
