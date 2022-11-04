@@ -4,6 +4,9 @@ import Spacer from "~/components/atoms/Spacer";
 import EditArticleForm from "~/components/organisms/forms/EditArticleForm";
 import { useWeb3Context } from "~/components/organisms/providers/Web3Provider";
 
+/**
+ * "/articles/:ariticleId/edit"で表示されるページコンポーネント
+ */
 const EditArticlePage = () => {
   const { articleId } = useParams();
   const { account, contract } = useWeb3Context();

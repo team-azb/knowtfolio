@@ -6,6 +6,9 @@ import { useWeb3Context } from "~/components/organisms/providers/Web3Provider";
 import ArticleEditor from "~/components/organisms/ArticleEditor";
 import { Button, Grid } from "@mui/material";
 
+/**
+ * 記事の新規作成用のフォーム
+ */
 const NewArticleForm = () => {
   const [content, setContent] = useState("");
   const [titleInput, setTitleInput] = useState("");

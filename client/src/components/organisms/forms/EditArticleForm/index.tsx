@@ -9,6 +9,10 @@ type editArticleFormProps = {
   articleId: string;
 };
 
+/**
+ * 記事の編集を行うためのフォーム
+ * @articleId 編集を行う記事のid
+ */
 const EditArticleForm = ({ articleId }: editArticleFormProps) => {
   const [content, setContent] = useState("");
   const [title, setTitle] = useState("");

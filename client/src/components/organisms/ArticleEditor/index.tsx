@@ -17,6 +17,9 @@ const extractExtension = (filename: string) => {
   return arr.length > 0 ? `.${arr.pop()}` : "";
 };
 
+/**
+ * TinyMCEのエディターのUI・プラグインをセッティングしたコンポーネント
+ */
 const ArticleEditor = ({ onEditorChange, value }: articleEditorProps) => {
   const s3Client = useS3Client();
 
