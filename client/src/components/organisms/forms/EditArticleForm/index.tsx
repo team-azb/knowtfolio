@@ -58,7 +58,7 @@ const EditArticleForm = ({ articleId }: editArticleFormProps) => {
     }
   }, [account, articleId, content, title, web3.eth.personal]);
 
-  const changeTitleInput = useCallback<
+  const onChangeTitleInput = useCallback<
     React.ChangeEventHandler<HTMLInputElement>
   >((event) => {
     setTitle(event.target.value);
@@ -78,7 +78,7 @@ const EditArticleForm = ({ articleId }: editArticleFormProps) => {
             width: "100%",
           }}
           type="text"
-          onChange={changeTitleInput}
+          onChange={onChangeTitleInput}
           value={title}
           placeholder="Title"
         />

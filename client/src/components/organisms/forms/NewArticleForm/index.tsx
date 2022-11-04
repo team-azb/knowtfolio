@@ -20,7 +20,7 @@ const NewArticleForm = () => {
   }, []);
   const navigate = useNavigate();
 
-  const changeTitleInput = useCallback<
+  const onChangeTitleInput = useCallback<
     React.ChangeEventHandler<HTMLInputElement>
   >((event) => {
     setTitleInput(event.target.value);
@@ -69,7 +69,7 @@ const NewArticleForm = () => {
             width: "100%",
           }}
           type="text"
-          onChange={changeTitleInput}
+          onChange={onChangeTitleInput}
           value={titleInput}
           placeholder="Title"
         />
