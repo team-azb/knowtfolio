@@ -11,8 +11,14 @@ import (
 
 var (
 	SignUpFormValidator = validator.New()
-	_                   = SignUpFormValidator.RegisterValidation("cognito_password", validateCognitoPassword)
 )
+
+func init() {
+	err := SignUpFormValidator.RegisterValidation("cognito_password", validateCognitoPassword)
+	if err != nil {
+		panic(err.(any))
+	}
+}
 
 // validateCognitoPassword checks if the given field matches the cognito password policies:
 // https://docs.aws.amazon.com/cognito/latest/developerguide/user-pool-settings-policies.html#user-pool-settings-password-policies
