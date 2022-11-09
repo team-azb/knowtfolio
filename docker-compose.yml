@@ -97,11 +97,17 @@ services:
         target: /entrypoint.sh
 
   go-eth-binding:
-    image: ethereum/client-go:alltools-v1.10.20
+    build:
+      context: .
+      dockerfile: server/go-eth-binding.Dockerfile
+    entrypoint: /entrypoint.sh
     command: [
         "abigen", "--abi", "${CONTRACT_ABI_FILE}", "--bin", "${CONTRACT_BIN_FILE}",
         "--pkg", "ethereum", "--type", "ContractBinding", "--out", "${GO_ETH_BINDING_PATH}"
     ]
+    environment:
+      HOST_UID: ${HOST_UID}
+      HOST_GID: ${HOST_GID}
     volumes:
       - type: bind
         source: ./blockchain
@@ -109,6 +115,9 @@ services:
       - type: bind
         source: ./server
         target: /server
+      - type: bind
+        source: ./entrypoint.alpine.sh
+        target: /entrypoint.sh
 
   hardhat:
     build:
