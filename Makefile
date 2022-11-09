@@ -88,10 +88,7 @@ test: goa go-eth-binding
 	docker-compose up --build test
 
 checkfmt-sv: $(SERVER_SRCS)
-	set -e ;\
-    OUTPUT=$$(docker-compose run server gofmt -e -l .) ;\
-    echo $$OUTPUT ;\
-    test -z $$OUTPUT # Fail if there are some unformatted files.
+	docker-compose run server test -z $$(gofmt -e -l .)
 
 
 ### Infrastructure ###
