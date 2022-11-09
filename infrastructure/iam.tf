@@ -74,7 +74,7 @@ resource "aws_iam_role_policy" "knowtfolio_sign_up_with_cognito" {
 }
 
 resource "aws_iam_role_policy" "cognito_user_creation_via_lambda" {
-  name   = "cognito-yesuser-yescreation-yesvia-yeslambda"
+  name   = "cognito-user-creation-via-lambda"
   role   = aws_iam_role.knowtfolio_sign_up_lambda.name
   policy = templatefile("${path.module}/templates/iam/create_cognito_user_policy.json", {
     resource_arn = aws_cognito_user_pool.knowtfolio.arn
