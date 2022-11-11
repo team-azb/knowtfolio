@@ -33,6 +33,7 @@ $(CLIENT_DIST_DIR): ./client/webpack.config.js $(CLIENT_NODE_MODULES_DIR) $(CLIE
 
 $(GOA_GEN_DIR): $(GOA_DESIGN_DIR) $(GOA_DOCKER_FILE) ./server/go.mod
 	docker-compose up --build goa
+	cp -f $(GOA_GEN_DIR)/http/openapi3.yaml ./server
 
 $(GO_ETH_BINDING_PATH): $(CONTRACT_ABI_FILE) $(CONTRACT_BIN_FILE)
 	docker-compose up --build go-eth-binding
