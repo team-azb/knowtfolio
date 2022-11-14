@@ -26,7 +26,7 @@ func initTestDB(t *testing.T) (db *gorm.DB) {
 		t.Skip("Tests using DB are skipped.")
 	}
 	// Connect to DB.
-	setupDB, err := gorm.Open(mysql.Open("root:password@tcp(db:3306)/?parseTime=true"))
+	setupDB, err := gorm.Open(mysql.Open(config.DatabaseURI))
 	fatalfIfError(t, err, "DB Connection failed")
 
 	// Create temporary database dedicated to this test call.
