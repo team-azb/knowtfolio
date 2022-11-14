@@ -48,8 +48,7 @@ const ArticleEditor = ({ onEditorChange, value }: articleEditorProps) => {
       value={value}
       apiKey={TINY_MCE_API_KEY}
       init={{
-        min_height: 500,
-        autoresize_bottom_margin: 0,
+        height: 800,
         menubar: true,
         content_style:
           "body { font-family:Helvetica,Arial,sans-serif; font-size:14px }",
@@ -79,7 +78,6 @@ const ArticleEditor = ({ onEditorChange, value }: articleEditorProps) => {
           { start: "* ", cmd: "InsertUnorderedList" },
           { start: "- ", cmd: "InsertUnorderedList" },
         ],
-        resize: true,
       }}
       toolbar={[
         "undo redo | styles | bold italic codeformat underline | fontfamily fontsize forecolor | alignleft aligncenter alignright",
@@ -103,7 +101,6 @@ const ArticleEditor = ({ onEditorChange, value }: articleEditorProps) => {
         "media",
         "wordcount",
         "help",
-        "autoresize",
       ]}
     />
   );
