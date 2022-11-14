@@ -51,7 +51,7 @@ const defaultContentOnUnauthenticated = (
  */
 const defualtContentWhileLoadingSession = (
   <div style={{ padding: "100px 400px" }}>
-    <LoadingDisplay message="認証情報をローディング中" />
+    <LoadingDisplay message="認証中" />
   </div>
 );
 

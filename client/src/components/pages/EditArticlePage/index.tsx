@@ -37,7 +37,7 @@ const EditArticlePage = () => {
 
   const content = useMemo(() => {
     if (ownerIdOfArticle === null) {
-      return <LoadingDisplay message="編集権限を照会中" />;
+      return <LoadingDisplay message="編集権限を検証中" />;
     } else if (isAuthorized && articleId) {
       return <ContentOnEditable articleId={articleId} />;
     } else {
