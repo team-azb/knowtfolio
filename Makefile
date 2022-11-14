@@ -71,6 +71,9 @@ client: $(CLIENT_DIST_DIR)
 fmt-cl: $(CLIENT_NODE_MODULES_DIR) $(CLIENT_SRC_DIR)
 	docker-compose run client npm run format
 
+checkfmt-cl: $(CLIENT_NODE_MODULES_DIR) $(CLIENT_SRC_DIR)
+	docker-compose run client npx prettier --check 'src/**/*.ts' 'src/**/*.tsx' 'src/**/*.html' 'src/**/*.css' 'webpack.*.js'
+
 lint-cl: $(CLIENT_NODE_MODULES_DIR) $(CLIENT_SRC_DIR)
 	docker-compose run client npm run lint
 
