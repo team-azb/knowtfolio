@@ -28,14 +28,14 @@ func validateCognitoPassword(fl validator.FieldLevel) bool {
 	containsLowercase, _ := regexp.MatchString("[a-z]", val)
 	containsUppercase, _ := regexp.MatchString("[A-Z]", val)
 	containsSpecialCharacter, _ := regexp.MatchString("[^$*.[\\]{}()?\"!@#%&/\\\\,><':;|_~`=+\\-]", val)
-	containsNoOtherCharacters, _ := regexp.MatchString("^[0-9a-zA-Z^$*.[\\]{}()?\"!@#%&/\\\\,><':;|_~`=+\\-]+$", val)
+	containsValidCharactersOnly, _ := regexp.MatchString("^[0-9a-zA-Z^$*.[\\]{}()?\"!@#%&/\\\\,><':;|_~`=+\\-]+$", val)
 	isLengthInRange := 8 <= len(val) && len(val) <= 256
 
 	return containsNumber &&
 		containsLowercase &&
 		containsUppercase &&
 		containsSpecialCharacter &&
-		containsNoOtherCharacters &&
+		containsValidCharactersOnly &&
 		isLengthInRange
 }
 
