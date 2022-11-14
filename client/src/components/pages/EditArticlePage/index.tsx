@@ -1,15 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import LoadingDisplay from "~/components/atoms/LoadingDisplay";
-import Spacer from "~/components/atoms/Spacer";
 import EditArticleForm from "~/components/organisms/forms/EditArticleForm";
 import { useWeb3Context } from "~/components/organisms/providers/Web3Provider";
 
 const ContentOnEditable = ({ articleId }: { articleId: string }) => {
   return (
     <div>
-      <h2>Edit article: {articleId}</h2>
-      <Spacer height="3rem" />
       <EditArticleForm articleId={articleId} />
     </div>
   );
