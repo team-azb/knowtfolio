@@ -19,7 +19,7 @@ const contentOnNotEditable = (
       <Link to="/mypage" style={{ color: "#000" }}>
         マイページ
       </Link>
-      にてアカウント情報をご確認ください
+      にて編集可能な記事をご確認ください
     </p>
   </div>
 );
