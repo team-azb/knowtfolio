@@ -5,15 +5,11 @@ import EditArticleForm from "~/components/organisms/forms/EditArticleForm";
 import { useWeb3Context } from "~/components/organisms/providers/Web3Provider";
 
 const ContentOnEditable = ({ articleId }: { articleId: string }) => {
-  return (
-    <div>
-      <EditArticleForm articleId={articleId} />
-    </div>
-  );
+  return <EditArticleForm articleId={articleId} />;
 };
 
 const contentOnNotEditable = (
-  <div>
+  <div style={{ padding: "100px 400px" }}>
     <h2>サインイン中のアカウントに記事の編集権限がありません</h2>
     <p>
       <Link to="/mypage" style={{ color: "#000" }}>
@@ -37,9 +33,17 @@ const EditArticlePage = () => {
 
   const content = useMemo(() => {
     if (ownerIdOfArticle === null) {
-      return <LoadingDisplay message="編集権限を検証中" />;
+      return (
+        <div style={{ padding: "100px 400px" }}>
+          <LoadingDisplay message="編集権限を検証中" />
+        </div>
+      );
     } else if (isAuthorized && articleId) {
-      return <ContentOnEditable articleId={articleId} />;
+      return (
+        <div style={{ padding: "100px 400px" }}>
+          <ContentOnEditable articleId={articleId} />
+        </div>
+      );
     } else {
       return contentOnNotEditable;
     }
@@ -54,7 +58,7 @@ const EditArticlePage = () => {
     })();
   }, [articleId, contract.methods]);
 
-  return <div style={{ padding: "100px 400px" }}>{content}</div>;
+  return <div>{content}</div>;
 };
 
 export default EditArticlePage;

@@ -5,7 +5,6 @@ import SignInPage from "~/components/pages/SignInPage";
 import AccountPage from "~/components/pages/AccountPage";
 import AuthProvider from "~/components/organisms/providers/AuthProvider";
 import UploadImagePage from "~/components/pages/UploadImagePage";
-import Header from "~/components/organisms/Header";
 import NotFoundPage from "~/components/pages/NofFoundPage";
 import NewArticlePage from "~/components/pages/NewArticlePage";
 import EditArticlePage from "~/components/pages/EditArticlePage";
@@ -19,7 +18,6 @@ import "~/global.css";
 const App = () => {
   return (
     <ThemeProvider theme={theme}>
-      <Header />
       <Web3Provider>
         <Routes>
           <Route path="/" element={<TopPage />} />
