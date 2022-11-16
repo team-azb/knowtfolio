@@ -66,4 +66,11 @@ resource "aws_security_group" "knowtfolio_backend_ec2" {
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
+
+  egress {
+    from_port       = 3306
+    to_port         = 3306
+    protocol        = "tcp"
+    security_groups = [aws_security_group.knowtfolio_db.id]
+  }
 }
