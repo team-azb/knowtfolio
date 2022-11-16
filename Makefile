@@ -2,6 +2,7 @@ CLIENT_NODE_MODULES_DIR = client/node_modules
 CLIENT_SRC_DIR = client/src
 CLIENT_DIST_DIR = client/dist
 
+SERVER_SRCS = $(wildcard server/*.go)
 GOA_DIR = server/gateways/api
 GOA_DESIGN_DIR = $(GOA_DIR)/design
 GOA_GEN_DIR = $(GOA_DIR)/gen
@@ -55,7 +56,8 @@ $(CONTRACT_BIN_FILE): $(CONTRACT_JSON_FILE)
 	docker-compose run hardhat \
     	/bin/bash -c "cat $(CONTRACT_JSON_FILE) | jq -r '.bytecode' > $(CONTRACT_BIN_FILE)"
 
-.PHONY: app client server goa test go-eth-binding clean
+.PHONY: app client server goa test-sv checkfmt-sv go-eth-binding \
+	init-tf fmt-tf checkfmt-tf plan-tf apply-tf clean
 
 app: $(CLIENT_DIST_DIR) goa go-eth-binding
 	docker-compose up --build client server
@@ -68,6 +70,9 @@ client: $(CLIENT_DIST_DIR)
 
 fmt-cl: $(CLIENT_NODE_MODULES_DIR) $(CLIENT_SRC_DIR)
 	docker-compose run client npm run format
+
+checkfmt-cl: $(CLIENT_NODE_MODULES_DIR) $(CLIENT_SRC_DIR)
+	docker-compose run client npx prettier --check 'src/**/*.ts' 'src/**/*.tsx' 'src/**/*.html' 'src/**/*.css' 'webpack.*.js'
 
 lint-cl: $(CLIENT_NODE_MODULES_DIR) $(CLIENT_SRC_DIR)
 	docker-compose run client npm run lint
@@ -85,11 +90,20 @@ server: goa go-eth-binding
 test: goa go-eth-binding
 	docker-compose up --build test
 
+checkfmt-sv: $(SERVER_SRCS)
+	docker-compose run server test -z $$(gofmt -e -l .)
+
 
 ### Infrastructure ###
 
 init-tf:
 	docker-compose run terraform init
+
+fmt-tf:
+	docker-compose run terraform fmt
+
+checkfmt-tf:
+	docker-compose run terraform fmt -check
 
 plan-tf:
 	docker-compose run terraform plan

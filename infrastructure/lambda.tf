@@ -16,7 +16,8 @@ locals {
 resource "null_resource" "build_golang_functions" {
   for_each = local.golang_functions
   triggers = {
-    code_diff = filebase64("${local.func_script_root_dir}/cmd/${each.key}/main.go")
+    // code_diff = filebase64("${local.func_script_root_dir}/cmd/${each.key}/main.go")
+    always_run = timestamp()
   }
 
   provisioner "local-exec" {
