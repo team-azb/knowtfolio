@@ -26,7 +26,7 @@ resource "aws_security_group" "knowtfolio_db" {
 }
 
 resource "aws_security_group_rule" "knowtfolio_db_to_backend" {
-  type                     = "egress"
+  type                     = "ingress"
   from_port                = 3306
   to_port                  = 3306
   protocol                 = "tcp"
