@@ -13,7 +13,6 @@ import Web3Provider from "~/components/organisms/providers/Web3Provider";
 import ResetWalletPage from "./components/pages/ResetWalletPage";
 import { ThemeProvider } from "@mui/material";
 import { theme } from "~/configs/theme";
-import LoadingSessionPage from "~/components/pages/LoadingSessionPage";
 import "~/global.css";
 
 const App = () => {
@@ -27,7 +26,7 @@ const App = () => {
           <Route
             path="/reset-wallet"
             element={
-              <AuthProvider contentWhileLoadingSession={<LoadingSessionPage />}>
+              <AuthProvider>
                 <ResetWalletPage />
               </AuthProvider>
             }
@@ -35,7 +34,7 @@ const App = () => {
           <Route
             path="/mypage"
             element={
-              <AuthProvider contentWhileLoadingSession={<LoadingSessionPage />}>
+              <AuthProvider>
                 <AccountPage />
               </AuthProvider>
             }
@@ -43,7 +42,7 @@ const App = () => {
           <Route
             path="/upload-image"
             element={
-              <AuthProvider contentWhileLoadingSession={<LoadingSessionPage />}>
+              <AuthProvider>
                 <UploadImagePage />
               </AuthProvider>
             }
@@ -51,7 +50,7 @@ const App = () => {
           <Route
             path="/articles/new"
             element={
-              <AuthProvider contentWhileLoadingSession={<LoadingSessionPage />}>
+              <AuthProvider>
                 <NewArticlePage />
               </AuthProvider>
             }
@@ -59,7 +58,7 @@ const App = () => {
           <Route
             path="/articles/:articleId/edit"
             element={
-              <AuthProvider contentWhileLoadingSession={<LoadingSessionPage />}>
+              <AuthProvider>
                 <EditArticlePage />
               </AuthProvider>
             }
