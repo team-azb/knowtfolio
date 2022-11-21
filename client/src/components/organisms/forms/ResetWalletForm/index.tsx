@@ -63,7 +63,7 @@ const ResetWalletForm = () => {
           <Grid item xs={9.5}>
             <WalletAddressDisplay
               style={{ display: "inline" }}
-              address={walletAddress || "未登録"}
+              address={walletAddress}
               shouldTruncate={false}
             />
           </Grid>

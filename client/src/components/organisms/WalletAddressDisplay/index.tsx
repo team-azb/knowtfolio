@@ -2,7 +2,7 @@ import JetBrainsMono from "~/components/atoms/JetBrainsMono";
 import TrancatedText from "~/components/atoms/TruncatedText";
 
 type walletAddressDisplayProps = {
-  address: string;
+  address?: string;
   shouldTruncate?: boolean;
   style?: React.CSSProperties;
 };
@@ -19,9 +19,19 @@ const WalletAddressDisplay = ({
   shouldTruncate = true,
 }: walletAddressDisplayProps) => {
   return (
-    <JetBrainsMono style={style}>
-      {shouldTruncate ? <TrancatedText str={address} m={8} n={4} /> : address}
-    </JetBrainsMono>
+    <>
+      {address ? (
+        <JetBrainsMono style={style}>
+          {shouldTruncate ? (
+            <TrancatedText str={address} m={8} n={4} />
+          ) : (
+            address
+          )}
+        </JetBrainsMono>
+      ) : (
+        "未登録"
+      )}
+    </>
   );
 };
 
