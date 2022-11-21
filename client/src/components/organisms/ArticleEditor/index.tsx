@@ -5,11 +5,12 @@ import { nanoid } from "nanoid";
 import { useS3Client } from "~/apis/s3";
 import { ARTICLE_RESOURCES_S3_BUCKET } from "~/configs/s3";
 import { TINY_MCE_API_KEY } from "~/configs/tinymce";
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 
 type articleEditorProps = {
   onEditorChange?: (a: string, editor: TinyMCEEditor) => void;
   value?: string;
+  height?: string | number;
 };
 
 const extractExtension = (filename: string) => {
@@ -17,8 +18,21 @@ const extractExtension = (filename: string) => {
   return arr.length > 0 ? `.${arr.pop()}` : "";
 };
 
-const ArticleEditor = ({ onEditorChange, value }: articleEditorProps) => {
+/**
+ * TinyMCEのエディターのUI・プラグインをセッティングしたコンポーネント
+ */
+const ArticleEditor = ({
+  onEditorChange,
+  value,
+  height,
+}: articleEditorProps) => {
   const s3Client = useS3Client();
+
+  useEffect(() => {
+    // Something is occupying some screen real estate!
+    console.log(window.screen.height);
+    console.log(window.screen.availHeight);
+  }, []);
 
   const imageUploadHandler = useCallback(
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -45,8 +59,8 @@ const ArticleEditor = ({ onEditorChange, value }: articleEditorProps) => {
       value={value}
       apiKey={TINY_MCE_API_KEY}
       init={{
-        height: 800,
-        menubar: true,
+        height,
+        menubar: false,
         content_style:
           "body { font-family:Helvetica,Arial,sans-serif; font-size:14px }",
         images_upload_handler: imageUploadHandler,
@@ -77,8 +91,8 @@ const ArticleEditor = ({ onEditorChange, value }: articleEditorProps) => {
         ],
       }}
       toolbar={[
-        "undo redo | styles | bold italic codeformat underline | fontfamily fontsize forecolor | alignleft aligncenter alignright",
-        "emoticons anchor link image media | numlist bullist table | codesample | wordcount searchreplace preview visualblocks help",
+        `undo redo | styles | bold italic codeformat underline | fontfamily fontsize forecolor | alignleft aligncenter alignright
+        | link image media | numlist bullist table | codesample | searchreplace help`,
       ]}
       plugins={[
         "image",

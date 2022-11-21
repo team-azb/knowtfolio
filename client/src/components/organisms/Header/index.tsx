@@ -104,12 +104,12 @@ const Header = () => {
         </p>
       </Grid>
       <Grid xs={6}>
-        <Grid container direction="row-reverse" alignItems="center" spacing={1}>
+        <Grid container direction="row-reverse" alignItems="center">
           <AuthProvider
             contentOnUnauthenticated={<AuthButtons />}
             contentWhileLoadingSession={<LoadingAuthDisplay />}
           >
-            <Grid item xs={2}>
+            <Grid xs={2}>
               <AcountInfo />
             </Grid>
             <Grid item xs={2}>

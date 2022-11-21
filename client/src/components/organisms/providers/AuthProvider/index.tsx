@@ -30,6 +30,9 @@ type props = {
   contentWhileLoadingSession?: React.ReactNode;
 };
 
+/**
+ * 認証が必要なコンポーネントで認証されていない場合に表示するデフォルトのUI
+ */
 const defaultContentOnUnauthenticated = (
   <div style={{ padding: "100px 400px" }}>
     <h2>サインインが必要です</h2>
@@ -43,10 +46,19 @@ const defaultContentOnUnauthenticated = (
   </div>
 );
 
+/**
+ * 認証情報を確認している際に表示するデフォルトのUI
+ */
+const defualtContentWhileLoadingSession = (
+  <div style={{ padding: "100px 400px" }}>
+    <LoadingDisplay message="認証中" />
+  </div>
+);
+
 const AuthProvider = ({
   children,
   contentOnUnauthenticated = defaultContentOnUnauthenticated,
-  contentWhileLoadingSession = <LoadingDisplay message="ローディング中" />,
+  contentWhileLoadingSession = defualtContentWhileLoadingSession,
 }: props) => {
   const [auth, setAuth] = useState<AuthContext | null>(null);
   const [hasLoadedSession, setHasLoadedSession] = useState(false);

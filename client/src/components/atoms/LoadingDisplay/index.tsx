@@ -5,7 +5,8 @@ type loadingDisplayProps = GridProps & {
 };
 
 /**
- * ローディング中のUI表示のコンポーネント
+ * ローディング中であることを示すUI表示のコンポーネント
+ * @message 表示されるメッセージ
  */
 const LoadingDisplay = (props: loadingDisplayProps) => {
   return (
