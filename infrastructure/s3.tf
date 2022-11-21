@@ -110,3 +110,20 @@ resource "aws_s3_bucket_cors_configuration" "knowtfolio_article_resources" {
     allowed_origins = ["*"]
   }
 }
+
+resource "aws_s3_bucket" "knowtfolio_code_deploy" {
+  bucket = "dev-knowtfolio-code-deploy"
+}
+
+resource "aws_s3_bucket_acl" "knowtfolio_code_deploy" {
+  bucket = aws_s3_bucket.knowtfolio_code_deploy.id
+  acl    = "private"
+}
+
+resource "aws_s3_bucket_public_access_block" "knowtfolio_code_deploy" {
+  bucket                  = aws_s3_bucket.knowtfolio_code_deploy.id
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}

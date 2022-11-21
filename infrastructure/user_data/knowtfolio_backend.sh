@@ -2,6 +2,13 @@
 sudo apt-get update
 sudo apt-get -y install make
 
+# install code deploy agent
+sudo apt update -y
+sudo apt install make g++ ruby ruby-full wget python3 python3-pip awscli pv -y
+wget https://aws-codedeploy-ap-northeast-1.s3.ap-northeast-1.amazonaws.com/latest/install
+chmod +x ./install
+sudo ./install auto > /tmp/logfile
+
 # install docker
 # https://docs.docker.com/engine/install/ubuntu/
 sudo apt-get -y install ca-certificates curl gnupg lsb-release
