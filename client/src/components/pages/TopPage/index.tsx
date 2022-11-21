@@ -1,8 +1,9 @@
 import { Link } from "react-router-dom";
+import HeaderLayout from "~/components/organisms/layouts/HeaderLayout";
 
 const TopPage = () => {
   return (
-    <div>
+    <HeaderLayout>
       <ul>
         <li>
           <Link to={"/signin"}>サインイン</Link>
@@ -20,7 +21,7 @@ const TopPage = () => {
           <Link to={"/articles"}>記事一覧</Link>
         </li>
       </ul>
-    </div>
+    </HeaderLayout>
   );
 };
 
