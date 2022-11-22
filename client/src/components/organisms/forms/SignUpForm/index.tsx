@@ -16,30 +16,6 @@ import Form from "~/components/atoms/authForm/Form";
 import Spacer from "~/components/atoms/Spacer";
 import WalletAddressDisplay from "~/components/organisms/WalletAddressDisplay";
 
-/**
- * 参考:
- * https://docs.aws.amazon.com/sdk-for-go/api/service/cognitoidentityprovider/#CognitoIdentityProvider.SignUp
- * 上記のtypesに加えて、電話番号が重複した場合に返す"PhoneNumberExistsException"を追加している。こちらはlambdaでカスタムして実装
- */
-type signUpErrorTypes =
-  | "UsernameExistsException"
-  | "PhoneNumberExistsException"
-  | "InvalidPasswordException";
-
-const translateSignUpErrorMessage = (message: string) => {
-  const prefix = message.split(":")[0] as signUpErrorTypes;
-  switch (prefix) {
-    case "UsernameExistsException":
-      return "すでに登録されたユーザーネームです";
-    case "PhoneNumberExistsException":
-      return "すでに登録された電話番号です";
-    case "InvalidPasswordException":
-      return "パスワードが条件を満たしていません";
-    default:
-      return message;
-  }
-};
-
 const SignUpForm = () => {
   const [form, setForm] = useState<SignUpForm>({
     phone: "",
@@ -95,15 +71,8 @@ const SignUpForm = () => {
         alert("successfully signed up!");
         setHasSignedUp(true);
       } catch (error) {
-        if (error instanceof AxiosError) {
-          // TODO: Print errors on each input fields.
-          const message = translateSignUpErrorMessage(
-            JSON.stringify(error.response?.data)
-          );
-          alert(message);
-        } else {
-          alert("sign up failed...");
-        }
+        // TODO: Display user friendly error.
+        alert(`sign up failed: ${error}`);
       }
     },
     [form]
