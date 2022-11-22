@@ -5,10 +5,9 @@
             "Sid": "",
             "Effect": "Allow",
             "Action": [
-                "cognito-idp:AdminCreateUser",
                 "cognito-idp:ListUsers"
             ],
-            "Resource": "${resource_arn}"
+            "Resource": "${user_pool_arn}"
         }
     ]
 }
