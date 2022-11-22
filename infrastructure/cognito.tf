@@ -28,9 +28,10 @@ resource "aws_cognito_user_pool" "knowtfolio" {
   }
 
   lambda_config {
-    define_auth_challenge          = aws_lambda_function.auth_challenge_functions["define_auth_challenge"].arn
-    create_auth_challenge          = aws_lambda_function.auth_challenge_functions["create_auth_challenge"].arn
-    verify_auth_challenge_response = aws_lambda_function.auth_challenge_functions["verify_auth_challenge_response"].arn
+    pre_sign_up                    = aws_lambda_function.cognito_triggers["pre_sign_up"].arn
+    define_auth_challenge          = aws_lambda_function.cognito_triggers["define_auth_challenge"].arn
+    create_auth_challenge          = aws_lambda_function.cognito_triggers["create_auth_challenge"].arn
+    verify_auth_challenge_response = aws_lambda_function.cognito_triggers["verify_auth_challenge_response"].arn
   }
 
   sms_configuration {
