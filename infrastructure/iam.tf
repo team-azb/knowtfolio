@@ -42,9 +42,11 @@ resource "aws_iam_role" "knowtfolio_auth_challenge_lambda" {
 }
 
 resource "aws_iam_role_policy" "basic_lambda_policy" {
-  name   = "basic-lambda-policy"
-  role   = aws_iam_role.knowtfolio_auth_challenge_lambda.name
-  policy = file("${path.module}/templates/iam/basic_lambda_policy.json")
+  name = "basic-lambda-policy"
+  role = aws_iam_role.knowtfolio_auth_challenge_lambda.name
+  policy = templatefile("${path.module}/templates/iam/basic_lambda_policy.json", {
+    user_to_wallet_table_arn = aws_dynamodb_table.user_to_wallet.arn
+  })
 }
 
 resource "aws_iam_role" "cognito_sms_sender" {
@@ -66,9 +68,11 @@ resource "aws_iam_role" "knowtfolio_sign_up_lambda" {
 }
 
 resource "aws_iam_role_policy" "knowtfolio_sign_up_with_cognito" {
-  name   = "knowtfolio-sign-up-with-cognito"
-  role   = aws_iam_role.knowtfolio_sign_up_lambda.name
-  policy = file("${path.module}/templates/iam/basic_lambda_policy.json")
+  name = "knowtfolio-sign-up-with-cognito"
+  role = aws_iam_role.knowtfolio_sign_up_lambda.name
+  policy = templatefile("${path.module}/templates/iam/basic_lambda_policy.json", {
+    user_to_wallet_table_arn = aws_dynamodb_table.user_to_wallet.arn
+  })
 }
 
 resource "aws_iam_role_policy" "cognito_user_creation_via_lambda" {

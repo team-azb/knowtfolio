@@ -96,8 +96,9 @@ const SignUpForm = () => {
         setHasSignedUp(true);
       } catch (error) {
         if (error instanceof AxiosError) {
+          // TODO: Print errors on each input fields.
           const message = translateSignUpErrorMessage(
-            String(error.response?.data)
+            JSON.stringify(error.response?.data)
           );
           alert(message);
         } else {
