@@ -78,8 +78,8 @@ resource "aws_lambda_permission" "cognito_triggers" {
   source_arn    = aws_cognito_user_pool.knowtfolio.arn
 }
 
-resource "aws_lambda_function_url" "knowtfolio_sign_up" {
-  function_name      = aws_lambda_function.sign_up_functions["sign_up"].function_name
+resource "aws_lambda_function_url" "validate_sign_up_form" {
+  function_name      = aws_lambda_function.validate_sign_up_form.function_name
   authorization_type = "NONE"
   cors {
     # NOTE: 開発用にlocalhostを許容している。環境で分けるようになった場合は、本番環境ではこれは除く必要がある。

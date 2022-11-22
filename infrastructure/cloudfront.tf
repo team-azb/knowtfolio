@@ -39,8 +39,8 @@ resource "aws_cloudfront_distribution" "knowtfolio" {
   }
 
   origin {
-    domain_name = "${aws_lambda_function_url.knowtfolio_sign_up.url_id}.lambda-url.ap-northeast-1.on.aws"
-    origin_id   = aws_lambda_function_url.knowtfolio_sign_up.url_id
+    domain_name = "${aws_lambda_function_url.validate_sign_up_form.url_id}.lambda-url.ap-northeast-1.on.aws"
+    origin_id   = aws_lambda_function_url.validate_sign_up_form.url_id
 
     custom_origin_config {
       http_port              = 80
@@ -91,11 +91,11 @@ resource "aws_cloudfront_distribution" "knowtfolio" {
   }
 
   ordered_cache_behavior {
-    path_pattern             = "/api/signup"
+    path_pattern             = "/api/validate_signup_form"
     allowed_methods          = ["GET", "HEAD", "OPTIONS", "PUT", "POST", "PATCH", "DELETE"]
     cached_methods           = ["GET", "HEAD", "OPTIONS"]
     viewer_protocol_policy   = "allow-all"
-    target_origin_id         = aws_lambda_function_url.knowtfolio_sign_up.url_id
+    target_origin_id         = aws_lambda_function_url.validate_sign_up_form.url_id
     cache_policy_id          = "4135ea2d-6df8-44a3-9df3-4b5a84be39ad" // CachingDisabled
     origin_request_policy_id = aws_cloudfront_origin_request_policy.lambda_function_url_request.id
     compress                 = true
