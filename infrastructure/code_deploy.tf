@@ -1,11 +1,11 @@
-resource "aws_codedeploy_app" "knowtfolio" {
+resource "aws_codedeploy_app" "backend" {
   name = "knowtfolio"
 }
 
-resource "aws_codedeploy_deployment_group" "knowtfolio_backend" {
-  app_name              = aws_codedeploy_app.knowtfolio.name
-  deployment_group_name = "knowtfolio_backend"
-  service_role_arn      = aws_iam_role.knowtfolio_code_deploy_backend.arn
+resource "aws_codedeploy_deployment_group" "backend" {
+  app_name              = aws_codedeploy_app.backend.name
+  deployment_group_name = "backend"
+  service_role_arn      = aws_iam_role.code_deploy_backend.arn
   ec2_tag_set {
     ec2_tag_filter {
       key   = "Name"
