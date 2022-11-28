@@ -3,6 +3,7 @@ locals {
 
   cognito_trigger_functions = {
     pre_sign_up                    = ""
+    post_confirmation              = ""
     define_auth_challenge          = ""
     create_auth_challenge          = ""
     verify_auth_challenge_response = ""
