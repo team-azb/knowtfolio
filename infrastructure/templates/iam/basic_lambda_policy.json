@@ -27,7 +27,7 @@
           "dynamodb:Query"
         ],
         "Effect": "Allow",
-        "Resource": "${user_to_wallet_table_arn}"
+        "Resource": "${user_to_wallet_table_arn}/*"
       }
     ]
   }

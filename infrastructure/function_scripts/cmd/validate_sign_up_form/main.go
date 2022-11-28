@@ -8,6 +8,8 @@ import (
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/cognitoidentityprovider"
+	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
+	"github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
 	"github.com/go-playground/validator/v10"
 	"github.com/team-azb/knowtfolio/infrastructure/function_scripts/pkg/aws_utils"
 	"github.com/team-azb/knowtfolio/infrastructure/function_scripts/pkg/models"
@@ -69,6 +71,26 @@ func handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 	err = checkDuplicateValueForField(ctx, "phone_number", form.PhoneNumber, &fieldErrs)
 	if err != nil {
 		return events.APIGatewayProxyResponse{}, err
+	}
+
+	// Check if `wallet_address` is already used.
+	res, err := aws_utils.DynamoDBClient.Query(ctx, &dynamodb.QueryInput{
+		TableName:              aws.String("user_to_wallet"),
+		IndexName:              aws.String("wallet_address-index"),
+		Limit:                  aws.Int32(1),
+		KeyConditionExpression: aws.String("wallet_address=:addr"),
+		ExpressionAttributeValues: map[string]types.AttributeValue{
+			":addr": &types.AttributeValueMemberS{Value: form.WalletAddress},
+		},
+	})
+	if err != nil {
+		return events.APIGatewayProxyResponse{}, err
+	}
+	if res.Count != 0 {
+		fieldErrs = append(fieldErrs, models.FieldError{
+			FieldName: "wallet_address",
+			Code:      models.AlreadyExists,
+		})
 	}
 
 	jsonBody, _ := json.Marshal(fieldErrs)
