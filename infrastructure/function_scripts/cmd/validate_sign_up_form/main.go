@@ -74,23 +74,25 @@ func handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 	}
 
 	// Check if `wallet_address` is already used.
-	res, err := aws_utils.DynamoDBClient.Query(ctx, &dynamodb.QueryInput{
-		TableName:              aws.String("user_to_wallet"),
-		IndexName:              aws.String("wallet_address-index"),
-		Limit:                  aws.Int32(1),
-		KeyConditionExpression: aws.String("wallet_address=:addr"),
-		ExpressionAttributeValues: map[string]types.AttributeValue{
-			":addr": &types.AttributeValueMemberS{Value: form.WalletAddress},
-		},
-	})
-	if err != nil {
-		return events.APIGatewayProxyResponse{}, err
-	}
-	if res.Count != 0 {
-		fieldErrs = append(fieldErrs, models.FieldError{
-			FieldName: "wallet_address",
-			Code:      models.AlreadyExists,
+	if form.WalletAddress != "" {
+		res, err := aws_utils.DynamoDBClient.Query(ctx, &dynamodb.QueryInput{
+			TableName:              &aws_utils.DynamoDBUserTableName,
+			Limit:                  aws.Int32(1),
+			IndexName:              aws.String("wallet_address-index"),
+			KeyConditionExpression: aws.String("wallet_address=:addr"),
+			ExpressionAttributeValues: map[string]types.AttributeValue{
+				":addr": &types.AttributeValueMemberS{Value: form.WalletAddress},
+			},
 		})
+		if err != nil {
+			return events.APIGatewayProxyResponse{}, err
+		}
+		if res.Count != 0 {
+			fieldErrs = append(fieldErrs, models.FieldError{
+				FieldName: "wallet_address",
+				Code:      models.AlreadyExists,
+			})
+		}
 	}
 
 	jsonBody, _ := json.Marshal(fieldErrs)
