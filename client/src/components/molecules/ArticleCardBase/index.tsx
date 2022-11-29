@@ -8,6 +8,12 @@ type articleCardProps = GridProps & {
   onClick: React.MouseEventHandler<HTMLDivElement>;
 };
 
+/**
+ * 記事カードのUIを作成するためのコンポーネント
+ * @title 記事のタイトル
+ * @lowerContent 記事カードの下部に表示する要素
+ * @onClick 記事カードをクリックした場合のハンドラ
+ */
 const ArticleCardBase = (props: articleCardProps) => {
   return (
     <Grid
