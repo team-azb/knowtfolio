@@ -1,8 +1,7 @@
-import { Button, Grid, GridProps } from "@mui/material";
-import { grey } from "@mui/material/colors";
+import { Button, GridProps } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { SearchResultEntry } from "~/apis/knowtfolio";
-import TrancatedText from "~/components/atoms/TruncatedText";
+import ArticleCardBase from "~/components/molecules/ArticleCardBase";
 
 type ownedArticleCardProps = GridProps & {
   article: SearchResultEntry;
@@ -14,37 +13,23 @@ type ownedArticleCardProps = GridProps & {
 const OwnedArticleCard = (props: ownedArticleCardProps) => {
   const navigate = useNavigate();
   return (
-    <Grid
-      container
-      direction="column"
-      style={{
-        border: `1px solid ${grey[500]}`,
-        borderRadius: 8,
-        padding: "1rem",
-      }}
-      {...props}
-    >
-      <Grid
-        item
-        style={{ height: "10rem", cursor: "pointer" }}
-        onClick={() => (location.href = `/articles/${props.article.id}`)}
-      >
-        <h3 style={{ fontWeight: "normal" }}>
-          <TrancatedText text={props.article.title} m={25} n={5} />
-        </h3>
-      </Grid>
-      <Grid item>
-        <hr />
-        <Button
-          variant="outlined"
-          onClick={() => {
-            navigate(`/articles/${props.article.id}/edit`);
-          }}
-        >
-          Edit
-        </Button>
-      </Grid>
-    </Grid>
+    <ArticleCardBase
+      title={props.article.title}
+      lowerContent={
+        <>
+          <hr />
+          <Button
+            variant="outlined"
+            onClick={() => {
+              navigate(`/articles/${props.article.id}/edit`);
+            }}
+          >
+            Edit
+          </Button>
+        </>
+      }
+      onClick={() => (location.href = `/articles/${props.article.id}`)}
+    />
   );
 };
 
