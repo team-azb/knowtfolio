@@ -30,7 +30,7 @@ const OwnedArticleCard = (props: ownedArticleCardProps) => {
         onClick={() => (location.href = `/articles/${props.article.id}`)}
       >
         <h3 style={{ fontWeight: "normal" }}>
-          <TrancatedText str={props.article.title} m={25} n={5} />
+          <TrancatedText text={props.article.title} m={25} n={5} />
         </h3>
       </Grid>
       <Grid item>

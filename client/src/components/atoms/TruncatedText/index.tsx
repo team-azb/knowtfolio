@@ -12,18 +12,18 @@ const truncate = (str: string, m: number, n: number) => {
 };
 
 type trancatedTextProps = {
-  str: string;
+  text: string;
   m: number;
   n: number;
 };
 /**
  * 長いテキストを途中短縮して表示するコンポーネント
- * @str テキスト
+ * @text テキスト
  * @m 表示する最初のm文字
  * @n 表示する最後のn文字
  */
-const TrancatedText = ({ str, m, n }: trancatedTextProps) => {
-  return <>{truncate(str, m, n)}</>;
+const TrancatedText = ({ text, m, n }: trancatedTextProps) => {
+  return <>{truncate(text, m, n)}</>;
 };
 
 export default TrancatedText;

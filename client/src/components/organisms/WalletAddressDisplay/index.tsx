@@ -23,7 +23,7 @@ const WalletAddressDisplay = ({
       {address ? (
         <JetBrainsMono style={style}>
           {shouldTruncate ? (
-            <TrancatedText str={address} m={8} n={4} />
+            <TrancatedText text={address} m={8} n={4} />
           ) : (
             address
           )}
