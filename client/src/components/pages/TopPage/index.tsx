@@ -18,7 +18,7 @@ const TopPage = () => {
           <Link to={"/articles/new"}>記事作成</Link>
         </li>
         <li>
-          <Link to={"/articles"}>記事一覧</Link>
+          <Link to={"/search"}>記事検索</Link>
         </li>
       </ul>
     </HeaderLayout>
