@@ -35,4 +35,5 @@ var (
 		Credentials: DefaultConfig.Credentials,
 		Region:      Region,
 	})
+	DynamoDBUserTableName = "user_to_wallet"
 )

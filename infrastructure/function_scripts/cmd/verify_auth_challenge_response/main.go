@@ -1,25 +1,38 @@
 package main
 
 import (
+	"context"
 	"errors"
 	"fmt"
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
+	"github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
 	"github.com/ethereum/go-ethereum/accounts"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/crypto"
+	"github.com/team-azb/knowtfolio/infrastructure/function_scripts/pkg/aws_utils"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 )
 
-func handler(event *events.CognitoEventUserPoolsVerifyAuthChallenge) (*events.CognitoEventUserPoolsVerifyAuthChallenge, error) {
+func handler(ctx context.Context, event *events.CognitoEventUserPoolsVerifyAuthChallenge) (*events.CognitoEventUserPoolsVerifyAuthChallenge, error) {
 	defer fmt.Printf("Verify Auth Challenge: %+v\n", event)
 
-	// `custom:wallet_address` should exist after passing the `define` phase.
-	address := event.Request.UserAttributes["custom:wallet_address"]
+	res, err := aws_utils.DynamoDBClient.GetItem(ctx, &dynamodb.GetItemInput{
+		TableName: &aws_utils.DynamoDBUserTableName,
+		Key: map[string]types.AttributeValue{
+			"user_id": &types.AttributeValueMemberS{Value: event.UserName},
+		},
+		ProjectionExpression: aws.String("wallet_address"),
+		ConsistentRead:       aws.Bool(true),
+	})
+	// `wallet_address` should exist after passing the `define` phase.
+	address := res.Item["wallet_address"].(*types.AttributeValueMemberS).Value
 	sign := event.Request.ChallengeAnswer.(string)
 	signedData := event.Request.PrivateChallengeParameters["sign_message"]
 
-	err := verifySignature(address, sign, signedData)
+	err = verifySignature(address, sign, signedData)
 	if err == nil {
 		event.Response = events.CognitoEventUserPoolsVerifyAuthChallengeResponse{AnswerCorrect: true}
 	}

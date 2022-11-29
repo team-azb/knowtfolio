@@ -19,7 +19,7 @@ func handler(ctx context.Context, event *events.CognitoEventUserPoolsPostConfirm
 			"user_id":        &types.AttributeValueMemberS{Value: event.UserName},
 			"wallet_address": &types.AttributeValueMemberS{Value: event.Request.UserAttributes["custom:wallet_address"]},
 		},
-		TableName:           aws.String("user_to_wallet"),
+		TableName:           &aws_utils.DynamoDBUserTableName,
 		ConditionExpression: aws.String("attribute_not_exists(wallet_address)"),
 	})
 
