@@ -1,8 +1,11 @@
 import { Grid } from "@mui/material";
 import { useCallback } from "react";
 import { useSearchParams } from "react-router-dom";
-import Input from "~/components/atoms/search/Input";
 
+/**
+ * 記事検索に用いるフォーム
+ * 入力されたキーワードをURLのクエリパラメータに指定する
+ */
 const SearchForm = () => {
   const [, setSearchParams] = useSearchParams();
 
@@ -18,7 +21,20 @@ const SearchForm = () => {
   return (
     <Grid container alignItems="center" spacing={1}>
       <Grid xs={12} item>
-        <Input type="text" placeholder="Keywords" onChange={onChangeKeywords} />
+        <input
+          style={{
+            border: "2px solid #eee",
+            borderRadius: "0.8rem",
+            boxShadow: "none",
+            boxSizing: "border-box",
+            fontSize: "1.6rem",
+            padding: "1rem",
+            width: "100%",
+          }}
+          type="text"
+          placeholder="Keywords"
+          onChange={onChangeKeywords}
+        />
       </Grid>
     </Grid>
   );
