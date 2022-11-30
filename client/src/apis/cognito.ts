@@ -122,7 +122,7 @@ export const signUpToCognito = (form: SignUpForm) => {
       },
       {
         password: form.password,
-        wallet_address: form.wallet || ""
+        wallet_address: form.wallet || "",
       }
     );
   });
