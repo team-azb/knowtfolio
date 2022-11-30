@@ -7,16 +7,22 @@ import { useSearchParams } from "react-router-dom";
  * 入力されたキーワードをURLのクエリパラメータに指定する
  */
 const SearchForm = () => {
-  const [, setSearchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const onChangeKeywords = useCallback<
     React.ChangeEventHandler<HTMLInputElement>
   >(
     (event) => {
       const { value } = event.target;
-      setSearchParams(value ? { q: value } : {});
+      if (value) {
+        searchParams.set("q", value);
+        searchParams.delete("page");
+      } else {
+        searchParams.delete("q");
+      }
+      setSearchParams(searchParams);
     },
-    [setSearchParams]
+    [searchParams, setSearchParams]
   );
   return (
     <Grid container alignItems="center" spacing={1}>
