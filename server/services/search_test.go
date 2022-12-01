@@ -129,4 +129,30 @@ func TestSearchForArticles(t *testing.T) {
 		assert.EqualValues(t, len(expectedResults), result2.TotalCount)
 		assert.EqualValues(t, len(expectedResults), result3.TotalCount)
 	})
+
+	t.Run("PaginationWithConds", func(t *testing.T) {
+		service := prepareSearchService(t)
+
+		keywords := "language"
+		result1, err1 := service.SearchForArticles(context.Background(), &search.SearchRequest{
+			Keywords: &keywords,
+			OwnedBy:  &user0Addr,
+			PageSize: 1,
+			PageNum:  1,
+		})
+		result2, err2 := service.SearchForArticles(context.Background(), &search.SearchRequest{
+			Keywords: &keywords,
+			OwnedBy:  &user0Addr,
+			PageSize: 1,
+			PageNum:  2,
+		})
+		combinedResults := append(result1.Results, result2.Results...)
+
+		// Assert request body.
+		expectedResults := []*search.SearchResultEntry{&pyEntry, &jsEntry}
+		assert.NoError(t, multierr.Combine(err1, err2))
+		assert.ElementsMatch(t, expectedResults, combinedResults)
+		assert.EqualValues(t, len(expectedResults), result1.TotalCount)
+		assert.EqualValues(t, len(expectedResults), result2.TotalCount)
+	})
 }
