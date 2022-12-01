@@ -12,7 +12,7 @@ import { useWeb3Context } from "~/components/organisms/providers/Web3Provider";
 import metamaskSvg from "~/assets/metamask.svg";
 import WalletAddressDisplay from "../../WalletAddressDisplay";
 import { toast } from "react-toastify";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 type signInWithPasswordForm = {
   username: string;
@@ -152,6 +152,15 @@ const SignInForm = () => {
               </Button>
             </Grid>
           </Grid>
+        </Grid>
+        <Grid item container justifyContent="center">
+          <p>
+            まだアカウントを持っていない方は
+            <Link to="/signup" style={{ color: "#000" }}>
+              サインアップ
+            </Link>
+            へ
+          </p>
         </Grid>
       </Grid>
     </Form>

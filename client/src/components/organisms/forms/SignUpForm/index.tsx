@@ -16,7 +16,7 @@ import Form from "~/components/atoms/authForm/Form";
 import Spacer from "~/components/atoms/Spacer";
 import WalletAddressDisplay from "~/components/organisms/WalletAddressDisplay";
 import { toast } from "react-toastify";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 /**
  * 参考:
@@ -224,6 +224,15 @@ const SignUpForm = () => {
             </Grid>
           </Grid>
         )}
+        <Grid item container justifyContent="center">
+          <p>
+            すでにアカウントを持っている人は
+            <Link to="/signin" style={{ color: "#000" }}>
+              サインイン
+            </Link>
+            へ
+          </p>
+        </Grid>
       </Grid>
     </Form>
   );
