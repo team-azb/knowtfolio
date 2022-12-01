@@ -1,0 +1,24 @@
+version: 0.0
+os: linux
+files:
+  - source: /server
+    destination: /home/ubuntu/knowtfolio
+  - source: /.env
+    destination: /home/ubuntu/knowtfolio
+
+permissions:
+  - object: /home/ubuntu/knowtfolio
+    owner: ubuntu
+    group: ubuntu
+    type: 
+      - directory
+
+hooks:
+  ApplicationStop:
+    - location: scripts/stopApp.sh
+      timeout: 60
+      runas: ubuntu
+  ApplicationStart:
+    - location: scripts/startApp.sh
+      timeout: 60
+      runas: ubuntu
