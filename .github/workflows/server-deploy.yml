@@ -29,9 +29,22 @@ jobs:
 
   build:
     runs-on: ubuntu-latest
+    needs: test
     steps:
       - name: checkout-code
         uses: actions/checkout@v2
+      - name: setup-dotenv
+        run: |
+          touch server/.env
+          echo DB_URI="admin:password@tcp(knowtfolio-db.c9irp7zzw9uy.ap-northeast-1.rds.amazonaws.com)/knowtfolio_db" >> server/.env
+          echo ADMIN_PRIVATE_KEY=${{inputs.ADMIN_WALLET_PRIVATE_KEY}} >> server/.env
+          echo CONTRACT_ADDRESS=0xd08db6d8Fb163182722e0D17fa8146f26a79BB6A >> server/.env
+          echo NETWORK_URI=https://polygon-mumbai.g.alchemy.com/v2/ZRG81-lcDf9T69OmxipvuoO-FMMFAOoH >> server/.env
+          echo CHAIN_ID=80001 >> server/.env
+          echo AWS_ACCESS_KEY=${{inputs.AWS_KNOWTFOLIO_ADMIN_ACCESS_KEY}} >> server/.env
+          echo AWS_SECRET_KEY=${{inputs.AWS_KNOWTFOLIO_ADMIN_SECRET_KEY}} >> server/.env
+          echo AWS_REGION=ap-northeast-1 >> server/.env
+          echo S3_BUCKET_NAME=dev-knowtfolio-nfts >> server/.env
       - name: build-server
         run: make build-sv
       - name: upload-server-bin
@@ -39,9 +52,15 @@ jobs:
         with:
           name: server-binary
           path: server/server
+      - name: upload-env
+        uses: actions/upload-artifact@v3
+        with:
+          name: env
+          path: server/server
   
   deploy:
     runs-on: ubuntu-latest
+    needs: build
     steps:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -51,18 +70,11 @@ jobs:
           aws-region: ap-northeast-1
       - name: change-workdir
         run: cd infrastructure/deploy/server
-      - name: setup-dotenv
-        run: |
-          touch .env
-          echo DB_URI="admin:password@tcp(knowtfolio-db.c9irp7zzw9uy.ap-northeast-1.rds.amazonaws.com)/knowtfolio_db" >> .env
-          echo ADMIN_PRIVATE_KEY=${{inputs.ADMIN_WALLET_PRIVATE_KEY}} >> .env
-          echo CONTRACT_ADDRESS=0xd08db6d8Fb163182722e0D17fa8146f26a79BB6A >> .env
-          echo NETWORK_URI=https://polygon-mumbai.g.alchemy.com/v2/ZRG81-lcDf9T69OmxipvuoO-FMMFAOoH >> .env
-          echo CHAIN_ID=80001 >> .env
-          echo AWS_ACCESS_KEY=${{inputs.AWS_KNOWTFOLIO_ADMIN_ACCESS_KEY}} >> .env
-          echo AWS_SECRET_KEY=${{inputs.AWS_KNOWTFOLIO_ADMIN_SECRET_KEY}} >> .env
-          echo AWS_REGION=ap-northeast-1 >> .env
-          echo S3_BUCKET_NAME=dev-knowtfolio-nfts >> .env
+      - name: download-env
+        uses: actions/download-artifact@v3
+        with: 
+          name: env
+          path: .env
       - name: download-server-bin
         uses: actions/download-artifact@v3
         with: 
