@@ -93,6 +93,8 @@ test: goa go-eth-binding
 checkfmt-sv: $(SERVER_SRCS)
 	docker-compose run server test -z $$(gofmt -e -l .)
 
+build-sv: goa go-eth-binding
+	docker-compose run server go build
 
 ### Infrastructure ###
 
