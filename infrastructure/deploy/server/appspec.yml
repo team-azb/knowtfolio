@@ -19,6 +19,9 @@ hooks:
       timeout: 60
       runas: ubuntu
   ApplicationStart:
+    - location: scripts/setUp.sh
+      timeout: 60
+      runas: root
     - location: scripts/startApp.sh
       timeout: 60
       runas: ubuntu
