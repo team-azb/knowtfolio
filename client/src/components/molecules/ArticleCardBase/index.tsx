@@ -18,7 +18,7 @@ const ArticleCardBase = ({
   onClick,
   title,
   lowerContent,
-  ...gridProps
+  ...outerGridProps
 }: articleCardProps) => {
   return (
     <Grid
@@ -29,7 +29,7 @@ const ArticleCardBase = ({
         borderRadius: 8,
         padding: "1rem",
       }}
-      {...gridProps}
+      {...outerGridProps}
     >
       <Grid
         item
