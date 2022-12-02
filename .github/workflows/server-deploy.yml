@@ -56,7 +56,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: env
-          path: server/server
+          path: server/.env
   
   deploy:
     runs-on: ubuntu-latest
@@ -70,21 +70,20 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_TERRAFORM_USER_ACCESS_KEY }}
           aws-secret-access-key: ${{ secrets.AWS_TERRAFORM_USER_SECRET_KEY }}
           aws-region: ap-northeast-1
-      - name: change-workdir
-        run: cd infrastructure/deploy/server
       - name: download-env
         uses: actions/download-artifact@v3
         with: 
           name: env
-          path: .env
+          path: infrastructure/deploy/server
       - name: download-server-bin
         uses: actions/download-artifact@v3
         with: 
           name: server-binary
-          path: server
-      - name: zip-files
-        run: zip -r test.zip .
+          path: infrastructure/deploy/server
       - name: upload-to-s3
-        run: aws s3 cp ./test.zip s3://dev-knowtfolio-code-deploy/test/test.zip
+        run: |
+          zip -r test.zip .
+          aws s3 cp ./test.zip s3://dev-knowtfolio-code-deploy/test/test.zip
+        working-directory: infrastructure/deploy/server
       - name: create-aws-deploy
         run: aws deploy create-deployment --application-name knowtfolio --deployment-group-name backend --s3-location bucket=dev-knowtfolio-code-deploy,key=test/test.zip,bundleType=zip
