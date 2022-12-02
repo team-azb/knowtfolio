@@ -1,0 +1,76 @@
+name: Server deploy
+
+on:
+  push:
+    branches:
+      - reibomaru/code-deploy
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: checkout-code
+        uses: actions/checkout@v2
+      - name: setup-dotenv
+        uses: ./.github/actions/setup-dotenv
+        with:
+          ADMIN_WALLET_PRIVATE_KEY: ${{secrets.ADMIN_WALLET_PRIVATE_KEY}}
+          AWS_KNOWTFOLIO_ADMIN_ACCESS_KEY: ${{secrets.AWS_KNOWTFOLIO_ADMIN_ACCESS_KEY}}
+          AWS_KNOWTFOLIO_ADMIN_SECRET_KEY: ${{secrets.AWS_KNOWTFOLIO_ADMIN_SECRET_KEY}}
+      - name: check-format
+        run: make checkfmt-sv
+      - name: go-test
+        run: make test
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout-code
+        uses: actions/checkout@v2
+      - name: build-server
+        run: make build-sv
+      - name: upload-server-bin
+        uses: actions/upload-artifact@v3
+        with:
+          name: server-binary
+          path: server/server
+  
+  deploy:
+    runs-on: ubuntu-latest
+    step:
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_TERRAFORM_USER_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_TERRAFORM_USER_SECRET_KEY }}
+          aws-region: ap-northeast-1
+      - name: change-workdir
+        run: cd infrastructure/deploy/server
+      - name: setup-dotenv
+        run: |
+          touch .env
+          echo DB_URI="admin:password@tcp(knowtfolio-db.c9irp7zzw9uy.ap-northeast-1.rds.amazonaws.com)/knowtfolio_db" >> .env
+          echo ADMIN_PRIVATE_KEY=${{inputs.ADMIN_WALLET_PRIVATE_KEY}} >> .env
+          echo CONTRACT_ADDRESS=0xd08db6d8Fb163182722e0D17fa8146f26a79BB6A >> .env
+          echo NETWORK_URI=https://polygon-mumbai.g.alchemy.com/v2/ZRG81-lcDf9T69OmxipvuoO-FMMFAOoH >> .env
+          echo CHAIN_ID=80001 >> .env
+          echo AWS_ACCESS_KEY=${{inputs.AWS_KNOWTFOLIO_ADMIN_ACCESS_KEY}} >> .env
+          echo AWS_SECRET_KEY=${{inputs.AWS_KNOWTFOLIO_ADMIN_SECRET_KEY}} >> .env
+          echo AWS_REGION=ap-northeast-1 >> .env
+          echo S3_BUCKET_NAME=dev-knowtfolio-nfts >> .env
+      - name: download-server-bin
+        uses: actions/download-artifact@v3
+        with: 
+          name: server-binary
+          path: server
+      - name: zip-files
+        run: zip -r test.zip .
+      - name: upload-to-s3
+        run: aws s3 cp ./test.zip s3://dev-knowtfolio-code-deploy/test/test.zip
+      - name: create-aws-deploy
+        run: aws deploy create-deployment --application-name knowtfolio --deployment-group-name backend --s3-location bucket=dev-knowtfolio-code-deploy,key=test/test.zip,bundleType=zip
