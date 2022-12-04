@@ -83,7 +83,11 @@ jobs:
       - name: upload-to-s3
         run: |
           zip -r artifacts.zip .
-          aws s3 cp ./artifacts.zip s3://dev-knowtfolio-code-deploy/artifacts/{{ github.sha }}.zip
+          aws s3 cp ./artifacts.zip s3://dev-knowtfolio-code-deploy/artifacts/${{ github.sha }}.zip
         working-directory: infrastructure/deploy/server
       - name: create-aws-deploy
-        run: aws deploy create-deployment --application-name knowtfolio --deployment-group-name backend --s3-location bucket=dev-knowtfolio-code-deploy,key=artifacts/{{ github.sha }}.zip,bundleType=zip
+        run: >
+          aws deploy create-deploymen
+          --application-name knowtfolio
+          --deployment-group-name backend
+          --s3-location bucket=dev-knowtfolio-code-deploy,key=artifacts/${{ github.sha }}.zip,bundleType=zip
