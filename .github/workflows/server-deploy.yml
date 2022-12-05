@@ -87,7 +87,7 @@ jobs:
         working-directory: infrastructure/deploy/server
       - name: create-aws-deploy
         run: >
-          aws deploy create-deploymen
+          aws deploy create-deployment
           --application-name knowtfolio
           --deployment-group-name backend
           --s3-location bucket=dev-knowtfolio-code-deploy,key=artifacts/${{ github.sha }}.zip,bundleType=zip
