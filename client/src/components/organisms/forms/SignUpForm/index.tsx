@@ -3,6 +3,7 @@ import {
   signUpToCognito,
   SignUpForm,
   confirmSigningUpToCognito,
+  signInToCognitoWithPassword,
 } from "~/apis/cognito";
 import { useWeb3Context } from "~/components/organisms/providers/Web3Provider";
 import PhoneInput from "react-phone-number-input/input";
@@ -124,13 +125,25 @@ const SignUpForm = () => {
       event.preventDefault();
       try {
         await confirmSigningUpToCognito(form.username, code);
-        navigate("/signin");
         toast.success("認証コードの検証に成功しました。");
       } catch (error) {
         toast.error("認証コードの検証に失敗しました。");
+        return;
+      }
+
+      try {
+        await signInToCognitoWithPassword(form.username, form.password);
+        toast.success("サインインしました。");
+        navigate("mypage", {
+          state: {
+            shouldLoadCurrentUser: true,
+          },
+        });
+      } catch (error) {
+        toast.error("サインインに失敗しました。");
       }
     },
-    [form.username, code, navigate]
+    [form.username, form.password, code, navigate]
   );
 
   return (
