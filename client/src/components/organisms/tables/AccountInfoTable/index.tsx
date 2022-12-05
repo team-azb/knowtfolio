@@ -28,7 +28,7 @@ const AccountInfoTable = () => {
       toast.success("サインアウトしました。");
     } catch (error) {
       console.error(error);
-      toast.error("サインインに失敗しました。");
+      toast.error("サインアウトに失敗しました。");
     }
   }, [navigate, user]);
 
