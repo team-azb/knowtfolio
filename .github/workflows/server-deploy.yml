@@ -2,10 +2,9 @@ name: Server deploy
 
 on:
   workflow_run:
-    workflows: ["Server Test"]
-    branches: ["reibomaru/code-deploy"]
-    types:
-      - completed
+    workflows: [Server Test]
+    branches: [reibomaru/code-deploy]
+    types: [completed]
 
 defaults:
   run:
