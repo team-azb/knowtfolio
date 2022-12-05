@@ -226,7 +226,7 @@ const SignUpForm = () => {
         )}
         <Grid item container justifyContent="center">
           <p>
-            すでにアカウントを持っている人は
+            すでにアカウントを持っている方は
             <Link to="/signin" style={{ color: "#000" }}>
               サインイン
             </Link>
