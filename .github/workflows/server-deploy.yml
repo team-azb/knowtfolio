@@ -3,7 +3,7 @@ name: Server deploy
 on:
   workflow_run:
     workflows: [Server Test]
-    branches: [reibomaru/code-deploy]
+    branches: [product]
     types: [completed]
 
 defaults:
@@ -17,6 +17,8 @@ jobs:
     steps:
       - name: checkout-code
         uses: actions/checkout@v2
+        # TODO: awsのリソース名などをterraformから取得して差し込みたい
+        # https://github.com/team-azb/knowtfolio/issues/182
       - name: setup-dotenv
         run: |
           touch server/.env
@@ -75,3 +77,5 @@ jobs:
           --application-name knowtfolio
           --deployment-group-name backend
           --s3-location bucket=dev-knowtfolio-code-deploy,key=artifacts/${{ github.sha }}.zip,bundleType=zip
+      # TODO: deployのlogを流して、実行結果をgithub actionsにも反映できるようにする
+      # https://github.com/team-azb/knowtfolio/issues/166
