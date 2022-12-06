@@ -1,17 +1,5 @@
 import JetBrainsMono from "~/components/atoms/JetBrainsMono";
-
-/**
- * trancate long string
- * @param str original string
- * @param m Display the first m characters
- * @param n Display the last n characters
- * @returns truncated string
- */
-export const truncate = (str: string, m: number, n: number) => {
-  return str.length > m + n
-    ? str.slice(0, m - 1) + "..." + str.slice(-(n + 1), -1)
-    : str;
-};
+import TrancatedText from "~/components/atoms/TruncatedText";
 
 type walletAddressDisplayProps = {
   address?: string;
@@ -34,7 +22,11 @@ const WalletAddressDisplay = ({
     <>
       {address ? (
         <JetBrainsMono style={style}>
-          {shouldTruncate ? truncate(address, 8, 4) : address}
+          {shouldTruncate ? (
+            <TrancatedText text={address} m={8} n={4} />
+          ) : (
+            address
+          )}
         </JetBrainsMono>
       ) : (
         "未登録"

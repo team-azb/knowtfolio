@@ -8,7 +8,7 @@ import UploadImagePage from "~/components/pages/UploadImagePage";
 import NotFoundPage from "~/components/pages/NofFoundPage";
 import NewArticlePage from "~/components/pages/NewArticlePage";
 import EditArticlePage from "~/components/pages/EditArticlePage";
-import IndexArticlesPage from "./components/pages/IndexArticlesPage";
+import SearchPage from "~/components/pages/SearchPage";
 import Web3Provider from "~/components/organisms/providers/Web3Provider";
 import ResetWalletPage from "./components/pages/ResetWalletPage";
 import { ThemeProvider } from "@mui/material";
@@ -63,7 +63,7 @@ const App = () => {
               </AuthProvider>
             }
           />
-          <Route path="/articles" element={<IndexArticlesPage />} />
+          <Route path="/search" element={<SearchPage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </Web3Provider>

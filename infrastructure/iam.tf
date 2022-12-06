@@ -79,3 +79,26 @@ resource "aws_iam_role_policy" "sns_publish" {
   role   = aws_iam_role.cognito_sms_sender.name
   policy = file("${path.module}/templates/iam/sns_publish_policy.json")
 }
+
+resource "aws_iam_role" "code_deploy_backend" {
+  name               = "code-deploy-backend"
+  assume_role_policy = file("${path.module}/templates/iam/code_deploy/assume_policy.json")
+}
+
+resource "aws_iam_role_policy_attachment" "aws_code_deploy_role" {
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSCodeDeployRole"
+  role       = aws_iam_role.code_deploy_backend.name
+}
+
+resource "aws_iam_role" "backend" {
+  name               = "knowtfolio-backend"
+  assume_role_policy = file("${path.module}/templates/iam/ec2/assume_policy.json")
+}
+
+resource "aws_iam_role_policy" "fetch_build_artifacts" {
+  name = "knowtfolio"
+  role = aws_iam_role.backend.name
+  policy = templatefile("${path.module}/templates/iam/ec2/knowtfolio_backend_policy.json", {
+    bucket = aws_s3_bucket.code_deploy.arn
+  })
+}
