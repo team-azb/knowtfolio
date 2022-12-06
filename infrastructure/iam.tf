@@ -38,13 +38,13 @@ resource "aws_iam_role" "knowtfolio_viewer" {
 
 resource "aws_iam_role" "lambda" {
   for_each           = local.lambda_functions
-  name               = "${each.key}_lambda"
+  name               = "${replace(each.key, "_", "-")}-lambda"
   assume_role_policy = file("${path.module}/templates/iam/basic_lambda_assume_policy.json")
 }
 
 resource "aws_iam_role_policy" "basic_lambda" {
   for_each = local.lambda_functions
-  name     = "${each.key}_lambda"
+  name     = "basic-lambda"
   role     = aws_iam_role.lambda[each.key].name
   policy = templatefile("${path.module}/templates/iam/basic_lambda_policy.json", {
     user_to_wallet_table_arn = aws_dynamodb_table.user_to_wallet.arn
