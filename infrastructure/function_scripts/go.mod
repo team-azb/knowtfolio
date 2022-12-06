@@ -7,6 +7,7 @@ require (
 	github.com/aws/aws-sdk-go-v2 v1.17.1
 	github.com/aws/aws-sdk-go-v2/config v1.1.1
 	github.com/aws/aws-sdk-go-v2/service/cognitoidentityprovider v1.21.1
+	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.17.7
 	github.com/aws/aws-sdk-go-v2/service/lambda v1.24.8
 	github.com/ethereum/go-ethereum v1.10.25
 	github.com/go-playground/validator/v10 v10.11.1
@@ -18,6 +19,8 @@ require (
 	github.com/aws/aws-sdk-go-v2/internal/configsources v1.1.25 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.4.19 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/ini v1.3.26 // indirect
+	github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.9.10 // indirect
+	github.com/aws/aws-sdk-go-v2/service/internal/endpoint-discovery v1.7.19 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.0.2 // indirect
 	github.com/aws/aws-sdk-go-v2/service/sso v1.1.1 // indirect
 	github.com/aws/aws-sdk-go-v2/service/sts v1.1.1 // indirect

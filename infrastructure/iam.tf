@@ -59,6 +59,24 @@ resource "aws_iam_role_policy" "pre_sign_up_lambda" {
   })
 }
 
+// TODO: 他のpolicyもこの記法で統一する
+data "aws_iam_policy_document" "update_wallet_table_policy" {
+  statement {
+    actions = [
+      "dynamodb:PutItem"
+    ]
+    resources = [
+      aws_dynamodb_table.user_to_wallet.arn
+    ]
+  }
+}
+
+resource "aws_iam_role_policy" "post_confirmation_lambda" {
+  name   = "post-confirmation-lambda"
+  role   = aws_iam_role.lambda["post_confirmation"].name
+  policy = data.aws_iam_policy_document.update_wallet_table_policy.json
+}
+
 resource "aws_iam_role_policy" "validate_sign_up_form_lambda" {
   name = "pre-sign-up-lambda"
   role = aws_iam_role.lambda["validate_sign_up_form"].name

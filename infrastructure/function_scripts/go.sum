@@ -19,6 +19,12 @@ github.com/aws/aws-sdk-go-v2/internal/ini v1.3.26 h1:Mza+vlnZr+fPKFKRq/lKGVvM6B/
 github.com/aws/aws-sdk-go-v2/internal/ini v1.3.26/go.mod h1:Y2OJ+P+MC1u1VKnavT+PshiEuGPyh/7DqxoDNij4/bg=
 github.com/aws/aws-sdk-go-v2/service/cognitoidentityprovider v1.21.1 h1:lj4DpCeptmd3fV30KgVRKWmADiIqfCtsay4kSbAnSdc=
 github.com/aws/aws-sdk-go-v2/service/cognitoidentityprovider v1.21.1/go.mod h1:2LQRr4SMTXDqUodAi6pIi0u7t1f0+kMOCRYjh3dAflw=
+github.com/aws/aws-sdk-go-v2/service/dynamodb v1.17.7 h1:/TwGWNd3vnjXaPMau8eY7s5j6Afe4WxnRfIB64r4jEk=
+github.com/aws/aws-sdk-go-v2/service/dynamodb v1.17.7/go.mod h1:BiglbKCG56L8tmMnUEyEQo422BO9xnNR8vVHnOsByf8=
+github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.9.10 h1:dpiPHgmFstgkLG07KaYAewvuptq5kvo52xn7tVSrtrQ=
+github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.9.10/go.mod h1:9cBNUHI2aW4ho0A5T87O294iPDuuUOSIEDjnd1Lq/z0=
+github.com/aws/aws-sdk-go-v2/service/internal/endpoint-discovery v1.7.19 h1:V03dAtcAN4Qtly7H3/0B6m3t/cyl4FgyKFqK738fyJw=
+github.com/aws/aws-sdk-go-v2/service/internal/endpoint-discovery v1.7.19/go.mod h1:2WpVWFC5n4DYhjNXzObtge8xfgId9UP6GWca46KJFLo=
 github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.0.2 h1:4AH9fFjUlVktQMznF+YN33aWNXaR4VgDXyP28qokJC0=
 github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.0.2/go.mod h1:45MfaXZ0cNbeuT0KQ1XJylq8A6+OpVV2E5kvY/Kq+u8=
 github.com/aws/aws-sdk-go-v2/service/lambda v1.24.8 h1:h//zBx2mVA+V07GWk/IgHnFeeHLmmgS/YuSsXSyzEqA=
