@@ -6,13 +6,37 @@ import (
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/team-azb/knowtfolio/server/config"
+	"github.com/team-azb/knowtfolio/server/gateways/aws"
 	"github.com/team-azb/knowtfolio/server/gateways/ethereum"
 	"github.com/team-azb/knowtfolio/server/models"
+	"go.uber.org/multierr"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	"log"
+	"os"
 	"strings"
 	"sync"
 	"testing"
+)
+
+var (
+	adminAddr = "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC"
+	testUsers = []testUser{
+		{
+			ID:          "test-user0",
+			Password:    "Password#0",
+			PhoneNumber: "+81120345678",
+			Address:     "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+		}, {
+			ID:          "test-user1",
+			Password:    "Password#1",
+			PhoneNumber: "+81120987654",
+			Address:     "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
+		},
+	}
+	transactionLock = map[string]*sync.Mutex{testUsers[0].Address: {}, testUsers[1].Address: {}, adminAddr: {}}
+	cognitoClient   = aws.NewCognitoClient()
+	dynamodbClient  = aws.NewDynamoDBClient()
 )
 
 func fatalfIfError(t *testing.T, err error, format string, args ...any) {
@@ -55,10 +79,6 @@ func initTestDB(t *testing.T) (db *gorm.DB) {
 	return
 }
 
-var adminAddr = "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC"
-
-var transactionLock = map[string]*sync.Mutex{user0Addr: {}, user1Addr: {}, adminAddr: {}}
-
 func initTestContractClient(t *testing.T) *ethereum.ContractClient {
 	if testing.Short() {
 		t.Skip("Tests using Contract are skipped.")
@@ -93,4 +113,68 @@ func initTestContractClient(t *testing.T) *ethereum.ContractClient {
 	t.Logf("[%v] Deployed contract %v to %v!", t.Name(), config.ContractAddress, config.NetworkURI)
 
 	return cli
+}
+
+type testUser struct {
+	ID          string
+	Password    string
+	PhoneNumber string
+	Address     string
+	IDToken     string
+}
+
+func (u *testUser) registerToAWS() error {
+	err := cognitoClient.CreateUserWithPassword(u.ID, u.Password, u.PhoneNumber)
+	if err != nil {
+		return err
+	}
+
+	err = dynamodbClient.PutUserWallet(u.ID, u.Address)
+	if err != nil {
+		return err
+	}
+
+	u.IDToken, err = cognitoClient.GetIDTokenOfUser(u.ID, u.Password)
+	log.Printf("TOKEN: %+v", u.IDToken)
+	return err
+}
+
+func (u *testUser) deleteFromAWS() error {
+	err := cognitoClient.DeleteUserByID(u.ID)
+	if err != nil {
+		return err
+	}
+
+	err = dynamodbClient.DeleteUserWalletByID(u.ID)
+	return err
+}
+
+func runTests(m *testing.M) (code int) {
+	var errs []error
+	for i := range testUsers {
+		err := testUsers[i].registerToAWS()
+		errs = append(errs, err)
+	}
+
+	defer func() {
+		for i := range testUsers {
+			err := testUsers[i].deleteFromAWS()
+			errs = append(errs, err)
+		}
+		if combined := multierr.Combine(errs...); combined != nil {
+			panic(fmt.Sprintf("test user creation/deletion failed: %+v", combined))
+		}
+	}()
+
+	if multierr.Combine(errs...) != nil {
+		return 1
+	}
+
+	code = m.Run()
+	return code
+}
+
+func TestMain(m *testing.M) {
+	code := runTests(m)
+	os.Exit(code)
 }
