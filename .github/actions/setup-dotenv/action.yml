@@ -20,4 +20,6 @@ runs:
         echo AWS_ACCESS_KEY=${{inputs.AWS_KNOWTFOLIO_ADMIN_ACCESS_KEY}} >> server/.env
         echo AWS_SECRET_KEY=${{inputs.AWS_KNOWTFOLIO_ADMIN_SECRET_KEY}} >> server/.env
         echo AWS_REGION=ap-northeast-1 >> server/.env
+        echo COGNITO_CLIENT_ID=23nde7tu6hjcgh059985bimqn5 >> server/.env
+        echo COGNITO_USER_POOL_ID=ap-northeast-1_zflp7NVvg >> server/.env
         echo S3_BUCKET_NAME=dev-knowtfolio-nfts >> server/.env
