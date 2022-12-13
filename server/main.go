@@ -7,6 +7,7 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/joho/godotenv"
 	"github.com/team-azb/knowtfolio/server/config"
+	"github.com/team-azb/knowtfolio/server/gateways/aws"
 	"github.com/team-azb/knowtfolio/server/gateways/ethereum"
 	"github.com/team-azb/knowtfolio/server/services"
 	"gorm.io/driver/mysql"
@@ -37,15 +38,17 @@ func main() {
 		logger.Fatal().Msgf("Failed to initialize with Contract Client: %v", err)
 	}
 
-	// Create S3 Client
+	// Create AWS Clients
 	cfg, err := awscfg.LoadDefaultConfig(context.Background())
 	if err != nil {
 		logger.Fatal().Msgf("Failed to load AWS config: %v", err)
 	}
 	s3Client := s3.NewFromConfig(cfg)
+	dynamoDBClient := aws.NewDynamoDBClient()
+	cognitoClient := aws.NewCognitoClient()
 
 	handler := services.NewHttpHandler()
-	handler.AddService(services.NewArticlesService(db, contract, *handler), "articles")
+	handler.AddService(services.NewArticlesService(db, contract, cognitoClient, dynamoDBClient, *handler), "articles")
 	handler.AddService(services.NewArticlesHtmlService(db, *handler), "articles-html")
 	handler.AddService(services.NewNftsService(db, contract, s3Client, *handler), "nfts")
 	handler.AddService(services.NewSearchService(db, contract, *handler), "search")
