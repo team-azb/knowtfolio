@@ -95,7 +95,7 @@ article-template: $(ARTICLE_PAGE_TEMPLATE)
 server: goa go-eth-binding article-template
 	docker-compose up --build server
 
-test: goa go-eth-binding
+test: goa go-eth-binding article-template
 	docker-compose up --build test
 
 checkfmt-sv: $(SERVER_SRCS)
