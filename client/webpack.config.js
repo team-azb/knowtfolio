@@ -67,7 +67,7 @@ const webResolveSettings = {
       "~": path.resolve(__dirname, "src"),
     },
   },
-}
+};
 
 module.exports = [
   {
