@@ -50,11 +50,30 @@ const moduleSettings = {
   },
 };
 
+const webResolveSettings = {
+  resolve: {
+    modules: ["node_modules"],
+    extensions: [".js", ".ts", ".tsx"],
+    fallback: {
+      crypto: require.resolve("crypto-browserify"),
+      stream: require.resolve("stream-browserify"),
+      assert: require.resolve("assert"),
+      http: require.resolve("stream-http"),
+      https: require.resolve("https-browserify"),
+      os: require.resolve("os-browserify"),
+      url: require.resolve("url"),
+    },
+    alias: {
+      "~": path.resolve(__dirname, "src"),
+    },
+  },
+}
+
 module.exports = [
   {
     target: "web",
     mode: "production",
-    entry: path.resolve(__dirname, `./src/index.tsx`),
+    entry: path.resolve(__dirname, `./src/csr.tsx`),
     plugins: [
       new HtmlWebpackPlugin({
         inject: "body",
@@ -73,26 +92,11 @@ module.exports = [
     ],
     externals: [],
     ...moduleSettings,
-    resolve: {
-      modules: ["node_modules"],
-      extensions: [".js", ".ts", ".tsx"],
-      fallback: {
-        crypto: require.resolve("crypto-browserify"),
-        stream: require.resolve("stream-browserify"),
-        assert: require.resolve("assert"),
-        http: require.resolve("stream-http"),
-        https: require.resolve("https-browserify"),
-        os: require.resolve("os-browserify"),
-        url: require.resolve("url"),
-      },
-      alias: {
-        "~": path.resolve(__dirname, "src"),
-      },
-    },
+    ...webResolveSettings,
     output: {
       publicPath: "/",
       path: path.resolve(__dirname, "dist"), //バンドルしたファイルの出力先のパスを指定
-      filename: "main.js", //出力時のファイル名の指定
+      filename: "csr.js", //出力時のファイル名の指定
     },
     optimization: {
       minimizer: [
@@ -128,6 +132,43 @@ module.exports = [
           },
           target: "http://server:8080",
         },
+      ],
+    },
+  },
+  {
+    target: "web",
+    mode: "production",
+    entry: path.resolve(__dirname, `./src/ssr.tsx`),
+    plugins: [
+      new HtmlWebpackPlugin({
+        inject: "body",
+        template: path.resolve(__dirname, `src/index.html`),
+        filename: path.resolve(__dirname, `dist/_template.html`),
+      }),
+      new MiniCssExtractPlugin(),
+      new webpack.ProvidePlugin({
+        process: "process/browser",
+        Buffer: ["buffer", "Buffer"],
+      }),
+      new Dotenv(),
+      new webpack.DefinePlugin({
+        __isBrowser__: true,
+      }),
+    ],
+    externals: [],
+    ...moduleSettings,
+    ...webResolveSettings,
+    output: {
+      publicPath: "/",
+      path: path.resolve(__dirname, "dist"), //バンドルしたファイルの出力先のパスを指定
+      filename: "ssr.js", //出力時のファイル名の指定
+    },
+    optimization: {
+      minimizer: [
+        new CssMinimizerPlugin(),
+        new TerserPlugin({
+          parallel: true,
+        }),
       ],
     },
   },

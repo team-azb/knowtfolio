@@ -6,11 +6,11 @@ import App from "./App";
 
 /**
  * 記事画面のssrのためにgoで用いられるhtmlのテンプレートを作成する関数
- * Reactのビルドで作成されるindex.htmlに依存関係があるので注意
+ * Reactのビルドで作成される_template.htmlに依存関係があるので注意
  */
 const main = async () => {
-  // templateのベースとなるReactのビルドで生成されたindex.htmlを読み込む
-  const fileBuf = await fs.readFile(`${__dirname}/index.html`);
+  // templateのベースとなるReactのビルドで生成された_template.htmlを読み込む
+  const fileBuf = await fs.readFile(`${__dirname}/_template.html`);
   const document = parse(fileBuf.toString());
   const app = renderToString(
     <StaticRouter location={"/articles/articleId"}>
