@@ -2,8 +2,9 @@ package models
 
 import (
 	"bytes"
-	"github.com/aidarkhanov/nanoid/v2"
 	"html/template"
+
+	"github.com/aidarkhanov/nanoid/v2"
 )
 
 type Article struct {
@@ -30,19 +31,7 @@ func (a *Article) SetIsTokenized() {
 
 func (a *Article) ToHTML() ([]byte, error) {
 	htmlTemplate, err := template.
-		New("HTML").
-		Parse(`
-			<head>
-				<meta charset="UTF-8" />
-				<title> {{ .title }} </title>
-			</head>
-			<body>
-				<a href="/articles">記事一覧</a>
-				<a href="/articles/{{ .id }}/edit">記事を編集</a>
-				<h1> {{ .title }} </h1>
-				{{ .content }}
-			</body>
-		`)
+		ParseFiles("dist/template.html")
 	if err != nil {
 		return nil, err
 	}
