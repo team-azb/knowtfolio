@@ -37,6 +37,9 @@ services:
       - type: bind
         source: ./server
         target: /server
+      - type: bind
+        source: ./client/dist
+        target: /server/dist
     depends_on:
       - db
 
