@@ -3,7 +3,7 @@ name: Server Deploy
 on:
   workflow_run:
     workflows: [Server Test]
-    branches: [main]
+    branches: [reibomaru/code-deploy]
     types: [completed]
 
 defaults:
