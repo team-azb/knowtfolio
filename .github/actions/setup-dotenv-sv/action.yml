@@ -1,4 +1,4 @@
-name: setup-dotenv
+name: setup-dotenv-sv
 inputs:
   ADMIN_WALLET_PRIVATE_KEY:
     required: true
