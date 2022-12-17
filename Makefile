@@ -98,7 +98,7 @@ server: goa go-eth-binding article-template
 test: goa go-eth-binding article-template
 	docker-compose up --build test
 
-checkfmt-sv: $(SERVER_SRCS) article-template
+checkfmt-sv: $(SERVER_SRCS)
 	docker-compose run server test -z $$(gofmt -e -l .)
 
 
