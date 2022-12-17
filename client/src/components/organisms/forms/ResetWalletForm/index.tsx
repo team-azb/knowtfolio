@@ -8,6 +8,7 @@ import WalletAddressDisplay from "~/components/organisms/WalletAddressDisplay";
 import { Button, Grid } from "@mui/material";
 import Spacer from "~/components/atoms/Spacer";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 /**
  * walletを再設定するためのフォーム
@@ -22,6 +23,7 @@ const ResetWalletForm = () => {
     return walletAddress;
   }, [attributes]);
   const { account } = useWeb3Context();
+  const navigate = useNavigate();
 
   const resetWalletAddress = useCallback(() => {
     user.updateAttributes(
@@ -33,22 +35,25 @@ const ResetWalletForm = () => {
       ],
       (err) => {
         if (err) {
-          alert(err.message || JSON.stringify(err));
+          console.error(err.message || JSON.stringify(err));
+          toast.error("Wallet addressの更新に失敗しました。");
           return;
         }
-        alert("wallet addressの更新に成功しました");
-        window.location.reload();
+        toast.success("Wallet addressの更新に成功しました。");
+        navigate("/reset-wallet", {
+          state: {
+            shouldLoadCurrentUser: true,
+          },
+        });
       }
     );
-  }, [user, walletAddressInput]);
+  }, [navigate, user, walletAddressInput]);
 
   const onChangeWalletAddressInput = useCallback<
     React.ChangeEventHandler<HTMLInputElement>
   >((event) => {
     setWalletAddressInput(event.target.value);
   }, []);
-
-  const navigate = useNavigate();
 
   return (
     <Form>
@@ -113,7 +118,7 @@ const ResetWalletForm = () => {
           <Grid item container xs={2} direction="row-reverse">
             <Button
               onClick={() => {
-                navigate(-1);
+                navigate("/mypage");
               }}
               variant="contained"
               style={{ fontSize: "1.4rem" }}

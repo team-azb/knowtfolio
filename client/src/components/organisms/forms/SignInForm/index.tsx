@@ -11,6 +11,8 @@ import Spacer from "~/components/atoms/Spacer";
 import { useWeb3Context } from "~/components/organisms/providers/Web3Provider";
 import metamaskSvg from "~/assets/metamask.svg";
 import WalletAddressDisplay from "../../WalletAddressDisplay";
+import { toast } from "react-toastify";
+import { Link, useNavigate } from "react-router-dom";
 
 type signInWithPasswordForm = {
   username: string;
@@ -23,6 +25,7 @@ const SignInForm = () => {
     password: "",
   });
   const { account, web3 } = useWeb3Context();
+  const navigate = useNavigate();
 
   const onChangeForm = useCallback<React.ChangeEventHandler<HTMLInputElement>>(
     (event) => {
@@ -47,14 +50,18 @@ const SignInForm = () => {
       event.preventDefault();
       try {
         await signInToCognitoWithPassword(form.username, form.password);
-        alert("サインイン成功");
-        window.location.reload();
+        navigate("/mypage", {
+          state: {
+            shouldLoadCurrentUser: true,
+          },
+        });
+        toast.success("サインインしました。");
       } catch (error) {
         console.error(error);
-        alert("サインイン失敗");
+        toast.error("サインインに失敗しました。");
       }
     },
-    [form.password, form.username]
+    [form.password, form.username, navigate]
   );
 
   const signInWithWallet = useCallback<
@@ -64,14 +71,18 @@ const SignInForm = () => {
       event.preventDefault();
       try {
         await signInToCognitoWithWallet(form.username, web3, account);
-        alert("サインイン成功");
-        window.location.reload();
+        navigate("/mypage", {
+          state: {
+            shouldLoadCurrentUser: true,
+          },
+        });
+        toast.success("サインインしました。");
       } catch (error) {
         console.error(error);
-        alert("サインイン失敗");
+        toast.error("サインインに失敗しました。");
       }
     },
-    [account, form.username, web3]
+    [account, form.username, navigate, web3]
   );
 
   return (
@@ -141,6 +152,15 @@ const SignInForm = () => {
               </Button>
             </Grid>
           </Grid>
+        </Grid>
+        <Grid item container justifyContent="center">
+          <p>
+            まだアカウントを持っていない方は
+            <Link to="/signup" style={{ color: "#000" }}>
+              サインアップ
+            </Link>
+            へ
+          </p>
         </Grid>
       </Grid>
     </Form>

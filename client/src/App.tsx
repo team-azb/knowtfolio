@@ -13,6 +13,8 @@ import Web3Provider from "~/components/organisms/providers/Web3Provider";
 import ResetWalletPage from "./components/pages/ResetWalletPage";
 import { ThemeProvider } from "@mui/material";
 import { theme } from "~/configs/theme";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import "~/global.css";
 
 const App = () => {
@@ -67,6 +69,7 @@ const App = () => {
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </Web3Provider>
+      <ToastContainer style={{ top: 100 }} />
     </ThemeProvider>
   );
 };
