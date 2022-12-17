@@ -5,6 +5,7 @@ import { useWeb3Context } from "~/components/organisms/providers/Web3Provider";
 import ArticleEditor from "~/components/organisms/ArticleEditor";
 import { Button, Grid } from "@mui/material";
 import ArrowBackIosNewRoundedIcon from "@mui/icons-material/ArrowBackIosNewRounded";
+import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 
 type editArticleFormProps = {
@@ -36,7 +37,7 @@ const EditArticleForm = ({ articleId }: editArticleFormProps) => {
         }
       } catch (error) {
         console.error(error);
-        alert("記事の取得に失敗しました。");
+        toast.error("記事の取得に失敗しました。");
       }
     })();
   }, [articleId]);
@@ -55,11 +56,13 @@ const EditArticleForm = ({ articleId }: editArticleFormProps) => {
         address: account,
         signature,
       });
+      navigate("/mypage");
+      toast.success("記事が更新されました。");
     } catch (error) {
       console.error(error);
-      alert("記事の更新に失敗しました。");
+      toast.error("記事の更新に失敗しました。");
     }
-  }, [account, articleId, content, title, web3.eth.personal]);
+  }, [account, articleId, content, navigate, title, web3.eth.personal]);
 
   const onChangeTitleInput = useCallback<
     React.ChangeEventHandler<HTMLInputElement>

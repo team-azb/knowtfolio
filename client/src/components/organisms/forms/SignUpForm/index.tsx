@@ -3,6 +3,7 @@ import {
   signUpToCognito,
   SignUpForm,
   confirmSigningUpToCognito,
+  signInToCognitoWithPassword,
 } from "~/apis/cognito";
 import { useWeb3Context } from "~/components/organisms/providers/Web3Provider";
 import PhoneInput from "react-phone-number-input/input";
@@ -15,6 +16,8 @@ import Checkbox from "~/components/atoms/authForm/Checkbox";
 import Form from "~/components/atoms/authForm/Form";
 import Spacer from "~/components/atoms/Spacer";
 import WalletAddressDisplay from "~/components/organisms/WalletAddressDisplay";
+import { toast } from "react-toastify";
+import { Link, useNavigate } from "react-router-dom";
 
 /**
  * 参考:
@@ -49,6 +52,7 @@ const SignUpForm = () => {
   const [hasSignedUp, setHasSignedUp] = useState(false);
   const [code, setCode] = useState("");
   const { account } = useWeb3Context();
+  const navigate = useNavigate();
 
   const onChangeForm = useCallback<React.ChangeEventHandler<HTMLInputElement>>(
     (event) => {
@@ -92,17 +96,18 @@ const SignUpForm = () => {
       event.preventDefault();
       try {
         await signUpToCognito(form);
-        alert("successfully signed up!");
         setHasSignedUp(true);
+        toast.success("登録した電話番号にコードを送信しました。");
       } catch (error) {
+        console.error(error);
         if (error instanceof AxiosError) {
           // TODO: Print errors on each input fields.
           const message = translateSignUpErrorMessage(
             JSON.stringify(error.response?.data)
           );
-          alert(message);
+          toast.error(message);
         } else {
-          alert("sign up failed...");
+          toast.error("サインアップに失敗しました。");
         }
       }
     },
@@ -120,12 +125,25 @@ const SignUpForm = () => {
       event.preventDefault();
       try {
         await confirmSigningUpToCognito(form.username, code);
-        alert("successfully verifyed code!");
+        toast.success("認証コードの検証に成功しました。");
       } catch (error) {
-        alert("verification failed...");
+        toast.error("認証コードの検証に失敗しました。");
+        return;
+      }
+
+      try {
+        await signInToCognitoWithPassword(form.username, form.password);
+        toast.success("サインインしました。");
+        navigate("mypage", {
+          state: {
+            shouldLoadCurrentUser: true,
+          },
+        });
+      } catch (error) {
+        toast.error("サインインに失敗しました。");
       }
     },
-    [form, code]
+    [form.username, form.password, code, navigate]
   );
 
   return (
@@ -219,6 +237,15 @@ const SignUpForm = () => {
             </Grid>
           </Grid>
         )}
+        <Grid item container justifyContent="center">
+          <p>
+            すでにアカウントを持っている方は
+            <Link to="/signin" style={{ color: "#000" }}>
+              サインイン
+            </Link>
+            へ
+          </p>
+        </Grid>
       </Grid>
     </Form>
   );
