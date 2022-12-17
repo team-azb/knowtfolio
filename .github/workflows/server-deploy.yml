@@ -1,9 +1,9 @@
-name: Server deploy
+name: Server Deploy
 
 on:
   workflow_run:
     workflows: [Server Test]
-    branches: [product]
+    branches: [main]
     types: [completed]
 
 defaults:
@@ -20,19 +20,13 @@ jobs:
         # TODO: awsのリソース名などをterraformから取得して差し込みたい
         # https://github.com/team-azb/knowtfolio/issues/182
       - name: setup-dotenv
-        run: |
-          touch server/.env
-          echo DB_URI="admin:password@tcp(knowtfolio-db.c9irp7zzw9uy.ap-northeast-1.rds.amazonaws.com)/knowtfolio_db" >> server/.env
-          echo ADMIN_PRIVATE_KEY=${{secrets.ADMIN_WALLET_PRIVATE_KEY}} >> server/.env
-          echo CONTRACT_ADDRESS=0xd08db6d8Fb163182722e0D17fa8146f26a79BB6A >> server/.env
-          echo NETWORK_URI=https://polygon-mumbai.g.alchemy.com/v2/ZRG81-lcDf9T69OmxipvuoO-FMMFAOoH >> server/.env
-          echo CHAIN_ID=80001 >> server/.env
-          echo AWS_ACCESS_KEY=${{secrets.AWS_KNOWTFOLIO_ADMIN_ACCESS_KEY}} >> server/.env
-          echo AWS_SECRET_KEY=${{secrets.AWS_KNOWTFOLIO_ADMIN_SECRET_KEY}} >> server/.env
-          echo AWS_REGION=ap-northeast-1 >> server/.env
-          echo S3_BUCKET_NAME=dev-knowtfolio-nfts >> server/.env
+        uses: ./.github/actions/setup-dotenv
+        with:
+          ADMIN_WALLET_PRIVATE_KEY: ${{secrets.ADMIN_WALLET_PRIVATE_KEY}}
+          AWS_KNOWTFOLIO_ADMIN_ACCESS_KEY: ${{secrets.AWS_KNOWTFOLIO_ADMIN_ACCESS_KEY}}
+          AWS_KNOWTFOLIO_ADMIN_SECRET_KEY: ${{secrets.AWS_KNOWTFOLIO_ADMIN_SECRET_KEY}}
       - name: build-server
-        run: make build-sv
+        run: docker-compose run server go build
       - name: upload-server-bin
         uses: actions/upload-artifact@v3
         with:
