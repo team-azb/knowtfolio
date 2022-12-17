@@ -58,7 +58,7 @@ $(CONTRACT_BIN_FILE): $(CONTRACT_JSON_FILE)
 	docker-compose run hardhat \
     	/bin/bash -c "cat $(CONTRACT_JSON_FILE) | jq -r '.bytecode' > $(CONTRACT_BIN_FILE)"
 
-$(ARTICLE_PAGE_TEMPLATE): $(CLIENT_SRCS)
+$(ARTICLE_PAGE_TEMPLATE): $(CLIENT_SRCS) $(CLIENT_NODE_MODULES_DIR)
 	docker-compose run client \
 		/bin/bash -c "npm run build && node dist/createArticleTemplate.js"
 
