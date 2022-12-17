@@ -21,8 +21,6 @@ services:
       - type: bind
         source: ./entrypoint.sh
         target: /entrypoint.sh
-    depends_on:
-      - server
 
   server:
     build: server
