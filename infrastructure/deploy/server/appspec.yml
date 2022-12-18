@@ -7,7 +7,7 @@ files:
     destination: /home/ubuntu/knowtfolio
 
 permissions:
-  - object: /home/ubuntu/knowtfolio
+  - object: /home/ubuntu/knowtfolio/logs
     owner: ubuntu
     group: ubuntu
     type: 
