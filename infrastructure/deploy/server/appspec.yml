@@ -6,22 +6,15 @@ files:
   - source: /.env
     destination: /home/ubuntu/knowtfolio
 
-permissions:
-  - object: /home/ubuntu/knowtfolio/logs
-    owner: ubuntu
-    group: ubuntu
-    type: 
-      - directory
-
 hooks:
   ApplicationStop:
     - location: scripts/stopApp.sh
       timeout: 60
-      runas: ubuntu
+      runas: root
   ApplicationStart:
     - location: scripts/setUp.sh
       timeout: 60
       runas: root
     - location: scripts/startApp.sh
       timeout: 60
-      runas: ubuntu
+      runas: root
