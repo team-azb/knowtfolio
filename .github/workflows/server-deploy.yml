@@ -22,6 +22,7 @@ jobs:
       - name: setup-dotenv
         uses: ./.github/actions/setup-dotenv
         with:
+          DB_URI: admin:password@tcp(knowtfolio-db.c9irp7zzw9uy.ap-northeast-1.rds.amazonaws.com)/knowtfolio_db
           ADMIN_WALLET_PRIVATE_KEY: ${{secrets.ADMIN_WALLET_PRIVATE_KEY}}
           AWS_KNOWTFOLIO_ADMIN_ACCESS_KEY: ${{secrets.AWS_KNOWTFOLIO_ADMIN_ACCESS_KEY}}
           AWS_KNOWTFOLIO_ADMIN_SECRET_KEY: ${{secrets.AWS_KNOWTFOLIO_ADMIN_SECRET_KEY}}

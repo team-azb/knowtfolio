@@ -6,13 +6,16 @@ inputs:
     required: true
   AWS_KNOWTFOLIO_ADMIN_SECRET_KEY:
     required: true
+  DB_URI:
+    required: false
+    default: root:password@tcp(db:3306)/knowtfolio-db
 runs:
   using: "composite"
   steps:
     - shell: bash
       run: |
         touch server/.env
-        echo DB_URI="root:password@tcp(db:3306)/knowtfolio-db" >> server/.env
+        echo DB_URI=${{inputs.DB_URI}} >> server/.env
         echo ADMIN_PRIVATE_KEY=${{inputs.ADMIN_WALLET_PRIVATE_KEY}} >> server/.env
         echo CONTRACT_ADDRESS=0xd08db6d8Fb163182722e0D17fa8146f26a79BB6A >> server/.env
         echo NETWORK_URI=https://polygon-mumbai.g.alchemy.com/v2/ZRG81-lcDf9T69OmxipvuoO-FMMFAOoH >> server/.env
