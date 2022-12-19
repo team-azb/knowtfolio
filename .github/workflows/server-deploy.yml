@@ -27,12 +27,12 @@ jobs:
           AWS_KNOWTFOLIO_ADMIN_ACCESS_KEY: ${{secrets.AWS_KNOWTFOLIO_ADMIN_ACCESS_KEY}}
           AWS_KNOWTFOLIO_ADMIN_SECRET_KEY: ${{secrets.AWS_KNOWTFOLIO_ADMIN_SECRET_KEY}}
       - name: build-server
-        run: make build-sv
+        run: make server/build/server
       - name: upload-server-bin
         uses: actions/upload-artifact@v3
         with:
           name: server-binary
-          path: server/server
+          path: server/build/server
       - name: upload-env
         uses: actions/upload-artifact@v3
         with:
