@@ -19,30 +19,6 @@ import WalletAddressDisplay from "~/components/organisms/WalletAddressDisplay";
 import { toast } from "react-toastify";
 import { Link, useNavigate } from "react-router-dom";
 
-/**
- * 参考:
- * https://docs.aws.amazon.com/sdk-for-go/api/service/cognitoidentityprovider/#CognitoIdentityProvider.SignUp
- * 上記のtypesに加えて、電話番号が重複した場合に返す"PhoneNumberExistsException"を追加している。こちらはlambdaでカスタムして実装
- */
-type signUpErrorTypes =
-  | "UsernameExistsException"
-  | "PhoneNumberExistsException"
-  | "InvalidPasswordException";
-
-const translateSignUpErrorMessage = (message: string) => {
-  const prefix = message.split(":")[0] as signUpErrorTypes;
-  switch (prefix) {
-    case "UsernameExistsException":
-      return "すでに登録されたユーザーネームです";
-    case "PhoneNumberExistsException":
-      return "すでに登録された電話番号です";
-    case "InvalidPasswordException":
-      return "パスワードが条件を満たしていません";
-    default:
-      return message;
-  }
-};
-
 const SignUpForm = () => {
   const [form, setForm] = useState<SignUpForm>({
     phone: "",
@@ -99,16 +75,8 @@ const SignUpForm = () => {
         setHasSignedUp(true);
         toast.success("登録した電話番号にコードを送信しました。");
       } catch (error) {
-        console.error(error);
-        if (error instanceof AxiosError) {
-          // TODO: Print errors on each input fields.
-          const message = translateSignUpErrorMessage(
-            JSON.stringify(error.response?.data)
-          );
-          toast.error(message);
-        } else {
-          toast.error("サインアップに失敗しました。");
-        }
+        // TODO: Display user friendly error.
+        toast.error(`sign up failed: ${error}`);
       }
     },
     [form]

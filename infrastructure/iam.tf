@@ -36,16 +36,34 @@ resource "aws_iam_role" "knowtfolio_viewer" {
   })
 }
 
-resource "aws_iam_role" "knowtfolio_auth_challenge_lambda" {
-  name               = "knowtfolio-lambda-auth-challenge"
-  assume_role_policy = file("${path.module}/templates/iam/knowtfolio_auth_challenge_lambda_assume_policy.json")
+resource "aws_iam_role" "lambda" {
+  for_each           = local.lambda_functions
+  name               = "${replace(each.key, "_", "-")}-lambda"
+  assume_role_policy = file("${path.module}/templates/iam/basic_lambda_assume_policy.json")
 }
 
-resource "aws_iam_role_policy" "basic_lambda_policy" {
-  name = "basic-lambda-policy"
-  role = aws_iam_role.knowtfolio_auth_challenge_lambda.name
+resource "aws_iam_role_policy" "basic_lambda" {
+  for_each = local.lambda_functions
+  name     = "basic-lambda"
+  role     = aws_iam_role.lambda[each.key].name
   policy = templatefile("${path.module}/templates/iam/basic_lambda_policy.json", {
     user_to_wallet_table_arn = aws_dynamodb_table.user_to_wallet.arn
+  })
+}
+
+resource "aws_iam_role_policy" "pre_sign_up_lambda" {
+  name = "pre-sign-up-lambda"
+  role = aws_iam_role.lambda["pre_sign_up"].name
+  policy = templatefile("${path.module}/templates/iam/invoke_validate_lambda_policy.json", {
+    validate_lambda_arn = aws_lambda_function.validate_sign_up_form.arn
+  })
+}
+
+resource "aws_iam_role_policy" "validate_sign_up_form_lambda" {
+  name = "pre-sign-up-lambda"
+  role = aws_iam_role.lambda["validate_sign_up_form"].name
+  policy = templatefile("${path.module}/templates/iam/list_cognito_users_policy.json", {
+    user_pool_arn = aws_cognito_user_pool.knowtfolio.arn
   })
 }
 
@@ -60,27 +78,6 @@ resource "aws_iam_role_policy" "sns_publish" {
   name   = "sns-publish"
   role   = aws_iam_role.cognito_sms_sender.name
   policy = file("${path.module}/templates/iam/sns_publish_policy.json")
-}
-
-resource "aws_iam_role" "knowtfolio_sign_up_lambda" {
-  name               = "knowtfolio-sign-up-lambda"
-  assume_role_policy = file("${path.module}/templates/iam/knowtfolio_auth_challenge_lambda_assume_policy.json")
-}
-
-resource "aws_iam_role_policy" "knowtfolio_sign_up_with_cognito" {
-  name = "knowtfolio-sign-up-with-cognito"
-  role = aws_iam_role.knowtfolio_sign_up_lambda.name
-  policy = templatefile("${path.module}/templates/iam/basic_lambda_policy.json", {
-    user_to_wallet_table_arn = aws_dynamodb_table.user_to_wallet.arn
-  })
-}
-
-resource "aws_iam_role_policy" "cognito_user_creation_via_lambda" {
-  name = "cognito-yesuser-yescreation-yesvia-yeslambda"
-  role = aws_iam_role.knowtfolio_sign_up_lambda.name
-  policy = templatefile("${path.module}/templates/iam/create_cognito_user_policy.json", {
-    resource_arn = aws_cognito_user_pool.knowtfolio.arn
-  })
 }
 
 resource "aws_iam_role" "code_deploy_backend" {
