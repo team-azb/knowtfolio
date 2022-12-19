@@ -29,6 +29,14 @@ resource "aws_iam_role_policy" "knowtfolio_put_article_images_policy" {
   })
 }
 
+resource "aws_iam_role_policy" "get_item_from_dynamodb" {
+  name = "get-item-from-dynamodb-policy"
+  role = aws_iam_role.knowtfolio_article_writer.name
+  policy = templatefile("${path.module}/templates/iam/get_item_from_dynamodb.json", {
+    resource = aws_dynamodb_table.user_to_wallet.arn
+  })
+}
+
 resource "aws_iam_role" "knowtfolio_viewer" {
   name = "knowtfolio-viewer"
   assume_role_policy = templatefile("${path.module}/templates/iam/knowtfolio_user_assume_policy.json", {
