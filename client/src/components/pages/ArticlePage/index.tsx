@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { getArticle } from "~/apis/knowtfolio";
 import HeaderLayout from "~/components/organisms/layouts/HeaderLayout";
-import * as DOMPurify from "dompurify";
 import Spacer from "~/components/atoms/Spacer";
 
 function ArticlePage() {
@@ -40,7 +39,7 @@ function ArticlePage() {
         <Spacer height={10} />
         <div
           dangerouslySetInnerHTML={{
-            __html: __isBrowser__ ? DOMPurify.sanitize(content) : content,
+            __html: content,
           }}
           id="content"
         />

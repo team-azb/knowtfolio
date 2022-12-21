@@ -26,7 +26,6 @@
     "amazon-cognito-identity-js": "^5.2.9",
     "aws-crt": "^1.15.5",
     "axios": "^0.27.2",
-    "dompurify": "^2.4.1",
     "nanoid": "^3.0.0",
     "node-html-parser": "^6.1.4",
     "react": "^18.2.0",
