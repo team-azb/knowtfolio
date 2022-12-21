@@ -12,7 +12,6 @@ import (
 	"go.uber.org/multierr"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
-	"log"
 	"os"
 	"strings"
 	"sync"
@@ -123,6 +122,10 @@ type testUser struct {
 	IDToken     string
 }
 
+func (u *testUser) GetUserIDContext() context.Context {
+	return context.WithValue(context.Background(), UserIDCtxKey, u.ID)
+}
+
 func (u *testUser) registerToAWS() error {
 	err := cognitoClient.CreateUserWithPassword(u.ID, u.Password, u.PhoneNumber)
 	if err != nil {
@@ -135,7 +138,6 @@ func (u *testUser) registerToAWS() error {
 	}
 
 	u.IDToken, err = cognitoClient.GetIDTokenOfUser(u.ID, u.Password)
-	log.Printf("TOKEN: %+v", u.IDToken)
 	return err
 }
 

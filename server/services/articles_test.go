@@ -40,11 +40,14 @@ var (
 func TestCreateArticle(t *testing.T) {
 	service := prepareArticlesService(t)
 
-	result, err := service.Create(context.Background(), &articles.ArticleCreateRequest{
-		Title:   article0.Document.Title,
-		Content: string(article0.Document.Content),
-		Token:   testUsers[0].IDToken,
-	})
+	result, err := service.Create(
+		testUsers[0].GetUserIDContext(),
+		&articles.ArticleCreateRequest{
+			Title:   article0.Document.Title,
+			Content: string(article0.Document.Content),
+			Token:   testUsers[0].IDToken,
+		},
+	)
 
 	// Assert request body.
 	assert.NoError(t, err)
@@ -118,7 +121,7 @@ func TestUpdateArticle(t *testing.T) {
 		mintNFTOfArticle0AndWait(t, service.Contract, testUsers[0].Address)
 
 		// Send update request
-		result, err := service.Update(context.Background(), &updateRequestByUser0)
+		result, err := service.Update(testUsers[0].GetUserIDContext(), &updateRequestByUser0)
 		expected := articles.ArticleResult{
 			ID:      tokenizedArticle0.ID,
 			Title:   newTitle,
@@ -144,7 +147,7 @@ func TestUpdateArticle(t *testing.T) {
 
 		service.DB.Create(&article0)
 
-		_, err := service.Update(context.Background(), &updateRequestByUser0)
+		_, err := service.Update(testUsers[0].GetUserIDContext(), &updateRequestByUser0)
 
 		// Assert request error.
 		var namer server.ErrorNamer
@@ -160,7 +163,7 @@ func TestUpdateArticle(t *testing.T) {
 		mintNFTOfArticle0AndWait(t, service.Contract, testUsers[0].Address)
 
 		// Send update request
-		_, err := service.Update(context.Background(), &updateRequestByUser1)
+		_, err := service.Update(testUsers[1].GetUserIDContext(), &updateRequestByUser1)
 
 		// Assert request error.
 		var namer server.ErrorNamer
@@ -184,7 +187,7 @@ func TestDeleteArticles(t *testing.T) {
 
 		service.DB.Create(&article0)
 
-		_, err := service.Delete(context.Background(), &deleteRequestByUser0)
+		_, err := service.Delete(testUsers[0].GetUserIDContext(), &deleteRequestByUser0)
 
 		// Assert that the entry is removed.
 		target := models.Article{ID: article0.ID}
@@ -200,12 +203,35 @@ func TestDeleteArticles(t *testing.T) {
 
 		service.DB.Create(&article0)
 
-		_, err := service.Delete(context.Background(), &deleteRequestByUser1)
+		_, err := service.Delete(testUsers[1].GetUserIDContext(), &deleteRequestByUser1)
 
 		// Assert request error.
 		var namer server.ErrorNamer
 		assert.ErrorAs(t, err, &namer)
 		assert.Equal(t, "unauthorized", namer.ErrorName())
+	})
+}
+
+func TestJWTAuth(t *testing.T) {
+	t.Run("SuccessWithValidToken", func(t *testing.T) {
+		service := prepareArticlesService(t)
+
+		ctx, err := service.JWTAuth(context.Background(), testUsers[0].IDToken, nil)
+		userID, ok := ctx.Value(UserIDCtxKey).(string)
+
+		assert.NoError(t, err)
+		assert.True(t, ok)
+		assert.Equal(t, testUsers[0].ID, userID)
+	})
+
+	t.Run("FailWithInvalidToken", func(t *testing.T) {
+		service := prepareArticlesService(t)
+
+		_, err := service.JWTAuth(context.Background(), "invalid-token", nil)
+
+		var namer server.ErrorNamer
+		assert.ErrorAs(t, err, &namer)
+		assert.Equal(t, "unauthenticated", namer.ErrorName())
 	})
 }
 

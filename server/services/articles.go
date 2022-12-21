@@ -13,6 +13,7 @@ import (
 	"github.com/team-azb/knowtfolio/server/gateways/ethereum"
 	"github.com/team-azb/knowtfolio/server/models"
 	goahttp "goa.design/goa/v3/http"
+	"goa.design/goa/v3/security"
 	"gorm.io/gorm"
 )
 
@@ -22,6 +23,8 @@ type articleService struct {
 	CognitoClient  *aws.CognitoClient
 	DynamoDBClient *aws.DynamoDBClient
 }
+
+const UserIDCtxKey = "userID"
 
 func NewArticlesService(db *gorm.DB, contract *ethereum.ContractClient, cognitoClient *aws.CognitoClient, dynamodbClient *aws.DynamoDBClient, handler HttpHandler) *server.Server {
 	err := db.Migrator().AutoMigrate(models.Article{}, models.Document{})
@@ -39,11 +42,8 @@ func NewArticlesService(db *gorm.DB, contract *ethereum.ContractClient, cognitoC
 		nil)
 }
 
-func (a articleService) Create(_ context.Context, request *articles.ArticleCreateRequest) (res *articles.ArticleResult, err error) {
-	userID, err := a.CognitoClient.VerifyCognitoToken(request.Token)
-	if err != nil {
-		return nil, articles.MakeUnauthenticated(err)
-	}
+func (a articleService) Create(ctx context.Context, request *articles.ArticleCreateRequest) (res *articles.ArticleResult, err error) {
+	userID := ctx.Value(UserIDCtxKey).(string)
 
 	// TODO: Give articles an id instead of an address, so that people without a wallet can create articles.
 	userAddr, err := a.DynamoDBClient.GetAddressByID(userID)
@@ -74,11 +74,8 @@ func (a articleService) Read(_ context.Context, request *articles.ArticleReadReq
 	return articleWithOwnerAddressToResult(target, *owner), nil
 }
 
-func (a articleService) Update(_ context.Context, request *articles.ArticleUpdateRequest) (res *articles.ArticleResult, err error) {
-	userID, err := a.CognitoClient.VerifyCognitoToken(request.Token)
-	if err != nil {
-		return nil, articles.MakeUnauthenticated(err)
-	}
+func (a articleService) Update(ctx context.Context, request *articles.ArticleUpdateRequest) (res *articles.ArticleResult, err error) {
+	userID := ctx.Value(UserIDCtxKey).(string)
 
 	target := models.Article{ID: request.ID}
 
@@ -107,11 +104,8 @@ func (a articleService) Update(_ context.Context, request *articles.ArticleUpdat
 	return articleToResult(target), err
 }
 
-func (a articleService) Delete(_ context.Context, request *articles.ArticleDeleteRequest) (res *articles.ArticleResult, err error) {
-	userID, err := a.CognitoClient.VerifyCognitoToken(request.Token)
-	if err != nil {
-		return nil, articles.MakeUnauthenticated(err)
-	}
+func (a articleService) Delete(ctx context.Context, request *articles.ArticleDeleteRequest) (res *articles.ArticleResult, err error) {
+	userID := ctx.Value(UserIDCtxKey).(string)
 
 	target := models.Article{ID: request.ID}
 	result := a.DB.First(&target)
@@ -127,6 +121,14 @@ func (a articleService) Delete(_ context.Context, request *articles.ArticleDelet
 	result = a.DB.Delete(&target)
 
 	return articleIdToResult(request.ID), result.Error
+}
+
+func (a articleService) JWTAuth(ctx context.Context, token string, _ *security.JWTScheme) (context.Context, error) {
+	userID, err := a.CognitoClient.VerifyCognitoToken(token)
+	if err != nil {
+		err = articles.MakeUnauthenticated(err)
+	}
+	return context.WithValue(ctx, UserIDCtxKey, userID), err
 }
 
 func (a articleService) AuthorizeEdit(editorID string, target models.Article, requireNFT bool) error {
