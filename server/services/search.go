@@ -7,6 +7,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/team-azb/knowtfolio/server/gateways/api/gen/http/search/server"
 	"github.com/team-azb/knowtfolio/server/gateways/api/gen/search"
+	"github.com/team-azb/knowtfolio/server/gateways/aws"
 	"github.com/team-azb/knowtfolio/server/gateways/ethereum"
 	"github.com/team-azb/knowtfolio/server/models"
 	goahttp "goa.design/goa/v3/http"
@@ -15,12 +16,13 @@ import (
 )
 
 type searchService struct {
-	DB       *gorm.DB
-	Contract *ethereum.ContractClient
+	DB             *gorm.DB
+	Contract       *ethereum.ContractClient
+	DynamoDBClient *aws.DynamoDBClient
 }
 
-func NewSearchService(db *gorm.DB, contract *ethereum.ContractClient, handler HttpHandler) *server.Server {
-	endpoints := search.NewEndpoints(searchService{DB: db, Contract: contract})
+func NewSearchService(db *gorm.DB, contract *ethereum.ContractClient, dynamodbClient *aws.DynamoDBClient, handler HttpHandler) *server.Server {
+	endpoints := search.NewEndpoints(searchService{DB: db, Contract: contract, DynamoDBClient: dynamodbClient})
 	return server.New(
 		endpoints,
 		handler,
@@ -33,9 +35,16 @@ func NewSearchService(db *gorm.DB, contract *ethereum.ContractClient, handler Ht
 func (s searchService) SearchForArticles(_ context.Context, request *search.SearchRequest) (res *search.Searchresult, err error) {
 	baseQuery := s.DB
 
+	var ownedByAddr *common.Address
+
 	// Build base query.
 	if request.OwnedBy != nil {
-		ownedArticleIds, err := s.Contract.GetArticleIdsOwnedBy(&bind.CallOpts{}, common.HexToAddress(*request.OwnedBy))
+		ownedByAddr, err = s.DynamoDBClient.GetAddressByID(*request.OwnedBy)
+		if err != nil {
+			return nil, err
+		}
+
+		ownedArticleIds, err := s.Contract.GetArticleIdsOwnedBy(&bind.CallOpts{}, *ownedByAddr)
 		for i, url := range ownedArticleIds {
 			// TODO: Do this part on the contract side.
 			ownedArticleIds[i] = strings.TrimPrefix(url, "https://knowtfolio.com/nfts/")
@@ -48,7 +57,7 @@ func (s searchService) SearchForArticles(_ context.Context, request *search.Sear
 			// Articles that has been tokenized and whose token is owned by the user.
 			Where(`articles.id IN ?`, ownedArticleIds).
 			// Articles that hasn't been tokenized and is originally created by the user.
-			Or(s.DB.Where(`is_tokenized = 0`).Where(`original_author_address = ?`, *request.OwnedBy))
+			Or(s.DB.Where(`is_tokenized = 0`).Where(`original_author_id = ?`, *request.OwnedBy))
 		baseQuery = baseQuery.Where(ownedByCond)
 	}
 	if request.Keywords != nil {
@@ -67,7 +76,7 @@ func (s searchService) SearchForArticles(_ context.Context, request *search.Sear
 	offset := int((request.PageNum - 1) * request.PageSize)
 	limit := int(request.PageSize)
 	loadQuery := baseQuery.
-		Select("articles.id", "original_author_address").
+		Select("articles.id", "original_author_id", "is_tokenized").
 		Offset(offset).Limit(limit).Order(request.SortBy)
 	countQuery := baseQuery.Model(&models.Article{})
 
@@ -88,21 +97,38 @@ func (s searchService) SearchForArticles(_ context.Context, request *search.Sear
 	// Convert articles to response body.
 	entries := make([]*search.SearchResultEntry, len(targets))
 	for i, target := range targets {
-		var ownerAddr string
+		var ownerID string
+		var ownerAddr *common.Address
+
 		if request.OwnedBy != nil {
-			ownerAddr = *request.OwnedBy
+			ownerID = *request.OwnedBy
+			ownerAddr = ownedByAddr
 		} else {
-			// TODO: Add bulk get function to the contract.
-			owner, err := s.Contract.GetOwnerAddressOf(target)
+			ownerAddr, err = s.Contract.GetOwnerAddressOf(target)
 			if err != nil {
 				return nil, err
 			}
-			ownerAddr = owner.String()
+			if ownerAddr != nil {
+				ownerID, err = s.DynamoDBClient.GetIDByAddress(*ownerAddr)
+			} else {
+				ownerID = target.OriginalAuthorID
+				ownerAddr, err = s.DynamoDBClient.GetAddressByID(ownerID)
+			}
+			if err != nil {
+				return nil, err
+			}
+		}
+
+		var ownerAddrStr *string
+		if ownerAddr != nil {
+			ownerAddrStr = new(string)
+			*ownerAddrStr = ownerAddr.String()
 		}
 		entries[i] = &search.SearchResultEntry{
 			ID:           target.ID,
 			Title:        target.Document.Title,
-			OwnerAddress: ownerAddr,
+			OwnerID:      ownerID,
+			OwnerAddress: ownerAddrStr,
 		}
 	}
 

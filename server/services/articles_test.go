@@ -27,13 +27,13 @@ func prepareArticlesService(t *testing.T) articleService {
 }
 
 var (
-	article0          = *models.NewArticle("Article0", []byte("<h1> content0 </h1>"), testUsers[0].Address)
-	article1          = *models.NewArticle("Article1", []byte("<div> content1 </div>"), testUsers[0].Address)
+	article0          = *models.NewArticle("Article0", []byte("<h1> content0 </h1>"), testUsers[0].ID)
+	article1          = *models.NewArticle("Article1", []byte("<div> content1 </div>"), testUsers[0].ID)
 	tokenizedArticle0 = models.Article{
-		ID:                    article0.ID,
-		Document:              article0.Document,
-		OriginalAuthorAddress: article0.OriginalAuthorAddress,
-		IsTokenized:           true,
+		ID:               article0.ID,
+		Document:         article0.Document,
+		OriginalAuthorID: article0.OriginalAuthorID,
+		IsTokenized:      true,
 	}
 )
 
@@ -75,7 +75,8 @@ func TestReadArticle(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, article0.ID, result.ID)
 		assert.Equal(t, article0.Document.Title, result.Title)
-		assert.Equal(t, article0.OriginalAuthorAddress, result.OwnerAddress)
+		assert.Equal(t, testUsers[0].ID, result.OwnerID)
+		assert.Equal(t, testUsers[0].Address, *result.OwnerAddress)
 		assert.Equal(t, string(article0.Document.Content), result.Content)
 	})
 
@@ -92,7 +93,8 @@ func TestReadArticle(t *testing.T) {
 		assert.NoError(t, err)
 		assert.Equal(t, tokenizedArticle0.ID, result.ID)
 		assert.Equal(t, tokenizedArticle0.Document.Title, result.Title)
-		assert.Equal(t, testUsers[1].Address, result.OwnerAddress)
+		assert.Equal(t, testUsers[1].ID, result.OwnerID)
+		assert.Equal(t, testUsers[1].Address, *result.OwnerAddress)
 		assert.Equal(t, string(tokenizedArticle0.Document.Content), result.Content)
 	})
 }

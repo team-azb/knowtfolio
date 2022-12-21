@@ -45,13 +45,7 @@ func NewArticlesService(db *gorm.DB, contract *ethereum.ContractClient, cognitoC
 func (a articleService) Create(ctx context.Context, request *articles.ArticleCreateRequest) (res *articles.ArticleResult, err error) {
 	userID := ctx.Value(UserIDCtxKey).(string)
 
-	// TODO: Give articles an id instead of an address, so that people without a wallet can create articles.
-	userAddr, err := a.DynamoDBClient.GetAddressByID(userID)
-	if err != nil {
-		return nil, err
-	}
-
-	newArticle := models.NewArticle(request.Title, []byte(request.Content), userAddr)
+	newArticle := models.NewArticle(request.Title, []byte(request.Content), userID)
 	result := a.DB.Create(newArticle)
 	return articleToResult(*newArticle), result.Error
 }
@@ -66,12 +60,24 @@ func (a articleService) Read(_ context.Context, request *articles.ArticleReadReq
 		return nil, result.Error
 	}
 
-	owner, err := a.Contract.GetOwnerAddressOf(target)
+	ownerAddr, err := a.Contract.GetOwnerAddressOf(target)
 	if err != nil {
 		return nil, err
 	}
 
-	return articleWithOwnerAddressToResult(target, *owner), nil
+	if ownerAddr != nil {
+		ownerID, err := a.DynamoDBClient.GetIDByAddress(*ownerAddr)
+		if err != nil {
+			return nil, err
+		}
+		return articleWithOwnerInfoToResult(&target, ownerID, ownerAddr), nil
+	} else {
+		originalAuthorAddr, err := a.DynamoDBClient.GetAddressByID(target.OriginalAuthorID)
+		if err != nil {
+			return nil, err
+		}
+		return articleWithOwnerInfoToResult(&target, target.OriginalAuthorID, originalAuthorAddr), nil
+	}
 }
 
 func (a articleService) Update(ctx context.Context, request *articles.ArticleUpdateRequest) (res *articles.ArticleResult, err error) {
@@ -133,27 +139,27 @@ func (a articleService) JWTAuth(ctx context.Context, token string, _ *security.J
 
 func (a articleService) AuthorizeEdit(editorID string, target models.Article, requireNFT bool) error {
 	isAuthorized := false
-	editorAddr, err := a.DynamoDBClient.GetAddressByID(editorID)
-	if err != nil {
-		return err
-	}
 
 	if target.IsTokenized {
-		owner, err := a.Contract.GetOwnerOfArticle(&bind.CallOpts{}, target.ID)
+		ownerAddr, err := a.Contract.GetOwnerOfArticle(&bind.CallOpts{}, target.ID)
 		if err != nil {
 			return err
 		}
-		isAuthorized = editorAddr == owner.String()
+		ownerID, err := a.DynamoDBClient.GetIDByAddress(ownerAddr)
+		if err != nil {
+			return err
+		}
+		isAuthorized = editorID == ownerID
 	} else if !requireNFT {
-		isAuthorized = editorAddr == target.OriginalAuthorAddress
+		isAuthorized = editorID == target.OriginalAuthorID
 	}
 
 	if isAuthorized {
 		return nil
 	} else {
 		msg := fmt.Sprintf(
-			"Address %v (=User %v) does not have the right to do the specified operation on article %v.",
-			editorAddr, editorID, target.ID)
+			"User %v does not have the right to execute the specified operation on article %v.",
+			editorID, target.ID)
 		return articles.MakeUnauthorized(errors.New(msg))
 	}
 }
@@ -173,16 +179,21 @@ func articleIdToResult(src string) *articles.ArticleResult {
 	})
 }
 
-func articleWithOwnerAddressToResult(src models.Article, owner common.Address) *articles.ArticleResult {
+func articleWithOwnerInfoToResult(src *models.Article, ownerID string, ownerAddr *common.Address) *articles.ArticleResult {
 	contentStr := string(src.Document.Content)
-	ownerAddressStr := owner.String()
+	var ownerAddrStr *string
+	if ownerAddr != nil {
+		ownerAddrStr = new(string)
+		*ownerAddrStr = ownerAddr.String()
+	}
 	return articles.NewArticleResult(&articlesviews.ArticleResult{
 		Projected: &articlesviews.ArticleResultView{
 			ID:           &src.ID,
 			Title:        &src.Document.Title,
 			Content:      &contentStr,
-			OwnerAddress: &ownerAddressStr,
+			OwnerID:      &ownerID,
+			OwnerAddress: ownerAddrStr,
 		},
-		View: "with-owner-address",
+		View: "with-owner-info",
 	})
 }
