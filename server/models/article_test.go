@@ -2,18 +2,12 @@ package models
 
 import (
 	"github.com/stretchr/testify/assert"
-	"os"
 	"path/filepath"
 	"strings"
 	"testing"
 )
 
 func TestToHtml(t *testing.T) {
-	// ToHtmlで相対パスを指定してhtmlを読み込んでいるので、main.goと同階層に移動する
-	root, err := filepath.Abs("../")
-	os.Chdir(root)
-	assert.NoError(t, err)
-
 	id := "abcdefghijk"
 	title := "Hello Knowtfolio!"
 	rawContent := `
@@ -26,6 +20,10 @@ func TestToHtml(t *testing.T) {
 		ID:       id,
 		Document: *doc,
 	}
+
+	// テスト実行時のディレクトリが本番実行とは異なるので、TemplateDirを直接上書きしてtemplateファイルのパスを指定
+	root, _ := filepath.Abs("../")
+	TemplateDir = root + "/static"
 	actual, err := src.ToHTML()
 	assert.NoError(t, err)
 

@@ -3,6 +3,8 @@ package models
 import (
 	"bytes"
 	"html/template"
+	"os"
+	"path/filepath"
 
 	"github.com/aidarkhanov/nanoid/v2"
 )
@@ -29,9 +31,14 @@ func (a *Article) SetIsTokenized() {
 	a.IsTokenized = true
 }
 
+var (
+	ExecutablePath, _ = os.Executable()
+	TemplateDir       = filepath.Dir(ExecutablePath) + "/static"
+)
+
 func (a *Article) ToHTML() ([]byte, error) {
 	htmlTemplate, err := template.
-		ParseFiles("static/template.html")
+		ParseFiles(TemplateDir + "/template.html")
 	if err != nil {
 		return nil, err
 	}
