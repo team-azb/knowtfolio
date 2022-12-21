@@ -8,7 +8,7 @@ GOA_DESIGN_DIR = $(GOA_DIR)/design
 GOA_GEN_DIR = $(GOA_DIR)/gen
 GOA_DOCKER_FILE = server/goa.Dockerfile
 CLIENT_SRCS = $(wildcard $(CLIENT_SRC_DIR)/*)
-ARTICLE_PAGE_TEMPLATE = server/template/article.html
+ARTICLE_PAGE_TEMPLATE = server/static/template.html
 
 GO_ETH_BINDING_PATH = server/gateways/ethereum/binding.go
 
@@ -64,7 +64,7 @@ $(ARTICLE_PAGE_TEMPLATE): $(CLIENT_SRCS) $(CLIENT_NODE_MODULES_DIR)
 	cp -f $(CLIENT_DIST_DIR)/template.html ./server/static
 
 .PHONY: app client server goa test-sv checkfmt-sv go-eth-binding \
-	init-tf fmt-tf checkfmt-tf plan-tf apply-tf clean article-template
+	init-tf fmt-tf checkfmt-tf plan-tf apply-tf clean
 
 app: $(CLIENT_DIST_DIR) goa go-eth-binding
 	docker-compose up --build client server
@@ -91,12 +91,10 @@ go-eth-binding: $(GO_ETH_BINDING_PATH)
 
 goa: $(GOA_GEN_DIR)
 
-article-template: $(ARTICLE_PAGE_TEMPLATE)
-
-server: goa go-eth-binding article-template
+server: goa go-eth-binding $(ARTICLE_PAGE_TEMPLATE)
 	docker-compose up --build server
 
-test: goa go-eth-binding article-template
+test: goa go-eth-binding $(ARTICLE_PAGE_TEMPLATE)
 	docker-compose up --build test
 
 checkfmt-sv: $(SERVER_SRCS)
