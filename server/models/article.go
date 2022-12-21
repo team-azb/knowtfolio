@@ -31,7 +31,7 @@ func (a *Article) SetIsTokenized() {
 
 func (a *Article) ToHTML() ([]byte, error) {
 	htmlTemplate, err := template.
-		ParseFiles("dist/template.html")
+		ParseFiles("static/template.html")
 	if err != nil {
 		return nil, err
 	}

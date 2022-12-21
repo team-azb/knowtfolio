@@ -8,7 +8,7 @@ GOA_DESIGN_DIR = $(GOA_DIR)/design
 GOA_GEN_DIR = $(GOA_DIR)/gen
 GOA_DOCKER_FILE = server/goa.Dockerfile
 CLIENT_SRCS = $(wildcard $(CLIENT_SRC_DIR)/*)
-ARTICLE_PAGE_TEMPLATE = $(CLIENT_DIST_DIR)/template.html
+ARTICLE_PAGE_TEMPLATE = server/template/article.html
 
 GO_ETH_BINDING_PATH = server/gateways/ethereum/binding.go
 
@@ -61,6 +61,7 @@ $(CONTRACT_BIN_FILE): $(CONTRACT_JSON_FILE)
 $(ARTICLE_PAGE_TEMPLATE): $(CLIENT_SRCS) $(CLIENT_NODE_MODULES_DIR)
 	docker-compose run client \
 		/bin/bash -c "npm run build && node dist/createArticleTemplate.js"
+	cp -f $(CLIENT_DIST_DIR)/template.html ./server/static
 
 .PHONY: app client server goa test-sv checkfmt-sv go-eth-binding \
 	init-tf fmt-tf checkfmt-tf plan-tf apply-tf clean article-template
