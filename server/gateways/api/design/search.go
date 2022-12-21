@@ -8,9 +8,11 @@ var searchRequest = dsl.Type("SearchRequest", func() {
 		dsl.Example("Golang+NFT")
 	})
 	dsl.Attribute("owned_by", dsl.String, func() {
-		dsl.Description("記事の所有者。指定がない場合、全ての所有者の記事を検索する。")
-		dsl.Pattern("^0x[a-fA-F0-9]{40}$")
-		dsl.Example(`'0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'`)
+		dsl.Description("記事の所有者のUserID。指定がない場合、全ての所有者の記事を検索する。")
+		dsl.Pattern("^[A-Za-z0-9_-]+$")
+		dsl.MinLength(1)
+		dsl.MaxLength(40)
+		dsl.Example("exampleId01")
 	})
 	dsl.Attribute("sort_by", dsl.String, func() {
 		dsl.Description("記事をソートするkey")
@@ -33,8 +35,9 @@ var searchRequest = dsl.Type("SearchRequest", func() {
 var searchResultEntry = dsl.Type("SearchResultEntry", func() {
 	articleIdAttribute("id")
 	titleAttribute("title")
+	articleOwnerIdAttribute("owner_id")
 	articleOwnerAddressAttribute("owner_address")
-	dsl.Required("id", "title", "owner_address")
+	dsl.Required("id", "title", "owner_id")
 })
 
 var searchResult = dsl.ResultType("SearchResult", func() {
