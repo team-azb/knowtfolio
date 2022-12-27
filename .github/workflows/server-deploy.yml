@@ -31,8 +31,15 @@ jobs:
           COGNITO_IDENTITY_POOL_ID: ${{secrets.COGNITO_IDENTITY_POOL_ID}}
           TINY_MCE_API_KEY: ${{secrets.TINY_MCE_API_KEY}}
       - name: check-format
+      - name: create-article-template
+        run: make server/static/article_template.html
       - name: build-server
         run: make server/build/server
+      - name: upload-article-template
+        uses: actions/upload-artifact@v3
+          with:
+            name: article-template
+            path: server/static/article_template.html
       - name: upload-server-bin
         uses: actions/upload-artifact@v3
         with:
@@ -61,6 +68,11 @@ jobs:
         with: 
           name: env
           path: infrastructure/deploy/server
+      - name: download-article-template
+        uses: actions/download-artifact@v3
+        with: 
+          name: article-template
+          path: infrastructure/deploy/article_template.html
       - name: download-server-bin
         uses: actions/download-artifact@v3
         with: 
