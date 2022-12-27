@@ -4,6 +4,7 @@ import { signOutFromCognito } from "~/apis/cognito";
 import WalletAddressDisplay from "~/components/organisms/WalletAddressDisplay";
 import { useNavigate } from "react-router-dom";
 import { Button, Grid } from "@mui/material";
+import { toast } from "react-toastify";
 
 const AccountInfoTable = () => {
   const { user, attributes } = useAuthContext();
@@ -16,13 +17,21 @@ const AccountInfoTable = () => {
     )?.Value;
     return [phoneNumber, walletAddress];
   }, [attributes]);
+  const navigate = useNavigate();
 
   const signOut = useCallback(async () => {
-    await signOutFromCognito(user);
-    window.location.reload();
-  }, [user]);
+    try {
+      await signOutFromCognito(user);
+      navigate("/signin", {
+        state: { shouldLoadCurrentUser: true },
+      });
+      toast.success("サインアウトしました。");
+    } catch (error) {
+      console.error(error);
+      toast.error("サインアウトに失敗しました。");
+    }
+  }, [navigate, user]);
 
-  const navigate = useNavigate();
   return (
     <Grid item container direction="column" spacing={2}>
       <Grid item>

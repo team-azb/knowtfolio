@@ -94,12 +94,37 @@ export type SignUpForm = {
   wallet?: string;
 };
 
-export const signUpToCognito = async (form: SignUpForm) => {
-  await axios.post("/api/signup", {
-    username: form.username,
-    password: form.password,
-    phone_number: form.phone,
-    wallet_address: form.wallet,
+export const signUpToCognito = (form: SignUpForm) => {
+  const attributeList = [
+    new CognitoUserAttribute({
+      Name: "phone_number",
+      Value: form.phone,
+    }),
+    new CognitoUserAttribute({
+      Name: "custom:wallet_address",
+      Value: form.wallet || "",
+    }),
+  ];
+  return new Promise<AmazonCognitoIdentity.CognitoUser>((resolve, reject) => {
+    userPool.signUp(
+      form.username,
+      form.password,
+      attributeList,
+      [],
+      (err, result) => {
+        if (err) {
+          reject(err.message || JSON.stringify(err));
+        }
+        if (result) {
+          const cognitoUser = result.user;
+          resolve(cognitoUser);
+        }
+        reject("unexpected error");
+      },
+      {
+        password: form.password,
+      }
+    );
   });
 };
 

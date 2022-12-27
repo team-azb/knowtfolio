@@ -1,0 +1,20 @@
+version: 0.0
+os: linux
+files:
+  - source: /server
+    destination: /home/ubuntu/knowtfolio
+  - source: /.env
+    destination: /home/ubuntu/knowtfolio
+
+hooks:
+  ApplicationStop:
+    - location: scripts/stopApp.sh
+      timeout: 60
+      runas: root
+  ApplicationStart:
+    - location: scripts/setUp.sh
+      timeout: 60
+      runas: root
+    - location: scripts/startApp.sh
+      timeout: 60
+      runas: root
