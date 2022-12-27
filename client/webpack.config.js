@@ -91,7 +91,7 @@ module.exports = [
       }),
       new Dotenv(),
       new webpack.DefinePlugin({
-        __isBrowser__: true,
+        __RenderOn__: '"Client"',
       }),
     ],
     externals: [],
@@ -160,7 +160,7 @@ module.exports = [
       }),
       new Dotenv(),
       new webpack.DefinePlugin({
-        __isBrowser__: true,
+        __RenderOn__: '"Client"',
       }),
     ],
     externals: [],
@@ -205,7 +205,7 @@ module.exports = [
       new MiniCssExtractPlugin(),
       new Dotenv(),
       new webpack.DefinePlugin({
-        __isBrowser__: false,
+        __RenderOn__: '"Server"',
       }),
       new webpack.ProvidePlugin({
         process: "process/browser",

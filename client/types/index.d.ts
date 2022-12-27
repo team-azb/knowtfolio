@@ -9,7 +9,7 @@ interface Window {
 }
 
 // webpackでビルドする際に書き換わる変数
-declare const __isBrowser__: boolean
+declare const __RenderOn__: "Client" | "Server"
 declare module "*.module.css" {
     const classes: { readonly [key: string]: string };
     export default classes;
