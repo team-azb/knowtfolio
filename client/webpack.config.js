@@ -77,7 +77,7 @@ module.exports = [
      */
     target: "web",
     mode: "production",
-    entry: path.resolve(__dirname, `./src/csr.tsx`),
+    entry: path.resolve(__dirname, `./src/clientSideRender.tsx`),
     plugins: [
       new HtmlWebpackPlugin({
         inject: "body",
@@ -100,7 +100,7 @@ module.exports = [
     output: {
       publicPath: "/",
       path: path.resolve(__dirname, "dist"), //バンドルしたファイルの出力先のパスを指定
-      filename: "csr.js", //出力時のファイル名の指定
+      filename: "clientSideRender.js", //出力時のファイル名の指定
     },
     optimization: {
       minimizer: [
@@ -146,12 +146,12 @@ module.exports = [
      */
     target: "web",
     mode: "production",
-    entry: path.resolve(__dirname, `./src/ssr.tsx`),
+    entry: path.resolve(__dirname, `./src/serverSideRender.tsx`),
     plugins: [
       new HtmlWebpackPlugin({
         inject: "body",
         template: path.resolve(__dirname, `src/index.html`),
-        filename: path.resolve(__dirname, `dist/_template.html`),
+        filename: path.resolve(__dirname, `dist/article_template.html`),
       }),
       new MiniCssExtractPlugin(),
       new webpack.ProvidePlugin({
@@ -169,7 +169,7 @@ module.exports = [
     output: {
       publicPath: "/",
       path: path.resolve(__dirname, "dist"), //バンドルしたファイルの出力先のパスを指定
-      filename: "ssr.js", //出力時のファイル名の指定
+      filename: "serverSideRender.js", //出力時のファイル名の指定
     },
     optimization: {
       minimizer: [
@@ -185,13 +185,13 @@ module.exports = [
      * サーバーサイドで用いるテンプレートのhtmlを生成するスクリプト
      */
     mode: "production",
-    entry: "./src/createArticleTemplate.tsx",
+    entry: "./src/insertPageContent.tsx",
     target: "node",
     externalsPresets: { node: true },
     externals: [NodeExternals()],
     output: {
       path: path.resolve(__dirname, "dist"),
-      filename: "createArticleTemplate.js",
+      filename: "insertPageContent.js",
     },
     ...moduleSettings,
     resolve: {

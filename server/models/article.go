@@ -32,13 +32,13 @@ func (a *Article) SetIsTokenized() {
 }
 
 var (
-	ExecutablePath, _ = os.Executable()
-	TemplateDir       = filepath.Dir(ExecutablePath) + "/static"
+	ExecutablePath, _ = os.Getwd()
+	TemplatePath      = filepath.Join(ExecutablePath, "/static")
 )
 
 func (a *Article) ToHTML() ([]byte, error) {
 	htmlTemplate, err := template.
-		ParseFiles(TemplateDir + "/template.html")
+		ParseFiles(TemplatePath + "/article_template.html")
 	if err != nil {
 		return nil, err
 	}
