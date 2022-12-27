@@ -14,6 +14,31 @@ resource "aws_iam_user_policy" "knowtfolio_nft_io" {
   })
 }
 
+data "aws_iam_policy_document" "backend_test" {
+  statement {
+    actions = [
+      "cognito-idp:*",
+    ]
+    resources = [
+      "${aws_cognito_user_pool.knowtfolio.arn}*",
+    ]
+  }
+  statement {
+    actions = [
+      "dynamodb:*",
+    ]
+    resources = [
+      "${aws_dynamodb_table.user_to_wallet.arn}*",
+    ]
+  }
+}
+
+resource "aws_iam_user_policy" "backend_test" {
+  name   = "backend-test"
+  user   = aws_iam_user.knowtfolio_admin.name
+  policy = data.aws_iam_policy_document.backend_test.json
+}
+
 resource "aws_iam_role" "knowtfolio_article_writer" {
   name = "knowtfolio-article-writer"
   assume_role_policy = templatefile("${path.module}/templates/iam/knowtfolio_user_assume_policy.json", {

@@ -44,8 +44,8 @@ var articleReadRequest = dsl.Type("ArticleReadRequest", func() {
 var articleCreateRequest = dsl.Type("ArticleCreateRequest", func() {
 	titleAttribute("title")
 	contentAttribute("content")
-	smartWalletAuthAttributes("address", "signature")
-	dsl.Required("title", "content", "address", "signature")
+	jwtAttribute("token")
+	dsl.Required("title", "content", "token")
 })
 
 var articleUpdateRequest = dsl.Type("ArticleUpdateRequest", func() {
@@ -54,15 +54,16 @@ var articleUpdateRequest = dsl.Type("ArticleUpdateRequest", func() {
 	// Body
 	titleAttribute("title")
 	contentAttribute("content")
-	smartWalletAuthAttributes("address", "signature")
+	jwtAttribute("token")
 
-	dsl.Required("id", "address", "signature")
+	dsl.Required("id", "token")
 })
 
 var articleDeleteRequest = dsl.Type("ArticleDeleteRequest", func() {
 	articleIdAttribute("id")
-	smartWalletAuthAttributes("address", "signature")
-	dsl.Required("id", "address", "signature")
+	jwtAttribute("token")
+
+	dsl.Required("id", "token")
 })
 
 var articleResult = dsl.ResultType("article-result", "ArticleResult", func() {
@@ -104,6 +105,8 @@ var _ = dsl.Service("articles", func() {
 	dsl.Method("Create", func() {
 		dsl.Description("Create new article.")
 
+		dsl.Security(jwtSecurity)
+
 		dsl.Payload(articleCreateRequest, "作成したい記事の情報")
 
 		dsl.Result(articleResult, func() {
@@ -137,6 +140,8 @@ var _ = dsl.Service("articles", func() {
 	dsl.Method("Update", func() {
 		dsl.Description("Update an article.")
 
+		dsl.Security(jwtSecurity)
+
 		dsl.Payload(articleUpdateRequest, "記事の更新内容\nリクエストに含まれるフィールドだけ更新される。")
 
 		dsl.Result(articleResult, func() {
@@ -154,6 +159,8 @@ var _ = dsl.Service("articles", func() {
 
 	dsl.Method("Delete", func() {
 		dsl.Description("Delete article by id.")
+
+		dsl.Security(jwtSecurity)
 
 		dsl.Payload(articleDeleteRequest)
 

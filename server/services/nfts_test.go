@@ -46,13 +46,13 @@ func TestCreateNFTForArticle(t *testing.T) {
 
 	service.DB.Create(&article0)
 
-	transactionLock[user0Addr].Lock()
+	transactionLock[testUsers[0].Address].Lock()
 	result, err := service.CreateForArticle(context.Background(), &nfts.CreateNftForArticleRequest{
 		ArticleID: article0.ID,
-		Address:   user0Addr,
+		Address:   testUsers[0].Address,
 		Signature: user0MintNFTSign,
 	})
-	transactionLock[user0Addr].Unlock()
+	transactionLock[testUsers[0].Address].Unlock()
 	assert.NoError(t, err)
 
 	// Remove s3 object after the test is done.

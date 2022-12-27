@@ -6,6 +6,10 @@ inputs:
     required: true
   AWS_KNOWTFOLIO_ADMIN_SECRET_KEY:
     required: true
+  COGNITO_CLIENT_ID:
+    required: true
+  COGNITO_USER_POOL_ID:
+    required: true
 runs:
   using: "composite"
   steps:
@@ -20,4 +24,6 @@ runs:
         echo AWS_ACCESS_KEY=${{inputs.AWS_KNOWTFOLIO_ADMIN_ACCESS_KEY}} >> server/.env
         echo AWS_SECRET_KEY=${{inputs.AWS_KNOWTFOLIO_ADMIN_SECRET_KEY}} >> server/.env
         echo AWS_REGION=ap-northeast-1 >> server/.env
+        echo COGNITO_CLIENT_ID=${{inputs.COGNITO_CLIENT_ID}} >> server/.env
+        echo COGNITO_USER_POOL_ID=${{inputs.COGNITO_USER_POOL_ID}} >> server/.env
         echo S3_BUCKET_NAME=dev-knowtfolio-nfts >> server/.env
