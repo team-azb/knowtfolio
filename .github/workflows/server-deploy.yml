@@ -37,9 +37,9 @@ jobs:
         run: make server/build/server
       - name: upload-article-template
         uses: actions/upload-artifact@v3
-          with:
-            name: article-template
-            path: server/static/article_template.html
+        with:
+          name: article-template
+          path: server/static/article_template.html
       - name: upload-server-bin
         uses: actions/upload-artifact@v3
         with:
