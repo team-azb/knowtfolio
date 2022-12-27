@@ -71,6 +71,10 @@ const webResolveSettings = {
 
 module.exports = [
   {
+    /**
+     * 記事ページ以外の画面からWebサイトにアクセスする場合のソースの作成
+     * クライアントレンダリングだけで画面を作成する仕様になっている
+     */
     target: "web",
     mode: "production",
     entry: path.resolve(__dirname, `./src/csr.tsx`),
@@ -136,6 +140,10 @@ module.exports = [
     },
   },
   {
+    /**
+     * 記事ページ画面からWebサイトにアクセスする場合のソースの作成
+     * 記事ページの初回ロードはReactのhydrateをつかってサーバーサイドレンダリングに対応している
+     */
     target: "web",
     mode: "production",
     entry: path.resolve(__dirname, `./src/ssr.tsx`),
@@ -173,6 +181,9 @@ module.exports = [
     },
   },
   {
+    /**
+     * サーバーサイドで用いるテンプレートのhtmlを生成するスクリプト
+     */
     mode: "production",
     entry: "./src/createArticleTemplate.tsx",
     target: "node",
