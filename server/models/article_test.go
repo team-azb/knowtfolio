@@ -23,7 +23,7 @@ func TestToHtml(t *testing.T) {
 
 	// テスト実行時のディレクトリが本番実行とは異なるので、TemplateDirを直接上書きしてtemplateファイルのパスを指定
 	root, _ := filepath.Abs("../")
-	TemplatePath = root + "/static"
+	TemplatePath = filepath.Join(root, "/static/article_template.html")
 
 	actual, err := src.ToHTML()
 	assert.NoError(t, err)
