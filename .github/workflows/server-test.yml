@@ -13,15 +13,12 @@ jobs:
     steps:
       - name: checkout-code
         uses: actions/checkout@v2
-      - name: setup-dotenv-sv
-        uses: ./.github/actions/setup-dotenv-sv
+      - name: setup-dotenv
+        uses: ./.github/actions/setup-dotenv
         with:
           ADMIN_WALLET_PRIVATE_KEY: ${{secrets.ADMIN_WALLET_PRIVATE_KEY}}
           AWS_KNOWTFOLIO_ADMIN_ACCESS_KEY: ${{secrets.AWS_KNOWTFOLIO_ADMIN_ACCESS_KEY}}
           AWS_KNOWTFOLIO_ADMIN_SECRET_KEY: ${{secrets.AWS_KNOWTFOLIO_ADMIN_SECRET_KEY}}
-      - name: setup-dotenv-cl
-        uses: ./.github/actions/setup-dotenv-cl
-        with:
           COGNITO_USER_POOL_ID: ${{secrets.COGNITO_USER_POOL_ID}}
           COGNITO_CLIENT_ID: ${{secrets.COGNITO_CLIENT_ID}}
           COGNITO_IDENTITY_POOL_ID: ${{secrets.COGNITO_IDENTITY_POOL_ID}}
