@@ -59,8 +59,8 @@ $(CONTRACT_BIN_FILE): $(CONTRACT_JSON_FILE)
     	/bin/bash -c "cat $(CONTRACT_JSON_FILE) | jq -r '.bytecode' > $(CONTRACT_BIN_FILE)"
 
 $(ARTICLE_PAGE_TEMPLATE): $(CLIENT_SRCS) $(CLIENT_NODE_MODULES_DIR)
-	docker-compose run client npm run build
-	docker-compose run client node dist/insertPageContent.js
+	docker-compose run --no-deps client npm run build
+	docker-compose run --no-deps client node dist/insertPageContent.js
 	mv -f $(CLIENT_DIST_DIR)/article_template.html $(ARTICLE_PAGE_TEMPLATE)
 
 .PHONY: app client server goa test-sv checkfmt-sv go-eth-binding \
