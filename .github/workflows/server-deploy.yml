@@ -1,0 +1,76 @@
+name: Server Deploy
+
+on:
+  workflow_run:
+    workflows: [Server Test]
+    branches: [main]
+    types: [completed]
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    steps:
+      - name: checkout-code
+        uses: actions/checkout@v2
+        # TODO: awsのリソース名などをterraformから取得して差し込みたい
+        # https://github.com/team-azb/knowtfolio/issues/182
+      - name: setup-dotenv
+        uses: ./.github/actions/setup-dotenv
+        with:
+          DB_URI: admin:password@tcp(knowtfolio-db.c9irp7zzw9uy.ap-northeast-1.rds.amazonaws.com)/knowtfolio_db
+          ADMIN_WALLET_PRIVATE_KEY: ${{secrets.ADMIN_WALLET_PRIVATE_KEY}}
+          AWS_KNOWTFOLIO_ADMIN_ACCESS_KEY: ${{secrets.AWS_KNOWTFOLIO_ADMIN_ACCESS_KEY}}
+          AWS_KNOWTFOLIO_ADMIN_SECRET_KEY: ${{secrets.AWS_KNOWTFOLIO_ADMIN_SECRET_KEY}}
+      - name: build-server
+        run: make server/build/server
+      - name: upload-server-bin
+        uses: actions/upload-artifact@v3
+        with:
+          name: server-binary
+          path: server/build/server
+      - name: upload-env
+        uses: actions/upload-artifact@v3
+        with:
+          name: env
+          path: server/.env
+  
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: checkout-code
+        uses: actions/checkout@v2
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_TERRAFORM_USER_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_TERRAFORM_USER_SECRET_KEY }}
+          aws-region: ap-northeast-1
+      - name: download-env
+        uses: actions/download-artifact@v3
+        with: 
+          name: env
+          path: infrastructure/deploy/server
+      - name: download-server-bin
+        uses: actions/download-artifact@v3
+        with: 
+          name: server-binary
+          path: infrastructure/deploy/server
+      - name: upload-to-s3
+        run: |
+          zip -r artifacts.zip .
+          aws s3 cp ./artifacts.zip s3://dev-knowtfolio-code-deploy/artifacts/${{ github.sha }}.zip
+        working-directory: infrastructure/deploy/server
+      - name: create-aws-deploy
+        run: >
+          aws deploy create-deployment
+          --application-name knowtfolio
+          --deployment-group-name backend
+          --s3-location bucket=dev-knowtfolio-code-deploy,key=artifacts/${{ github.sha }}.zip,bundleType=zip
+      # TODO: deployのlogを流して、実行結果をgithub actionsにも反映できるようにする
+      # https://github.com/team-azb/knowtfolio/issues/166

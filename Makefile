@@ -56,6 +56,10 @@ $(CONTRACT_BIN_FILE): $(CONTRACT_JSON_FILE)
 	docker-compose run hardhat \
     	/bin/bash -c "cat $(CONTRACT_JSON_FILE) | jq -r '.bytecode' > $(CONTRACT_BIN_FILE)"
 
+# Binary file for production server execution
+server/build/server: $(GOA_GEN_DIR) $(GO_ETH_BINDING_PATH)
+	docker-compose run server go build -o build/server
+
 .PHONY: app client server goa test-sv checkfmt-sv go-eth-binding \
 	init-tf fmt-tf checkfmt-tf plan-tf apply-tf clean
 
@@ -92,7 +96,6 @@ test: goa go-eth-binding
 
 checkfmt-sv: $(SERVER_SRCS)
 	docker-compose run server test -z $$(gofmt -e -l .)
-
 
 ### Infrastructure ###
 
