@@ -9,12 +9,8 @@ import (
 	"regexp"
 )
 
-var (
-	SignUpFormValidator = validator.New()
-)
-
 func init() {
-	err := SignUpFormValidator.RegisterValidation("cognito_password", validateCognitoPassword)
+	err := requestValidator.RegisterValidation("cognito_password", validateCognitoPassword)
 	if err != nil {
 		panic(err.(any))
 	}
