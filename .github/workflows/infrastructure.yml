@@ -6,6 +6,11 @@ defaults:
   run:
     shell: bash
 
+# This is required because we cannot call `terraform apply` concurrently.
+concurrency:
+  group: ${{ github.workflow }}
+  cancel-in-progress: true
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -35,3 +40,31 @@ jobs:
         run: make checkfmt-tf
       - name: terraform-test
         run: make plan-tf
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: test
+
+    steps:
+      - name: checkout-code
+        uses: actions/checkout@v2
+      - name: setup-dotenv
+        uses: ./.github/actions/setup-dotenv
+        with:
+          ADMIN_WALLET_PRIVATE_KEY: ${{secrets.ADMIN_WALLET_PRIVATE_KEY}}
+          AWS_KNOWTFOLIO_ADMIN_ACCESS_KEY: ${{secrets.AWS_KNOWTFOLIO_ADMIN_ACCESS_KEY}}
+          AWS_KNOWTFOLIO_ADMIN_SECRET_KEY: ${{secrets.AWS_KNOWTFOLIO_ADMIN_SECRET_KEY}}
+      - name: setup-credentials
+        run: |
+          touch infrastructure/.aws/config
+          echo [profile knowtfolio] >> infrastructure/.aws/config
+          echo region = ap-northeast-1 >> infrastructure/.aws/config
+          echo output = json >> infrastructure/.aws/config
+          touch infrastructure/.aws/credentials
+          echo [knowtfolio] >> infrastructure/.aws/credentials
+          echo aws_access_key_id = ${{secrets.AWS_TERRAFORM_USER_ACCESS_KEY}} >> infrastructure/.aws/credentials
+          echo aws_secret_access_key = ${{secrets.AWS_TERRAFORM_USER_SECRET_KEY}} >> infrastructure/.aws/credentials
+      - name: init-terraform
+        run: make init-tf
+      - name: terraform-apply
+        run: docker compose run terraform apply -auto-approve
