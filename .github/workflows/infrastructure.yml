@@ -24,6 +24,10 @@ jobs:
           ADMIN_WALLET_PRIVATE_KEY: ${{secrets.ADMIN_WALLET_PRIVATE_KEY}}
           AWS_KNOWTFOLIO_ADMIN_ACCESS_KEY: ${{secrets.AWS_KNOWTFOLIO_ADMIN_ACCESS_KEY}}
           AWS_KNOWTFOLIO_ADMIN_SECRET_KEY: ${{secrets.AWS_KNOWTFOLIO_ADMIN_SECRET_KEY}}
+          COGNITO_USER_POOL_ID: ${{secrets.COGNITO_USER_POOL_ID}}
+          COGNITO_CLIENT_ID: ${{secrets.COGNITO_CLIENT_ID}}
+          COGNITO_IDENTITY_POOL_ID: ${{secrets.COGNITO_IDENTITY_POOL_ID}}
+          TINY_MCE_API_KEY: ${{secrets.TINY_MCE_API_KEY}}
       - name: setup-credentials
         run: |
           touch infrastructure/.aws/config
@@ -44,6 +48,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     needs: test
+    if: ${{ github.ref == 'refs/heads/main' }}
 
     steps:
       - name: checkout-code
@@ -54,6 +59,10 @@ jobs:
           ADMIN_WALLET_PRIVATE_KEY: ${{secrets.ADMIN_WALLET_PRIVATE_KEY}}
           AWS_KNOWTFOLIO_ADMIN_ACCESS_KEY: ${{secrets.AWS_KNOWTFOLIO_ADMIN_ACCESS_KEY}}
           AWS_KNOWTFOLIO_ADMIN_SECRET_KEY: ${{secrets.AWS_KNOWTFOLIO_ADMIN_SECRET_KEY}}
+          COGNITO_USER_POOL_ID: ${{secrets.COGNITO_USER_POOL_ID}}
+          COGNITO_CLIENT_ID: ${{secrets.COGNITO_CLIENT_ID}}
+          COGNITO_IDENTITY_POOL_ID: ${{secrets.COGNITO_IDENTITY_POOL_ID}}
+          TINY_MCE_API_KEY: ${{secrets.TINY_MCE_API_KEY}}
       - name: setup-credentials
         run: |
           touch infrastructure/.aws/config

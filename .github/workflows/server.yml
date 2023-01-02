@@ -19,6 +19,10 @@ jobs:
           ADMIN_WALLET_PRIVATE_KEY: ${{secrets.ADMIN_WALLET_PRIVATE_KEY}}
           AWS_KNOWTFOLIO_ADMIN_ACCESS_KEY: ${{secrets.AWS_KNOWTFOLIO_ADMIN_ACCESS_KEY}}
           AWS_KNOWTFOLIO_ADMIN_SECRET_KEY: ${{secrets.AWS_KNOWTFOLIO_ADMIN_SECRET_KEY}}
+          COGNITO_USER_POOL_ID: ${{secrets.COGNITO_USER_POOL_ID}}
+          COGNITO_CLIENT_ID: ${{secrets.COGNITO_CLIENT_ID}}
+          COGNITO_IDENTITY_POOL_ID: ${{secrets.COGNITO_IDENTITY_POOL_ID}}
+          TINY_MCE_API_KEY: ${{secrets.TINY_MCE_API_KEY}}
       - name: check-format
         run: make checkfmt-sv
       - name: go-test
@@ -41,6 +45,10 @@ jobs:
           ADMIN_WALLET_PRIVATE_KEY: ${{secrets.ADMIN_WALLET_PRIVATE_KEY}}
           AWS_KNOWTFOLIO_ADMIN_ACCESS_KEY: ${{secrets.AWS_KNOWTFOLIO_ADMIN_ACCESS_KEY}}
           AWS_KNOWTFOLIO_ADMIN_SECRET_KEY: ${{secrets.AWS_KNOWTFOLIO_ADMIN_SECRET_KEY}}
+          COGNITO_USER_POOL_ID: ${{secrets.COGNITO_USER_POOL_ID}}
+          COGNITO_CLIENT_ID: ${{secrets.COGNITO_CLIENT_ID}}
+          COGNITO_IDENTITY_POOL_ID: ${{secrets.COGNITO_IDENTITY_POOL_ID}}
+          TINY_MCE_API_KEY: ${{secrets.TINY_MCE_API_KEY}}
       - name: build-server
         run: make server/build/server
       - name: upload-server-bin
