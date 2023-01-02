@@ -1,4 +1,4 @@
-name: Server Test
+name: client
 
 on: [push, workflow_dispatch]
 
@@ -20,6 +20,6 @@ jobs:
           AWS_KNOWTFOLIO_ADMIN_ACCESS_KEY: ${{secrets.AWS_KNOWTFOLIO_ADMIN_ACCESS_KEY}}
           AWS_KNOWTFOLIO_ADMIN_SECRET_KEY: ${{secrets.AWS_KNOWTFOLIO_ADMIN_SECRET_KEY}}
       - name: check-format
-        run: make checkfmt-sv
-      - name: go-test
-        run: make test
+        run: make checkfmt-cl
+      - name: lint-test
+        run: make lint-cl
