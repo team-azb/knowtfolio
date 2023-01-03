@@ -13,8 +13,8 @@ locals {
       allow_methods = ["POST"]
       resource_name = "validate_sign_up_form"
     }
-    put_wallet_address = {
-      allow_methods = ["PUT"]
+    post_wallet_address = {
+      allow_methods = ["POST"]
       resource_name = "wallet_address"
     }
   }
