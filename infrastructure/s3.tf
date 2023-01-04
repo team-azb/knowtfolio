@@ -127,3 +127,20 @@ resource "aws_s3_bucket_public_access_block" "code_deploy" {
   ignore_public_acls      = true
   restrict_public_buckets = true
 }
+
+resource "aws_s3_bucket" "lambda_artifacts" {
+  bucket = "dev-knowtfolio-lambda-artifacts"
+}
+
+resource "aws_s3_bucket_acl" "lambda_artifacts" {
+  bucket = aws_s3_bucket.lambda_artifacts.id
+  acl    = "private"
+}
+
+resource "aws_s3_bucket_public_access_block" "lambda_artifacts" {
+  bucket                  = aws_s3_bucket.lambda_artifacts.id
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
