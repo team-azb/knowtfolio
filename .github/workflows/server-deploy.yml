@@ -71,7 +71,7 @@ jobs:
         uses: actions/download-artifact@v3
         with: 
           name: article-template
-          path: infrastructure/deploy/article_template.html
+          path: infrastructure/deploy/server
       - name: download-server-bin
         uses: actions/download-artifact@v3
         with: 

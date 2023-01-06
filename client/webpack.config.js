@@ -188,7 +188,12 @@ module.exports = [
     entry: "./src/insertPageContent.tsx",
     target: "node",
     externalsPresets: { node: true },
-    externals: [NodeExternals()],
+    externals: [
+      NodeExternals({
+        // node_modules配下のcssをbundleに含めるようにする設定
+        allowlist: [cssRegex],
+      }),
+    ],
     output: {
       path: path.resolve(__dirname, "dist"),
       filename: "insertPageContent.js",
