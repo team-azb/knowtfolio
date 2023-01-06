@@ -11,6 +11,7 @@ import EditArticlePage from "~/components/pages/EditArticlePage";
 import SearchPage from "~/components/pages/SearchPage";
 import Web3Provider from "~/components/organisms/providers/Web3Provider";
 import ResetWalletPage from "./components/pages/ResetWalletPage";
+import ArticlePage from "~/components/pages/ArticlePage";
 import { ThemeProvider } from "@mui/material";
 import { theme } from "~/configs/theme";
 import { ToastContainer } from "react-toastify";
@@ -65,6 +66,7 @@ const App = () => {
               </AuthProvider>
             }
           />
+          <Route path="/articles/:articleId" element={<ArticlePage />} />
           <Route path="/search" element={<SearchPage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>

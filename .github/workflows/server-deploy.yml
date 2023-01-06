@@ -26,8 +26,19 @@ jobs:
           ADMIN_WALLET_PRIVATE_KEY: ${{secrets.ADMIN_WALLET_PRIVATE_KEY}}
           AWS_KNOWTFOLIO_ADMIN_ACCESS_KEY: ${{secrets.AWS_KNOWTFOLIO_ADMIN_ACCESS_KEY}}
           AWS_KNOWTFOLIO_ADMIN_SECRET_KEY: ${{secrets.AWS_KNOWTFOLIO_ADMIN_SECRET_KEY}}
+          COGNITO_USER_POOL_ID: ${{secrets.COGNITO_USER_POOL_ID}}
+          COGNITO_CLIENT_ID: ${{secrets.COGNITO_CLIENT_ID}}
+          COGNITO_IDENTITY_POOL_ID: ${{secrets.COGNITO_IDENTITY_POOL_ID}}
+          TINY_MCE_API_KEY: ${{secrets.TINY_MCE_API_KEY}}
+      - name: create-article-template
+        run: make server/static/article_template.html
       - name: build-server
         run: make server/build/server
+      - name: upload-article-template
+        uses: actions/upload-artifact@v3
+        with:
+          name: article-template
+          path: server/static/article_template.html
       - name: upload-server-bin
         uses: actions/upload-artifact@v3
         with:
@@ -55,6 +66,11 @@ jobs:
         uses: actions/download-artifact@v3
         with: 
           name: env
+          path: infrastructure/deploy/server
+      - name: download-article-template
+        uses: actions/download-artifact@v3
+        with: 
+          name: article-template
           path: infrastructure/deploy/server
       - name: download-server-bin
         uses: actions/download-artifact@v3

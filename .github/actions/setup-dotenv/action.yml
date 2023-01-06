@@ -6,6 +6,14 @@ inputs:
     required: true
   AWS_KNOWTFOLIO_ADMIN_SECRET_KEY:
     required: true
+  COGNITO_USER_POOL_ID:
+    required: true
+  COGNITO_CLIENT_ID:
+    required: true
+  COGNITO_IDENTITY_POOL_ID:
+    required: true
+  TINY_MCE_API_KEY:
+    required: true
   DB_URI:
     required: false
     default: root:password@tcp(db:3306)/knowtfolio-db
@@ -24,3 +32,12 @@ runs:
         echo AWS_SECRET_KEY=${{inputs.AWS_KNOWTFOLIO_ADMIN_SECRET_KEY}} >> server/.env
         echo AWS_REGION=ap-northeast-1 >> server/.env
         echo S3_BUCKET_NAME=dev-knowtfolio-nfts >> server/.env
+    - shell: bash
+      run: |
+        touch client/.env
+        echo COGNITO_USER_POOL_ID=${{inputs.COGNITO_USER_POOL_ID}} >> client/.env
+        echo COGNITO_CLIENT_ID=${{inputs.COGNITO_CLIENT_ID}} >> client/.env
+        echo COGNITO_IDENTITY_POOL_ID=${{inputs.COGNITO_IDENTITY_POOL_ID}} >> client/.env
+        echo ARTICLE_RESOURCES_S3_BUCKET=dev-knowtfolio-article-resources >> client/.env
+        echo TINY_MCE_API_KEY=${{inputs.TINY_MCE_API_KEY}} >> client/.env
+        echo CONTRACT_ADDRESS=0xd08db6d8Fb163182722e0D17fa8146f26a79BB6A >> client/.env
