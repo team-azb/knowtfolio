@@ -170,11 +170,13 @@ const SignUpForm = () => {
         ) : (
           <Grid item container>
             <Grid item xs={9}>
-              Wallet
-              addressをアカウントに紐付けるためにはMetamaskに接続する必要があります。
+              {
+                "Wallet addressをアカウントに紐付けるためにはMetamaskに接続する必要があります。"
+              }
               <br />
-              ※アカウント作成後にWallet
-              addressをアカウントに紐付けることも可能です。
+              {
+                "※アカウント作成後にWallet addressをアカウントに紐付けることも可能です。"
+              }
             </Grid>
             <Grid item flexGrow={1}>
               <ConnectToMetamaskButton />
