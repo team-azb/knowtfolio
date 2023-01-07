@@ -79,6 +79,8 @@ const SignInForm = () => {
             },
           });
           toast.success("サインインしました。");
+        } else {
+          throw new Error("Metamaskに接続されていません。");
         }
       } catch (error) {
         console.error(error);
