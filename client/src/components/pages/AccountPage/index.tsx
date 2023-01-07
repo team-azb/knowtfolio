@@ -48,20 +48,23 @@ const AccountPage = () => {
         <Grid item container alignItems="center">
           <Grid xs={2}>Wallet address</Grid>
           <Grid xs={10}>
-            <WalletAddressDisplay
-              style={{ display: "inline" }}
-              address={userWalletAddress}
-              shouldTruncate={false}
-            />
-            <Button
-              variant="outlined"
-              onClick={() => {
-                navigate("/reset-wallet");
-              }}
-              style={{ marginLeft: "1rem", fontSize: "1.4rem" }}
-            >
-              変更/登録する
-            </Button>
+            {userWalletAddress ? (
+              <WalletAddressDisplay
+                style={{ display: "inline" }}
+                address={userWalletAddress}
+                shouldTruncate={false}
+              />
+            ) : (
+              <Button
+                variant="outlined"
+                onClick={() => {
+                  navigate("/reset-wallet");
+                }}
+                style={{ marginLeft: "1rem", fontSize: "1.4rem" }}
+              >
+                登録する
+              </Button>
+            )}
           </Grid>
         </Grid>
         <Grid item>

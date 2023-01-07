@@ -1,5 +1,4 @@
-import { useCallback, useState } from "react";
-import { RadioGroup, Radio, FormControlLabel } from "@mui/material";
+import { useCallback } from "react";
 import { useAuthContext } from "~/components/organisms/providers/AuthProvider";
 import { useWeb3Context } from "~/components/organisms/providers/Web3Provider";
 import Form from "~/components/atoms/authForm/Form";
@@ -10,10 +9,56 @@ import { useNavigate } from "react-router-dom";
 import { postWalletAddress } from "~/apis/lambda";
 
 /**
+ * wallet addressがすでに登録されていた場合に表示するメッセージ
+ */
+const MessageToRejectRegistration = () => {
+  const { user, userWalletAddress } = useAuthContext();
+  const navigate = useNavigate();
+
+  return (
+    <Grid container direction="column" spacing={3}>
+      <Grid item>
+        すでに下記のwallet addressが登録されています。登録したwallet
+        addressを後から変更することはできません。
+      </Grid>
+      <Grid item container alignItems="center">
+        <Grid item xs={2.5}>
+          <p>ユーザーid</p>
+        </Grid>
+        <Grid item xs={9.5}>
+          {user.getUsername()}
+        </Grid>
+      </Grid>
+      <Grid item container alignItems="flex-start">
+        <Grid item xs={2.5}>
+          wallet address
+        </Grid>
+        <Grid item xs={9.5}>
+          <WalletAddressDisplay
+            address={userWalletAddress}
+            shouldTruncate={false}
+          />
+        </Grid>
+      </Grid>
+      <Grid item container xs={2} direction="row-reverse">
+        <Button
+          onClick={() => {
+            navigate("/mypage");
+          }}
+          variant="contained"
+          style={{ fontSize: "1.4rem" }}
+        >
+          cancel
+        </Button>
+      </Grid>
+    </Grid>
+  );
+};
+
+/**
  * walletを再設定するためのフォーム
  */
 const ResetWalletForm = () => {
-  const [walletAddressInput, setWalletAddressInput] = useState<string>("");
   const { user, userWalletAddress } = useAuthContext();
   const { account, web3 } = useWeb3Context();
 
@@ -26,23 +71,17 @@ const ResetWalletForm = () => {
     try {
       await postWalletAddress({
         userId: user.getUsername(),
-        walletAddress: walletAddressInput,
+        walletAddress: account,
         signature: signature,
       });
       // TODO: toastで実装する
-      alert("Walletの登録が完了しました。")
-      window.location.reload()
+      alert("Walletの登録が完了しました。");
+      window.location.reload();
     } catch (error) {
       // TODO: toastで実装する
-      alert("Walletの登録に失敗しました。")
+      alert("Walletの登録に失敗しました。");
     }
-  }, [account, user, walletAddressInput, web3.eth.personal]);
-
-  const onChangeWalletAddressInput = useCallback<
-    React.ChangeEventHandler<HTMLInputElement>
-  >((event) => {
-    setWalletAddressInput(event.target.value);
-  }, []);
+  }, [account, user, web3.eth.personal]);
 
   const navigate = useNavigate();
 
@@ -51,74 +90,60 @@ const ResetWalletForm = () => {
       <h2>Wallet addressを登録する</h2>
       <hr />
       <Spacer height="3rem" />
-      <Grid container direction="column" spacing={3}>
-        <Grid item container alignItems="center">
-          <Grid item xs={2.5}>
-            <p>現在のwallet address</p>
+      {userWalletAddress ? (
+        <MessageToRejectRegistration />
+      ) : (
+        <Grid container direction="column" spacing={3}>
+          <Grid item>
+            表示されているwallet addressとユーザーidを連携します。
+            <br />
+            <b>
+              {
+                "※一度連携したwallet addressは後から変更・削除できません。必ず正しいwallet addressが表示されているかどうかよく確認してから登録してください。"
+              }
+            </b>
           </Grid>
-          <Grid item xs={9.5}>
-            <WalletAddressDisplay
-              style={{ display: "inline" }}
-              address={userWalletAddress}
-              shouldTruncate={false}
-            />
+          <Grid item container alignItems="center">
+            <Grid item xs={2.5}>
+              <p>ユーザーid</p>
+            </Grid>
+            <Grid item xs={9.5}>
+              {user.getUsername()}
+            </Grid>
           </Grid>
-        </Grid>
-        <Grid item container alignItems="flex-start">
-          <Grid item xs={2.5}>
-            <p>新しいwallet address</p>
+          <Grid item container alignItems="flex-start">
+            <Grid item xs={2.5}>
+              wallet address
+            </Grid>
+            <Grid item xs={9.5}>
+              <WalletAddressDisplay address={account} shouldTruncate={false} />
+            </Grid>
           </Grid>
-          <Grid item container direction="column" xs={9.5} spacing={1}>
-            <RadioGroup
-              value={walletAddressInput}
-              onChange={onChangeWalletAddressInput}
-            >
-              <FormControlLabel
-                value={account}
-                control={<Radio />}
-                label={
-                  <p>
-                    <WalletAddressDisplay
-                      address={account}
-                      shouldTruncate={false}
-                      style={{ display: "inline" }}
-                    />
-                    を登録する
-                  </p>
-                }
-              />
-              <FormControlLabel
-                value={""}
-                control={<Radio />}
-                label={<p>Wallet addressを登録解除する</p>}
-              />
-            </RadioGroup>
-          </Grid>
-        </Grid>
-        <Grid item container justifyContent="center">
-          <Grid item xs={2.5}></Grid>
-          <Grid item xs={7.5}>
-            <Button
-              variant="outlined"
-              onClick={resetWalletAddress}
-              style={{ fontSize: "1.4rem" }}
-            >
-              update wallet address
-            </Button>
-          </Grid>
-          <Grid item container xs={2} direction="row-reverse">
-            <Button
-              onClick={() => {
-                navigate(-1);
-              }}
-              variant="contained"
-              style={{ fontSize: "1.4rem" }}
-            >
-              cancel
-            </Button>
+          <Grid item container justifyContent="center">
+            <Grid item xs={2.5}></Grid>
+            <Grid item xs={7.5}>
+              <Button
+                variant="outlined"
+                onClick={resetWalletAddress}
+                style={{ fontSize: "1.4rem" }}
+              >
+                update wallet address
+              </Button>
+            </Grid>
+            <Grid item container xs={2} direction="row-reverse">
+              <Button
+                onClick={() => {
+                  navigate("/mypage");
+                }}
+                variant="contained"
+                style={{ fontSize: "1.4rem" }}
+              >
+                cancel
+              </Button>
+            </Grid>
           </Grid>
         </Grid>
-      </Grid>
+      )}
     </Form>
   );
 };
