@@ -7,7 +7,6 @@ import {
 import { useWeb3Context } from "~/components/organisms/providers/Web3Provider";
 import PhoneInput from "react-phone-number-input/input";
 import { E164Number } from "libphonenumber-js/types";
-import { AxiosError } from "axios";
 import { Button, Grid } from "@mui/material";
 import Input, { InputStyle } from "~/components/atoms/authForm/Input";
 import Label from "~/components/atoms/authForm/Label";
@@ -15,6 +14,9 @@ import Checkbox from "~/components/atoms/authForm/Checkbox";
 import Form from "~/components/atoms/authForm/Form";
 import Spacer from "~/components/atoms/Spacer";
 import WalletAddressDisplay from "~/components/organisms/WalletAddressDisplay";
+
+export const noteOnWalletAddress =
+  "※一度連携したwallet addressは後から変更・削除できません。必ず正しいwallet addressが表示されているかどうかよく確認してから登録してください。";
 
 const SignUpForm = () => {
   const [form, setForm] = useState<SignUpForm>({
@@ -149,6 +151,7 @@ const SignUpForm = () => {
             </>
           }
         />
+        <Grid item>{noteOnWalletAddress}</Grid>
         <Grid item container justifyContent="center">
           <Button
             variant="outlined"

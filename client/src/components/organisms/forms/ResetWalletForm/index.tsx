@@ -7,6 +7,7 @@ import { Button, Grid } from "@mui/material";
 import Spacer from "~/components/atoms/Spacer";
 import { useNavigate } from "react-router-dom";
 import { postWalletAddress } from "~/apis/lambda";
+import { noteOnWalletAddress } from "~/components/organisms/forms/SignUpForm";
 
 /**
  * wallet addressがすでに登録されていた場合に表示するメッセージ
@@ -18,8 +19,9 @@ const MessageToRejectRegistration = () => {
   return (
     <Grid container direction="column" spacing={3}>
       <Grid item>
-        すでに下記のwallet addressが登録されています。登録したwallet
-        addressを後から変更することはできません。
+        {
+          "すでに下記のwallet addressが登録されています。登録したwallet addressを後から変更することはできません。"
+        }
       </Grid>
       <Grid item container alignItems="center">
         <Grid item xs={2.5}>
@@ -97,11 +99,7 @@ const ResetWalletForm = () => {
           <Grid item>
             表示されているwallet addressとユーザーidを連携します。
             <br />
-            <b>
-              {
-                "※一度連携したwallet addressは後から変更・削除できません。必ず正しいwallet addressが表示されているかどうかよく確認してから登録してください。"
-              }
-            </b>
+            <b>{noteOnWalletAddress}</b>
           </Grid>
           <Grid item container alignItems="center">
             <Grid item xs={2.5}>
