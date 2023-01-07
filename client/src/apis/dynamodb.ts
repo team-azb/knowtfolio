@@ -47,10 +47,5 @@ export const fetchWalletAddress = async (
   };
   const command = new GetItemCommand(params);
   const resp = await client.send(command);
-  const walletAddress = resp.Item?.wallet_address.S;
-  if (walletAddress) {
-    return walletAddress;
-  } else {
-    throw new Error("wallet addressが登録されていません。");
-  }
+  return resp.Item?.wallet_address.S;
 };

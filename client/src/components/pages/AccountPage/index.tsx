@@ -10,15 +10,12 @@ import HeaderLayout from "~/components/organisms/layouts/HeaderLayout";
  * "/mypage"のページコンポーネント
  */
 const AccountPage = () => {
-  const { user, attributes } = useAuthContext();
-  const [phoneNumber, walletAddress] = useMemo(() => {
+  const { user, attributes, userWalletAddress } = useAuthContext();
+  const phoneNumber = useMemo(() => {
     const phoneNumber = attributes.find(
       (atr) => atr.Name === "phone_number"
     )?.Value;
-    const walletAddress = attributes.find(
-      (atr) => atr.Name === "custom:wallet_address"
-    )?.Value;
-    return [phoneNumber, walletAddress];
+    return phoneNumber;
   }, [attributes]);
 
   const signOut = useCallback(async () => {
@@ -53,7 +50,7 @@ const AccountPage = () => {
           <Grid xs={10}>
             <WalletAddressDisplay
               style={{ display: "inline" }}
-              address={walletAddress}
+              address={userWalletAddress}
               shouldTruncate={false}
             />
             <Button
