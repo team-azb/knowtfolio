@@ -98,7 +98,7 @@ resource "aws_cloudfront_distribution" "knowtfolio" {
     for_each = local.auth_endpoint_functions
 
     content {
-      path_pattern             = "/api/${ordered_cache_behavior.value.resource_name}"
+      path_pattern             = "/api/${ordered_cache_behavior.value.api_resource_path}"
       allowed_methods          = ["GET", "HEAD", "OPTIONS", "PUT", "POST", "PATCH", "DELETE"]
       cached_methods           = ["GET", "HEAD", "OPTIONS"]
       viewer_protocol_policy   = "allow-all"

@@ -10,12 +10,12 @@ locals {
   }
   auth_endpoint_functions = {
     validate_sign_up_form = {
-      allow_methods = ["POST"]
-      resource_name = "validate_sign_up_form"
+      allow_methods     = ["POST"]
+      api_resource_path = "validate_sign_up_form"
     }
     post_wallet_address = {
-      allow_methods = ["POST"]
-      resource_name = "wallet_address"
+      allow_methods     = ["POST"]
+      api_resource_path = "wallet_address"
     }
   }
 
