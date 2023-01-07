@@ -39,7 +39,7 @@ func NewArticlesService(db *gorm.DB, contract *ethereum.ContractClient, handler 
 }
 
 func (a articleService) Create(_ context.Context, request *articles.ArticleCreateRequest) (res *articles.ArticleResult, err error) {
-	err = VerifySignature(request.Address, request.Signature, config.SignData["CreateArticle"])
+	err = ethereum.VerifySignature(request.Address, request.Signature, config.SignData["CreateArticle"])
 	if err != nil {
 		return nil, articles.MakeUnauthenticated(err)
 	}
@@ -68,7 +68,7 @@ func (a articleService) Read(_ context.Context, request *articles.ArticleReadReq
 }
 
 func (a articleService) Update(_ context.Context, request *articles.ArticleUpdateRequest) (res *articles.ArticleResult, err error) {
-	err = VerifySignature(request.Address, request.Signature, config.SignData["UpdateArticle"])
+	err = ethereum.VerifySignature(request.Address, request.Signature, config.SignData["UpdateArticle"])
 	if err != nil {
 		return nil, articles.MakeUnauthenticated(err)
 	}
@@ -101,7 +101,7 @@ func (a articleService) Update(_ context.Context, request *articles.ArticleUpdat
 }
 
 func (a articleService) Delete(_ context.Context, request *articles.ArticleDeleteRequest) (res *articles.ArticleResult, err error) {
-	err = VerifySignature(request.Address, request.Signature, config.SignData["DeleteArticle"])
+	err = ethereum.VerifySignature(request.Address, request.Signature, config.SignData["DeleteArticle"])
 	if err != nil {
 		return nil, articles.MakeUnauthenticated(err)
 	}
