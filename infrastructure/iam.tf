@@ -29,12 +29,22 @@ resource "aws_iam_role_policy" "knowtfolio_put_article_images_policy" {
   })
 }
 
+// TODO: 他のpolicyもこの記法で統一する
+data "aws_iam_policy_document" "read_wallet_table_policy" {
+  statement {
+    actions = [
+      "dynamodb:GetItem"
+    ]
+    resources = [
+      aws_dynamodb_table.user_to_wallet.arn
+    ]
+  }
+}
+
 resource "aws_iam_role_policy" "get_item_from_dynamodb" {
-  name = "get-item-from-dynamodb-policy"
-  role = aws_iam_role.knowtfolio_article_writer.name
-  policy = templatefile("${path.module}/templates/iam/get_item_from_dynamodb.json", {
-    resource = aws_dynamodb_table.user_to_wallet.arn
-  })
+  name   = "get-item-from-dynamodb-policy"
+  role   = aws_iam_role.knowtfolio_article_writer.name
+  policy = data.aws_iam_policy_document.read_wallet_table_policy.json
 }
 
 resource "aws_iam_role" "knowtfolio_viewer" {
