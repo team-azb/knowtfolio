@@ -44,25 +44,29 @@ const EditArticleForm = ({ articleId }: editArticleFormProps) => {
 
   const handleUpdate = useCallback(async () => {
     try {
-      const signature = await web3.eth.personal.sign(
-        "Update Article",
-        account,
-        ""
-      );
-      await putArticle({
-        articleId: articleId || "",
-        title,
-        content,
-        address: account,
-        signature,
-      });
-      navigate("/mypage");
-      toast.success("記事が更新されました。");
+      if (account && web3) {
+        const signature = await web3.eth.personal.sign(
+          "Update Article",
+          account,
+          ""
+        );
+        await putArticle({
+          articleId: articleId || "",
+          title,
+          content,
+          address: account,
+          signature,
+        });
+        navigate("/mypage");
+        toast.success("記事が更新されました。");
+      } else {
+        throw new Error("metamaskに接続されていません。");
+      }
     } catch (error) {
       console.error(error);
       toast.error("記事の更新に失敗しました。");
     }
-  }, [account, articleId, content, navigate, title, web3.eth.personal]);
+  }, [account, articleId, content, navigate, title, web3]);
 
   const onChangeTitleInput = useCallback<
     React.ChangeEventHandler<HTMLInputElement>

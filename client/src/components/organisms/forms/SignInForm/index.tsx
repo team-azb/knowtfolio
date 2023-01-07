@@ -9,10 +9,11 @@ import Input from "~/components/atoms/authForm/Input";
 import Label from "~/components/atoms/authForm/Label";
 import Spacer from "~/components/atoms/Spacer";
 import { useWeb3Context } from "~/components/organisms/providers/Web3Provider";
-import metamaskSvg from "~/assets/metamask.svg";
 import WalletAddressDisplay from "../../WalletAddressDisplay";
 import { toast } from "react-toastify";
 import { Link, useNavigate } from "react-router-dom";
+import MetamaskButton from "~/components/atoms/MetamaskButton";
+import ConnectToMetamaskButton from "~/components/organisms/ConnectToMetamaskButton";
 
 type signInWithPasswordForm = {
   username: string;
@@ -70,13 +71,15 @@ const SignInForm = () => {
     async (event) => {
       event.preventDefault();
       try {
-        await signInToCognitoWithWallet(form.username, web3, account);
-        navigate("/mypage", {
-          state: {
-            shouldLoadCurrentUser: true,
-          },
-        });
-        toast.success("サインインしました。");
+        if (web3 && account) {
+          await signInToCognitoWithWallet(form.username, web3, account);
+          navigate("/mypage", {
+            state: {
+              shouldLoadCurrentUser: true,
+            },
+          });
+          toast.success("サインインしました。");
+        }
       } catch (error) {
         console.error(error);
         toast.error("サインインに失敗しました。");
@@ -129,28 +132,24 @@ const SignInForm = () => {
             <b>OR</b>
           </Grid>
           <Grid item container xs={5}>
-            <Grid item container direction="column">
-              <Label>Connected wallet address</Label>
-              <WalletAddressDisplay
-                shouldTruncate={false}
-                address={account}
-                style={{ fontSize: "1.4rem" }}
-              />
-            </Grid>
-            <Grid item container alignItems="center" justifyContent="center">
-              <Button
-                variant="outlined"
-                onClick={signInWithWallet}
-                style={{ fontSize: "1.4rem" }}
-              >
-                <img
-                  src={metamaskSvg}
-                  alt="metamask_icon"
-                  style={{ height: 40, marginRight: 10 }}
+            {account ? (
+              <Grid item container direction="column">
+                <Label>Connected wallet address</Label>
+                <WalletAddressDisplay
+                  shouldTruncate={false}
+                  address={account}
+                  style={{ fontSize: "1.4rem" }}
                 />
-                Sign in with metamask
-              </Button>
-            </Grid>
+                <MetamaskButton onClick={signInWithWallet}>
+                  Sign in with metamask
+                </MetamaskButton>
+              </Grid>
+            ) : (
+              <Grid item container direction="column">
+                <Label>Connect to Metamask</Label>
+                <ConnectToMetamaskButton />
+              </Grid>
+            )}
           </Grid>
         </Grid>
         <Grid item container justifyContent="center">

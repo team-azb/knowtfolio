@@ -6,11 +6,12 @@ import { useWeb3Context } from "~/components/organisms/providers/Web3Provider";
 import ArticleEditor from "~/components/organisms/ArticleEditor";
 import { Button, Grid } from "@mui/material";
 import ArrowBackIosNewRoundedIcon from "@mui/icons-material/ArrowBackIosNewRounded";
+import { toast } from "react-toastify";
+import ConnectToMetamaskButton from "~/components/organisms/ConnectToMetamaskButton";
+
 /**
  * 記事の新規作成用のフォーム
  */
-import { toast } from "react-toastify";
-
 const NewArticleForm = () => {
   const [content, setContent] = useState("");
   const [titleInput, setTitleInput] = useState("");
@@ -30,34 +31,38 @@ const NewArticleForm = () => {
 
   const handlePost = useCallback(async () => {
     try {
-      const signatureForCreate = await web3.eth.personal.sign(
-        "Create Article",
-        account,
-        ""
-      );
-      const { id } = await postArticle({
-        title: titleInput,
-        address: account,
-        signature: signatureForCreate,
-        content,
-      });
-      const signatureForMint = await web3.eth.personal.sign(
-        "Mint NFT",
-        account,
-        ""
-      );
-      await mintArticleNft({
-        articleId: id,
-        address: account,
-        signature: signatureForMint,
-      });
-      navigate("/mypage");
-      toast.success("記事を作成しました。");
+      if (web3 && account) {
+        const signatureForCreate = await web3.eth.personal.sign(
+          "Create Article",
+          account,
+          ""
+        );
+        const { id } = await postArticle({
+          title: titleInput,
+          address: account,
+          signature: signatureForCreate,
+          content,
+        });
+        const signatureForMint = await web3.eth.personal.sign(
+          "Mint NFT",
+          account,
+          ""
+        );
+        await mintArticleNft({
+          articleId: id,
+          address: account,
+          signature: signatureForMint,
+        });
+        navigate("/mypage");
+        toast.success("記事を作成しました。");
+      } else {
+        throw new Error("metamaskに接続されていません。");
+      }
     } catch (error) {
       console.error(error);
       toast.error("記事の作成に失敗しました。");
     }
-  }, [account, content, navigate, titleInput, web3.eth.personal]);
+  }, [account, content, navigate, titleInput, web3]);
   return (
     <div
       style={{
@@ -91,13 +96,17 @@ const NewArticleForm = () => {
           </Grid>
         </Grid>
         <Grid item xs={9} container direction="row-reverse">
-          <Button
-            variant="contained"
-            onClick={handlePost}
-            style={{ fontSize: "1.4rem" }}
-          >
-            create article
-          </Button>
+          {web3 && account ? (
+            <Button
+              variant="contained"
+              onClick={handlePost}
+              style={{ fontSize: "1.4rem" }}
+            >
+              create article
+            </Button>
+          ) : (
+            <ConnectToMetamaskButton />
+          )}
         </Grid>
       </Grid>
       <Grid flexGrow={1}>

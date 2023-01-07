@@ -8,7 +8,6 @@ import {
 import { useWeb3Context } from "~/components/organisms/providers/Web3Provider";
 import PhoneInput from "react-phone-number-input/input";
 import { E164Number } from "libphonenumber-js/types";
-import { AxiosError } from "axios";
 import { Button, Grid } from "@mui/material";
 import Input, { InputStyle } from "~/components/atoms/authForm/Input";
 import Label from "~/components/atoms/authForm/Label";
@@ -18,6 +17,7 @@ import Spacer from "~/components/atoms/Spacer";
 import WalletAddressDisplay from "~/components/organisms/WalletAddressDisplay";
 import { toast } from "react-toastify";
 import { Link, useNavigate } from "react-router-dom";
+import ConnectToMetamaskButton from "~/components/organisms/ConnectToMetamaskButton";
 
 const SignUpForm = () => {
   const [form, setForm] = useState<SignUpForm>({
@@ -41,7 +41,7 @@ const SignUpForm = () => {
           });
           break;
         case "wallet":
-          if (event.target.checked) {
+          if (event.target.checked && account) {
             setForm((prev) => {
               return { ...prev, wallet: account };
             });
@@ -151,21 +151,36 @@ const SignUpForm = () => {
           value={form.password}
           placeholder="Password"
         />
-        <Checkbox
-          id="wallet"
-          name="wallet"
-          disabled={hasSignedUp}
-          onChange={onChangeForm}
-          label={
-            <>
-              <WalletAddressDisplay
-                address={account}
-                style={{ display: "inline" }}
-              />
-              をwallet addressとして登録する(option)
-            </>
-          }
-        />
+        {account ? (
+          <Checkbox
+            id="wallet"
+            name="wallet"
+            disabled={hasSignedUp}
+            onChange={onChangeForm}
+            label={
+              <>
+                <WalletAddressDisplay
+                  address={account}
+                  style={{ display: "inline" }}
+                />
+                をwallet addressとして登録する(option)
+              </>
+            }
+          />
+        ) : (
+          <Grid item container>
+            <Grid item xs={9}>
+              Wallet
+              addressをアカウントに紐付けるためにはMetamaskに接続する必要があります。
+              <br />
+              ※アカウント作成後にWallet
+              addressをアカウントに紐付けることも可能です。
+            </Grid>
+            <Grid item flexGrow={1}>
+              <ConnectToMetamaskButton />
+            </Grid>
+          </Grid>
+        )}
         <Grid item container justifyContent="center">
           <Button
             variant="outlined"

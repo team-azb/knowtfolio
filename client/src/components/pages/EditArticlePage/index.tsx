@@ -61,12 +61,18 @@ const EditArticlePage = () => {
 
   useEffect(() => {
     (async () => {
-      const ownerIdOfArticle = await contract.methods
-        .getOwnerOfArticle(articleId)
-        .call();
-      setOwnerIdOfArticle(ownerIdOfArticle);
+      if (contract) {
+        // TODO: コントラクトではなくバックエンド経由で取得する
+        const ownerIdOfArticle = await contract.methods
+          .getOwnerOfArticle(articleId)
+          .call();
+        setOwnerIdOfArticle(ownerIdOfArticle);
+      } else {
+        // Metamaskが接続されていない場合は、空文字を入れる。編集権限は必然的にないと判定される。
+        setOwnerIdOfArticle("");
+      }
     })();
-  }, [articleId, contract.methods]);
+  }, [articleId, contract]);
 
   return <div>{content}</div>;
 };

@@ -9,6 +9,7 @@ import { Button, Grid } from "@mui/material";
 import Spacer from "~/components/atoms/Spacer";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import ConnectToMetamaskButton from "~/components/organisms/ConnectToMetamaskButton";
 
 /**
  * walletを再設定するためのフォーム
@@ -78,30 +79,36 @@ const ResetWalletForm = () => {
             <p>新しいwallet address</p>
           </Grid>
           <Grid item container direction="column" xs={9.5} spacing={1}>
-            <RadioGroup
-              value={walletAddressInput}
-              onChange={onChangeWalletAddressInput}
-            >
-              <FormControlLabel
-                value={account}
-                control={<Radio />}
-                label={
-                  <p>
-                    <WalletAddressDisplay
-                      address={account}
-                      shouldTruncate={false}
-                      style={{ display: "inline" }}
-                    />
-                    を登録する
-                  </p>
-                }
-              />
-              <FormControlLabel
-                value={""}
-                control={<Radio />}
-                label={<p>Wallet addressを登録解除する</p>}
-              />
-            </RadioGroup>
+            {account ? (
+              <RadioGroup
+                value={walletAddressInput}
+                onChange={onChangeWalletAddressInput}
+              >
+                <FormControlLabel
+                  value={account}
+                  control={<Radio />}
+                  label={
+                    <p>
+                      <WalletAddressDisplay
+                        address={account}
+                        shouldTruncate={false}
+                        style={{ display: "inline" }}
+                      />
+                      を登録する
+                    </p>
+                  }
+                />
+                <FormControlLabel
+                  value={""}
+                  control={<Radio />}
+                  label={<p>Wallet addressを登録解除する</p>}
+                />
+              </RadioGroup>
+            ) : (
+              <Grid item container xs={4}>
+                <ConnectToMetamaskButton />
+              </Grid>
+            )}
           </Grid>
         </Grid>
         <Grid item container justifyContent="center">
