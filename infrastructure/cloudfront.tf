@@ -98,7 +98,7 @@ resource "aws_cloudfront_distribution" "knowtfolio" {
     for_each = local.auth_endpoint_functions
 
     content {
-      path_pattern             = "/api/${ordered_cache_behavior.value.resource_name}"
+      path_pattern             = "/api/${ordered_cache_behavior.value.api_resource_path}"
       allowed_methods          = ["GET", "HEAD", "OPTIONS", "PUT", "POST", "PATCH", "DELETE"]
       cached_methods           = ["GET", "HEAD", "OPTIONS"]
       viewer_protocol_policy   = "allow-all"
@@ -107,6 +107,17 @@ resource "aws_cloudfront_distribution" "knowtfolio" {
       origin_request_policy_id = aws_cloudfront_origin_request_policy.lambda_function_url_request.id
       compress                 = true
     }
+  }
+
+  ordered_cache_behavior {
+    path_pattern             = "/api/*"
+    allowed_methods          = ["GET", "HEAD", "OPTIONS", "PUT", "POST", "PATCH", "DELETE"]
+    cached_methods           = ["GET", "HEAD", "OPTIONS"]
+    viewer_protocol_policy   = "allow-all"
+    target_origin_id         = aws_lb.knowtfolio_backend.id
+    cache_policy_id          = "4135ea2d-6df8-44a3-9df3-4b5a84be39ad" // CachingDisabled
+    origin_request_policy_id = "216adef6-5c7f-47e4-b989-5492eafa07d3" // AllViewer
+    compress                 = true
   }
 
   ordered_cache_behavior {
