@@ -12,7 +12,7 @@ type SignUpForm struct {
 	Password      string `json:"password" validate:"required,cognito_password"`
 	PhoneNumber   string `json:"phone_number" validate:"required,e164"`
 	WalletAddress string `json:"wallet_address" validate:"omitempty,eth_addr"`
-	Signature     string `json:"signature" validate:"required_with=WalletAddress,eth_sign_addr=WalletAddress"`
+	Signature     string `json:"signature" validate:"required_with=WalletAddress,omitempty,eth_sign_addr=WalletAddress"`
 }
 
 func (f *SignUpForm) ToCognitoInput() *cognitoidentityprovider.SignUpInput {
