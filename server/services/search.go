@@ -44,10 +44,10 @@ func (s searchService) SearchForArticles(_ context.Context, request *search.Sear
 			return nil, err
 		}
 
-		ownedArticleIds, err := s.Contract.GetArticleIdsOwnedBy(&bind.CallOpts{}, *ownedByAddr)
-		for i, url := range ownedArticleIds {
+		ownedArticleIDs, err := s.Contract.GetArticleIdsOwnedBy(&bind.CallOpts{}, *ownedByAddr)
+		for i, url := range ownedArticleIDs {
 			// TODO: Do this part on the contract side.
-			ownedArticleIds[i] = strings.TrimPrefix(url, "https://knowtfolio.com/nfts/")
+			ownedArticleIDs[i] = strings.TrimPrefix(url, "https://knowtfolio.com/nfts/")
 		}
 
 		if err != nil {
@@ -55,7 +55,7 @@ func (s searchService) SearchForArticles(_ context.Context, request *search.Sear
 		}
 		ownedByCond := s.DB.
 			// Articles that has been tokenized and whose token is owned by the user.
-			Where(`articles.id IN ?`, ownedArticleIds).
+			Where(`articles.id IN ?`, ownedArticleIDs).
 			// Articles that hasn't been tokenized and is originally created by the user.
 			Or(s.DB.Where(`is_tokenized = 0`).Where(`original_author_id = ?`, *request.OwnedBy))
 		baseQuery = baseQuery.Where(ownedByCond)
