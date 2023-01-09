@@ -9,7 +9,7 @@ resource "aws_key_pair" "knowtfolio" {
 
 resource "aws_instance" "knowtfolio_backend" {
   ami                         = local.UBUNTU_20_AMI
-  instance_type               = "t2.medium"
+  instance_type               = "t2.micro"
   subnet_id                   = aws_subnet.knowtfolio_public_a.id
   key_name                    = aws_key_pair.knowtfolio.id
   associate_public_ip_address = true
