@@ -26,7 +26,7 @@ const SignUpForm = () => {
   });
   const [hasSignedUp, setHasSignedUp] = useState(false);
   const [code, setCode] = useState("");
-  const { account } = useWeb3Context();
+  const { account, web3 } = useWeb3Context();
 
   const onChangeForm = useCallback<React.ChangeEventHandler<HTMLInputElement>>(
     (event) => {
@@ -69,7 +69,14 @@ const SignUpForm = () => {
     async (event) => {
       event.preventDefault();
       try {
-        await signUpToCognito(form);
+        const signature =
+          form.wallet &&
+          (await web3.eth.personal.sign(
+            "Sign up with wallet address",
+            account,
+            ""
+          ));
+        await signUpToCognito({ ...form, signature });
         alert("successfully signed up!");
         setHasSignedUp(true);
       } catch (error) {
@@ -77,7 +84,7 @@ const SignUpForm = () => {
         alert(`sign up failed: ${error}`);
       }
     },
-    [form]
+    [account, form, web3.eth.personal]
   );
 
   const onChangeCodeInput = useCallback<

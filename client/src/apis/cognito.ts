@@ -91,7 +91,18 @@ export type SignUpForm = {
   password: string;
   username: string;
   wallet?: string;
+  signature?: string;
 };
+
+type metaData =
+  | {
+      password: string;
+      wallet_address: string;
+      signature: string;
+    }
+  | {
+      password: string;
+    };
 
 export const signUpToCognito = (form: SignUpForm) => {
   const attributeList = [
@@ -99,11 +110,25 @@ export const signUpToCognito = (form: SignUpForm) => {
       Name: "phone_number",
       Value: form.phone,
     }),
+    // TODO: custom:wallet_address属性が削除されるときにここも削除
     new CognitoUserAttribute({
       Name: "custom:wallet_address",
       Value: form.wallet || "",
     }),
   ];
+
+  const { wallet, signature } = form;
+  const metaData: metaData =
+    wallet && signature
+      ? {
+          password: form.password,
+          wallet_address: wallet,
+          signature: signature,
+        }
+      : {
+          password: form.password,
+        };
+
   return new Promise<AmazonCognitoIdentity.CognitoUser>((resolve, reject) => {
     userPool.signUp(
       form.username,
@@ -120,10 +145,7 @@ export const signUpToCognito = (form: SignUpForm) => {
         }
         reject("unexpected error");
       },
-      {
-        password: form.password,
-        wallet_address: form.wallet || "",
-      }
+      metaData
     );
   });
 };
