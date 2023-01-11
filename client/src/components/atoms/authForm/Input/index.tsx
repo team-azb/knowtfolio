@@ -1,6 +1,8 @@
 import { Grid } from "@mui/material";
 import { grey } from "@mui/material/colors";
 import Label from "../Label";
+// import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+// import { useMemo } from "react";
 
 export const InputStyle: React.CSSProperties = {
   fontSize: "1.5rem",
@@ -15,6 +17,7 @@ type inputProps = React.DetailedHTMLProps<
   HTMLInputElement
 > & {
   label?: string;
+  message?: string | JSX.Element;
 };
 
 /**
@@ -29,6 +32,7 @@ const Input = ({
   placeholder,
   style,
   label,
+  message,
 }: inputProps) => {
   return (
     <Grid item container direction="column">
@@ -42,6 +46,7 @@ const Input = ({
         placeholder={placeholder}
         style={{ ...InputStyle, ...style }}
       />
+      <label htmlFor={id}>{message}</label>
     </Grid>
   );
 };

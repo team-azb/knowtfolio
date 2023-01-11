@@ -1,9 +1,10 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   signUpToCognito,
   SignUpForm,
   confirmSigningUpToCognito,
   signInToCognitoWithPassword,
+  SignUpFormKey,
 } from "~/apis/cognito";
 import { useWeb3Context } from "~/components/organisms/providers/Web3Provider";
 import PhoneInput from "react-phone-number-input/input";
@@ -18,6 +19,90 @@ import Spacer from "~/components/atoms/Spacer";
 import WalletAddressDisplay from "~/components/organisms/WalletAddressDisplay";
 import { toast } from "react-toastify";
 import { Link, useNavigate } from "react-router-dom";
+import { signUpErrorCode, validateSignUpForm } from "~/apis/lambda";
+
+type formFieldMessages = {
+  [key in SignUpFormKey]?: string | JSX.Element;
+};
+
+const castFieldErrorKey = (upperCamelKey: unknown): SignUpFormKey | null => {
+  // NOTE: keyの値がゆれているのでそれに対応している
+  // https://github.com/team-azb/knowtfolio/issues/217
+  switch (upperCamelKey) {
+    case "username":
+      return "username";
+    case "password":
+      return "password";
+    case "phone_number":
+      return "phone";
+    case "wallet_address":
+      return "wallet";
+    default:
+      return null;
+  }
+};
+
+/**
+ * invalid_formだった場合のエラー表示文
+ */
+const messagesOnInvalidFormError = {
+  username: "適切なユーザーネームではありません。",
+  password: "大文字・小文字・数字・記号を含む８文字以上である必要があります。",
+  phone:
+    "適切な電話番号ではありません。（日本国以外の電話番号は利用できません。）",
+  wallet: "適切なwallet addressではありません。",
+} as const;
+
+/**
+ * signUpFormのエラーコードをエラー表示用のJSX Elementに変換する
+ * messagesOnInvalidFormErrorに依存関係あり
+ * @param field 対象のフィールド
+ * @param errorCode エラーコード
+ * @param value フィールドの値
+ * @returns エラー表示用のJSX Element
+ */
+const translateSignUpErrorCode = (
+  field: SignUpFormKey,
+  errorCode: signUpErrorCode,
+  value: string
+) => {
+  if (errorCode === "already_exists") {
+    return (
+      <span style={{ color: "red" }}>
+        <b>{value}</b>はすでに登録されています。
+      </span>
+    );
+  }
+  // invalida_formだった場合のエラーメッセージ
+  return (
+    <span style={{ color: "red" }}>{messagesOnInvalidFormError[field]}</span>
+  );
+};
+
+const formToFieldMessages = async (form: SignUpForm) => {
+  // 値が入力されているものについてのみメッセージ表示の対応
+  const init = (Object.keys(form) as SignUpFormKey[]).reduce<formFieldMessages>(
+    (obj, key) => {
+      if (form[key]) {
+        obj[key] = <span style={{ color: "green" }}>有効な値です。</span>;
+      }
+      return obj;
+    },
+    {}
+  );
+
+  const fieldMessages = await validateSignUpForm(form);
+  const resp = fieldMessages.reduce<formFieldMessages>((obj, err) => {
+    const key = castFieldErrorKey(err.field_name);
+    const value = key && form[key];
+    // 値が入力されているものについてのみエラー表示の対象
+    if (key && value) {
+      obj[key] = translateSignUpErrorCode(key, err.code, value);
+    }
+    return obj;
+  }, init);
+  return resp;
+};
 
 const SignUpForm = () => {
   const [form, setForm] = useState<SignUpForm>({
@@ -25,6 +110,7 @@ const SignUpForm = () => {
     password: "",
     username: "",
   });
+  const [fieldMessages, setFieldMessages] = useState<formFieldMessages>({});
   const [hasSignedUp, setHasSignedUp] = useState(false);
   const [code, setCode] = useState("");
   const { account } = useWeb3Context();
@@ -57,6 +143,13 @@ const SignUpForm = () => {
     },
     [account]
   );
+
+  useEffect(() => {
+    (async () => {
+      const fieldMessages = await formToFieldMessages(form);
+      setFieldMessages(fieldMessages);
+    })();
+  }, [form]);
 
   const onChangePhoneNumberInput = useCallback((value: E164Number) => {
     setForm((prev) => {
@@ -102,7 +195,7 @@ const SignUpForm = () => {
       try {
         await signInToCognitoWithPassword(form.username, form.password);
         toast.success("サインインしました。");
-        navigate("mypage", {
+        navigate("/mypage", {
           state: {
             shouldLoadCurrentUser: true,
           },
@@ -128,6 +221,7 @@ const SignUpForm = () => {
           id="username"
           onChange={onChangeForm}
           placeholder="Name used as display name"
+          message={fieldMessages.username}
         />
         <Grid item container direction="column">
           <Label htmlFor="phone_number">Phone number</Label>
@@ -140,6 +234,9 @@ const SignUpForm = () => {
             style={InputStyle}
             placeholder="Phone number"
           />
+          <label htmlFor="phone_number" style={{ color: "red" }}>
+            {fieldMessages.phone}
+          </label>
         </Grid>
         <Input
           label="Password"
@@ -150,6 +247,7 @@ const SignUpForm = () => {
           onChange={onChangeForm}
           value={form.password}
           placeholder="Password"
+          message={fieldMessages.password}
         />
         <Checkbox
           id="wallet"
