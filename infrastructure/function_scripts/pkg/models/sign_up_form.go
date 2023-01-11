@@ -6,6 +6,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/cognitoidentityprovider/types"
 	"github.com/go-playground/validator/v10"
 	"github.com/team-azb/knowtfolio/infrastructure/function_scripts/pkg/aws_utils"
+	"reflect"
 	"regexp"
 )
 
@@ -15,6 +16,9 @@ var (
 
 func init() {
 	err := SignUpFormValidator.RegisterValidation("cognito_password", validateCognitoPassword)
+	SignUpFormValidator.RegisterTagNameFunc(func(field reflect.StructField) string {
+		return field.Tag.Get("json")
+	})
 	if err != nil {
 		panic(err.(any))
 	}
