@@ -66,7 +66,7 @@ const ResetWalletForm = () => {
 
   const resetWalletAddress = useCallback(async () => {
     const signature = await web3.eth.personal.sign(
-      "Update Wallet Address",
+      "Register wallet address",
       account,
       ""
     );
