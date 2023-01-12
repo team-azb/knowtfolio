@@ -10,7 +10,7 @@ import NewArticlePage from "~/components/pages/NewArticlePage";
 import EditArticlePage from "~/components/pages/EditArticlePage";
 import IndexArticlesPage from "./components/pages/IndexArticlesPage";
 import Web3Provider from "~/components/organisms/providers/Web3Provider";
-import ResetWalletPage from "./components/pages/ResetWalletPage";
+import RegisterWalletPage from "./components/pages/RegisterWalletPage";
 import { ThemeProvider } from "@mui/material";
 import { theme } from "~/configs/theme";
 import "~/global.css";
@@ -24,10 +24,10 @@ const App = () => {
           <Route path="/signup" element={<SignUpPage />} />
           <Route path="/signin" element={<SignInPage />} />
           <Route
-            path="/reset-wallet"
+            path="/register-wallet"
             element={
               <AuthProvider>
-                <ResetWalletPage />
+                <RegisterWalletPage />
               </AuthProvider>
             }
           />

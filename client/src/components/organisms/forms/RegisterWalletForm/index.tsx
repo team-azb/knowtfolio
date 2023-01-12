@@ -58,13 +58,13 @@ const MessageToRejectRegistration = () => {
 };
 
 /**
- * walletを再設定するためのフォーム
+ * walletを登録するためのフォーム
  */
-const ResetWalletForm = () => {
+const RegisterWalletForm = () => {
   const { user, userWalletAddress } = useAuthContext();
   const { account, web3 } = useWeb3Context();
 
-  const resetWalletAddress = useCallback(async () => {
+  const registerWalletAddress = useCallback(async () => {
     const signature = await web3.eth.personal.sign(
       "Register wallet address",
       account,
@@ -122,10 +122,10 @@ const ResetWalletForm = () => {
             <Grid item xs={7.5}>
               <Button
                 variant="outlined"
-                onClick={resetWalletAddress}
+                onClick={registerWalletAddress}
                 style={{ fontSize: "1.4rem" }}
               >
-                update wallet address
+                register wallet address
               </Button>
             </Grid>
             <Grid item container xs={2} direction="row-reverse">
@@ -146,4 +146,4 @@ const ResetWalletForm = () => {
   );
 };
 
-export default ResetWalletForm;
+export default RegisterWalletForm;

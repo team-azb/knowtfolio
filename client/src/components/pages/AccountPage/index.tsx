@@ -58,7 +58,7 @@ const AccountPage = () => {
               <Button
                 variant="outlined"
                 onClick={() => {
-                  navigate("/reset-wallet");
+                  navigate("/register-wallet");
                 }}
                 style={{ marginLeft: "1rem", fontSize: "1.4rem" }}
               >
