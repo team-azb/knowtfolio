@@ -62,6 +62,10 @@ const translateSignUpErrorCode = (
   );
 };
 
+/**
+ * フィールドに表示するメッセージを作成するための関数
+ * @param form サインアップフォーム
+ */
 const createFieldMessages = async (form: SignUpForm) => {
   // 値が入力されているものについてのみメッセージ表示の対応
   const messagesWhenValid = (

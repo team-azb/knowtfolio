@@ -122,6 +122,7 @@ module.exports = [
           target: "https://knowtfolio.com",
         },
         {
+          // TODO: https://github.com/team-azb/knowtfolio/pull/174 とマージするときにエンドポイントを変更
           context: "/api/validate_signup_form",
           changeOrigin: true,
           target: "https://knowtfolio.com",
