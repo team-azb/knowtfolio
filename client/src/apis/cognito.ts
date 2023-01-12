@@ -7,7 +7,6 @@ import * as AmazonCognitoIdentity from "amazon-cognito-identity-js";
 import { userPool } from "~/configs/cognito";
 import Web3 from "web3";
 import axios from "axios";
-import SignUpForm from "~/components/organisms/forms/SignUpForm";
 
 export const signOutFromCognito = (cognitoUser: CognitoUser) => {
   return new Promise<void>((resolve) => {
