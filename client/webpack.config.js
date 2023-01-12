@@ -122,6 +122,11 @@ module.exports = [
           target: "https://knowtfolio.com",
         },
         {
+          context: "/api/validate_signup_form",
+          changeOrigin: true,
+          target: "https://knowtfolio.com",
+        },
+        {
           context: (path) => {
             if (path.includes("/api")) {
               return true;
