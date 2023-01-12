@@ -25,23 +25,6 @@ type formFieldMessages = {
   [key in SignUpFormKey]?: string | JSX.Element;
 };
 
-const castFieldErrorKey = (upperCamelKey: unknown): SignUpFormKey | null => {
-  // NOTE: keyの値がゆれているのでそれに対応している
-  // https://github.com/team-azb/knowtfolio/issues/217
-  switch (upperCamelKey) {
-    case "username":
-      return "username";
-    case "password":
-      return "password";
-    case "phone_number":
-      return "phone_number";
-    case "wallet_address":
-      return "wallet_address";
-    default:
-      return null;
-  }
-};
-
 /**
  * invalid_formだった場合のエラー表示文
  */
@@ -92,15 +75,17 @@ const formToFieldMessages = async (form: SignUpForm) => {
   );
 
   const fieldMessages = await validateSignUpForm(form);
-  const resp = fieldMessages.reduce<formFieldMessages>((obj, err) => {
-    const key = castFieldErrorKey(err.field_name);
-    const value = key && form[key];
-    // 値が入力されているものについてのみエラー表示の対象
-    if (key && value) {
-      obj[key] = translateSignUpErrorCode(key, err.code, value);
-    }
-    return obj;
-  }, init);
+  const resp = fieldMessages.reduce<formFieldMessages>(
+    (obj, { field_name, code }) => {
+      const value = form[field_name];
+      // 値が入力されているものについてのみエラー表示の対象
+      if (value) {
+        obj[field_name] = translateSignUpErrorCode(field_name, code, value);
+      }
+      return obj;
+    },
+    init
+  );
   return resp;
 };
 

@@ -1,9 +1,9 @@
 import axios from "axios";
-import { SignUpForm } from "./cognito";
+import { SignUpForm, SignUpFormKey } from "./cognito";
 
 export type signUpErrorCode = "invalid_format" | "already_exists";
 export type FieldError = {
-  field_name: string;
+  field_name: SignUpFormKey;
   code: signUpErrorCode;
 };
 
