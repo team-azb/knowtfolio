@@ -22,7 +22,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { signUpErrorCode, validateSignUpForm } from "~/apis/lambda";
 
 type formFieldMessages = {
-  [key in SignUpFormKey]?: string | JSX.Element;
+  [key in SignUpFormKey]?: JSX.Element;
 };
 
 /**
@@ -62,31 +62,27 @@ const translateSignUpErrorCode = (
   );
 };
 
-const formToFieldMessages = async (form: SignUpForm) => {
+const createFieldMessages = async (form: SignUpForm) => {
   // 値が入力されているものについてのみメッセージ表示の対応
-  const init = (Object.keys(form) as SignUpFormKey[]).reduce<formFieldMessages>(
-    (obj, key) => {
-      if (form[key]) {
-        obj[key] = <span style={{ color: "green" }}>有効な値です。</span>;
-      }
-      return obj;
-    },
-    {}
-  );
+  const messagesWhenValid = (
+    Object.keys(form) as SignUpFormKey[]
+  ).reduce<formFieldMessages>((obj, key) => {
+    if (form[key]) {
+      obj[key] = <span style={{ color: "green" }}>有効な値です。</span>;
+    }
+    return obj;
+  }, {});
 
-  const fieldMessages = await validateSignUpForm(form);
-  const resp = fieldMessages.reduce<formFieldMessages>(
-    (obj, { field_name, code }) => {
-      const value = form[field_name];
-      // 値が入力されているものについてのみエラー表示の対象
-      if (value) {
-        obj[field_name] = translateSignUpErrorCode(field_name, code, value);
-      }
-      return obj;
-    },
-    init
-  );
-  return resp;
+  // バリデーションエラーが起きているフィールドのメッセージを上書きする
+  const fieldErrors = await validateSignUpForm(form);
+  return fieldErrors.reduce<formFieldMessages>((obj, { field_name, code }) => {
+    const value = form[field_name];
+    // 値が入力されているものについてのみエラー表示の対象
+    if (value) {
+      obj[field_name] = translateSignUpErrorCode(field_name, code, value);
+    }
+    return obj;
+  }, messagesWhenValid);
 };
 
 const SignUpForm = () => {
@@ -130,7 +126,7 @@ const SignUpForm = () => {
 
   useEffect(() => {
     (async () => {
-      const fieldMessages = await formToFieldMessages(form);
+      const fieldMessages = await createFieldMessages(form);
       setFieldMessages(fieldMessages);
     })();
   }, [form]);
