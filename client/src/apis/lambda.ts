@@ -11,8 +11,8 @@ export const validateSignUpForm = async (form: SignUpForm) => {
   const { data: errData } = await axios.post("/api/validate_signup_form", {
     username: form.username,
     password: form.password,
-    phone_number: form.phone,
-    wallet_address: form.wallet,
+    phone_number: form.phone_number,
+    wallet_address: form.wallet_address,
   });
   return errData as FieldError[];
 };

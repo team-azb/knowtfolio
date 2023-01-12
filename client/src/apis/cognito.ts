@@ -89,10 +89,10 @@ export const signInToCognitoWithWallet = async (
 };
 
 export type SignUpForm = {
-  phone: string;
+  phone_number: string;
   password: string;
   username: string;
-  wallet?: string;
+  wallet_address?: string;
 };
 export type SignUpFormKey = keyof SignUpForm;
 
@@ -100,11 +100,11 @@ export const signUpToCognito = (form: SignUpForm) => {
   const attributeList = [
     new CognitoUserAttribute({
       Name: "phone_number",
-      Value: form.phone,
+      Value: form.phone_number,
     }),
     new CognitoUserAttribute({
       Name: "custom:wallet_address",
-      Value: form.wallet || "",
+      Value: form.wallet_address || "",
     }),
   ];
   return new Promise<AmazonCognitoIdentity.CognitoUser>((resolve, reject) => {

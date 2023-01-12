@@ -34,9 +34,9 @@ const castFieldErrorKey = (upperCamelKey: unknown): SignUpFormKey | null => {
     case "password":
       return "password";
     case "phone_number":
-      return "phone";
+      return "phone_number";
     case "wallet_address":
-      return "wallet";
+      return "wallet_address";
     default:
       return null;
   }
@@ -48,9 +48,9 @@ const castFieldErrorKey = (upperCamelKey: unknown): SignUpFormKey | null => {
 const messagesOnInvalidFormError = {
   username: "適切なユーザーネームではありません。",
   password: "大文字・小文字・数字・記号を含む８文字以上である必要があります。",
-  phone:
+  phone_number:
     "適切な電話番号ではありません。（日本国以外の電話番号は利用できません。）",
-  wallet: "適切なwallet addressではありません。",
+  wallet_address: "適切なwallet addressではありません。",
 } as const;
 
 /**
@@ -106,7 +106,7 @@ const formToFieldMessages = async (form: SignUpForm) => {
 
 const SignUpForm = () => {
   const [form, setForm] = useState<SignUpForm>({
-    phone: "",
+    phone_number: "",
     password: "",
     username: "",
   });
@@ -119,21 +119,20 @@ const SignUpForm = () => {
   const onChangeForm = useCallback<React.ChangeEventHandler<HTMLInputElement>>(
     (event) => {
       switch (event.target.name) {
-        case "phone":
         case "password":
         case "username":
           setForm((prev) => {
             return { ...prev, [event.target.name]: event.target.value };
           });
           break;
-        case "wallet":
+        case "wallet_address":
           if (event.target.checked) {
             setForm((prev) => {
-              return { ...prev, wallet: account };
+              return { ...prev, wallet_address: account };
             });
           } else {
             setForm((prev) => {
-              return { ...prev, wallet: undefined };
+              return { ...prev, wallet_address: undefined };
             });
           }
           break;
@@ -155,7 +154,7 @@ const SignUpForm = () => {
     setForm((prev) => {
       return {
         ...prev,
-        phone: value,
+        phone_number: value,
       };
     });
   }, []);
@@ -229,13 +228,14 @@ const SignUpForm = () => {
             onChange={onChangePhoneNumberInput}
             country="JP"
             id="phone_number"
+            name="phone_number"
             disabled={hasSignedUp}
-            value={form.phone}
+            value={form.phone_number}
             style={InputStyle}
             placeholder="Phone number"
           />
           <label htmlFor="phone_number" style={{ color: "red" }}>
-            {fieldMessages.phone}
+            {fieldMessages.phone_number}
           </label>
         </Grid>
         <Input
@@ -250,8 +250,8 @@ const SignUpForm = () => {
           message={fieldMessages.password}
         />
         <Checkbox
-          id="wallet"
-          name="wallet"
+          id="wallet_address"
+          name="wallet_address"
           disabled={hasSignedUp}
           onChange={onChangeForm}
           label={
