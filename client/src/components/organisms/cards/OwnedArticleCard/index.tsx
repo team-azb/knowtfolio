@@ -28,7 +28,7 @@ const OwnedArticleCard = (props: ownedArticleCardProps) => {
           </Button>
         </>
       }
-      onClick={() => (location.href = `/articles/${props.article.id}`)}
+      onClick={() => navigate(`/articles/${props.article.id}`)}
     />
   );
 };

@@ -5,6 +5,8 @@ files:
     destination: /home/ubuntu/knowtfolio
   - source: /.env
     destination: /home/ubuntu/knowtfolio
+  - source: /article_template.html
+    destination: /home/ubuntu/knowtfolio/static
 
 hooks:
   ApplicationStop:
