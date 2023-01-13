@@ -15,6 +15,7 @@ import (
 	"github.com/team-azb/knowtfolio/server/config"
 	"github.com/team-azb/knowtfolio/server/gateways/api/gen/http/nfts/server"
 	"github.com/team-azb/knowtfolio/server/gateways/api/gen/nfts"
+	awsutil "github.com/team-azb/knowtfolio/server/gateways/aws"
 	"github.com/team-azb/knowtfolio/server/gateways/ethereum"
 	"github.com/team-azb/knowtfolio/server/models"
 	goahttp "goa.design/goa/v3/http"
@@ -22,13 +23,14 @@ import (
 )
 
 type nftsService struct {
-	DB       *gorm.DB
-	Contract *ethereum.ContractClient
-	S3Client *s3.Client
+	DB             *gorm.DB
+	Contract       *ethereum.ContractClient
+	S3Client       *s3.Client
+	DynamoDBClient *awsutil.DynamoDBClient
 }
 
-func NewNftsService(db *gorm.DB, contract *ethereum.ContractClient, s3Client *s3.Client, handler HttpHandler) *server.Server {
-	endpoints := nfts.NewEndpoints(nftsService{DB: db, Contract: contract, S3Client: s3Client})
+func NewNftsService(db *gorm.DB, contract *ethereum.ContractClient, s3Client *s3.Client, dynamodbClient *awsutil.DynamoDBClient, handler HttpHandler) *server.Server {
+	endpoints := nfts.NewEndpoints(nftsService{DB: db, Contract: contract, S3Client: s3Client, DynamoDBClient: dynamodbClient})
 	return server.New(
 		endpoints,
 		handler,
@@ -48,14 +50,20 @@ func (s nftsService) CreateForArticle(ctx context.Context, request *nfts.CreateN
 	target := models.Article{ID: request.ArticleID}
 
 	err = s.DB.Transaction(func(tx *gorm.DB) error {
-		// Get target Article and check the author
+		// Get target Article
 		result := tx.First(&target)
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
 			return nfts.MakeArticleNotFound(result.Error)
 		} else if result.Error != nil {
 			return result.Error
 		}
-		if target.OriginalAuthorAddress != request.Address {
+
+		// Check the author of the article
+		originalAuthorAddress, err := s.DynamoDBClient.GetAddressByID(target.OriginalAuthorID)
+		if err != nil {
+			return err
+		}
+		if originalAuthorAddress.String() != request.Address {
 			msg := fmt.Sprintf("Address %v is not the orignial owner of article %v.", request.Address, target.ID)
 			return nfts.MakeUnauthorized(errors.New(msg))
 		}

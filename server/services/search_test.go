@@ -5,6 +5,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/stretchr/testify/assert"
 	"github.com/team-azb/knowtfolio/server/gateways/api/gen/search"
+	"github.com/team-azb/knowtfolio/server/gateways/aws"
 	"github.com/team-azb/knowtfolio/server/gateways/ethereum"
 	"github.com/team-azb/knowtfolio/server/models"
 	"go.uber.org/multierr"
@@ -12,21 +13,24 @@ import (
 )
 
 var (
-	goArticle = models.NewArticle("Golang", []byte("<div> Build fast, reliable, and efficient software at scale. </div>"), testUsers[0].Address)
-	rsArticle = models.NewArticle("Rust", []byte("<div> A language empowering everyone to build reliable and efficient software. </div>"), testUsers[0].Address)
-	pyArticle = models.NewArticle("Python", []byte("<div> Python is a programming language that lets you work quickly and integrate systems more effectively. </div>"), testUsers[0].Address)
-	ktArticle = models.NewArticle("Kotlin", []byte("<div> A modern programming language that makes developers happier. </div>"), testUsers[1].Address)
-	jsArticle = models.NewArticle("JavaScript", []byte("<div> JavaScript (JS) is a lightweight, interpreted, or just-in-time compiled programming language with first-class functions. </div>"), testUsers[1].Address)
-	tsArticle = models.NewArticle("TypeScript", []byte("<div> TypeScript is a strongly typed programming language that builds on JavaScript, giving you better tooling at any scale. </div>"), testUsers[1].Address)
+	goArticle = models.NewArticle("Golang", []byte("<div> Build fast, reliable, and efficient software at scale. </div>"), testUsers[0].ID)
+	rsArticle = models.NewArticle("Rust", []byte("<div> A language empowering everyone to build reliable and efficient software. </div>"), testUsers[0].ID)
+	pyArticle = models.NewArticle("Python", []byte("<div> Python is a programming language that lets you work quickly and integrate systems more effectively. </div>"), testUsers[0].ID)
+	ktArticle = models.NewArticle("Kotlin", []byte("<div> A modern programming language that makes developers happier. </div>"), testUsers[1].ID)
+	jsArticle = models.NewArticle("JavaScript", []byte("<div> JavaScript (JS) is a lightweight, interpreted, or just-in-time compiled programming language with first-class functions. </div>"), testUsers[1].ID)
+	tsArticle = models.NewArticle("TypeScript", []byte("<div> TypeScript is a strongly typed programming language that builds on JavaScript, giving you better tooling at any scale. </div>"), testUsers[1].ID)
 )
 
 var (
-	goEntry = search.SearchResultEntry{ID: goArticle.ID, Title: goArticle.Document.Title, OwnerAddress: testUsers[0].Address}
-	rsEntry = search.SearchResultEntry{ID: rsArticle.ID, Title: rsArticle.Document.Title, OwnerAddress: testUsers[1].Address}
-	pyEntry = search.SearchResultEntry{ID: pyArticle.ID, Title: pyArticle.Document.Title, OwnerAddress: testUsers[0].Address}
-	ktEntry = search.SearchResultEntry{ID: ktArticle.ID, Title: ktArticle.Document.Title, OwnerAddress: testUsers[1].Address}
-	jsEntry = search.SearchResultEntry{ID: jsArticle.ID, Title: jsArticle.Document.Title, OwnerAddress: testUsers[0].Address}
-	tsEntry = search.SearchResultEntry{ID: tsArticle.ID, Title: tsArticle.Document.Title, OwnerAddress: testUsers[1].Address}
+	createEntry = func(article *models.Article, owner *testUser) search.SearchResultEntry {
+		return search.SearchResultEntry{ID: article.ID, Title: article.Document.Title, OwnerID: owner.ID, OwnerAddress: &owner.Address}
+	}
+	goEntry = createEntry(goArticle, &testUsers[0])
+	rsEntry = createEntry(rsArticle, &testUsers[1])
+	pyEntry = createEntry(pyArticle, &testUsers[0])
+	ktEntry = createEntry(ktArticle, &testUsers[1])
+	jsEntry = createEntry(jsArticle, &testUsers[0])
+	tsEntry = createEntry(tsArticle, &testUsers[1])
 )
 
 func tokenizeTestTargetArticle(client *ethereum.ContractClient, target *models.Article, ownerAddr string) error {
@@ -48,8 +52,9 @@ func prepareSearchService(t *testing.T) searchService {
 	t.Parallel()
 
 	service := searchService{
-		DB:       initTestDB(t),
-		Contract: initTestContractClient(t),
+		DB:             initTestDB(t),
+		Contract:       initTestContractClient(t),
+		DynamoDBClient: aws.NewDynamoDBClient(),
 	}
 
 	// Mint NFTs for the target articles.
@@ -103,7 +108,7 @@ func TestSearchForArticles(t *testing.T) {
 		service := prepareSearchService(t)
 
 		result, err := service.SearchForArticles(context.Background(), &search.SearchRequest{
-			OwnedBy: &testUsers[0].Address,
+			OwnedBy: &testUsers[0].ID,
 		})
 
 		// Assert request body.
@@ -136,13 +141,13 @@ func TestSearchForArticles(t *testing.T) {
 		keywords := "language"
 		result1, err1 := service.SearchForArticles(context.Background(), &search.SearchRequest{
 			Keywords: &keywords,
-			OwnedBy:  &testUsers[0].Address,
+			OwnedBy:  &testUsers[0].ID,
 			PageSize: 1,
 			PageNum:  1,
 		})
 		result2, err2 := service.SearchForArticles(context.Background(), &search.SearchRequest{
 			Keywords: &keywords,
-			OwnedBy:  &testUsers[0].Address,
+			OwnedBy:  &testUsers[0].ID,
 			PageSize: 1,
 			PageNum:  2,
 		})

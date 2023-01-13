@@ -13,6 +13,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/team-azb/knowtfolio/server/config"
 	"github.com/team-azb/knowtfolio/server/gateways/api/gen/nfts"
+	"github.com/team-azb/knowtfolio/server/gateways/aws"
 	"github.com/team-azb/knowtfolio/server/gateways/ethereum"
 	"github.com/team-azb/knowtfolio/server/models"
 	"io"
@@ -29,9 +30,10 @@ func prepareNftsService(t *testing.T) nftsService {
 	}
 
 	service := nftsService{
-		DB:       initTestDB(t),
-		Contract: initTestContractClient(t),
-		S3Client: s3.NewFromConfig(cfg),
+		DB:             initTestDB(t),
+		Contract:       initTestContractClient(t),
+		S3Client:       s3.NewFromConfig(cfg),
+		DynamoDBClient: aws.NewDynamoDBClient(),
 	}
 
 	return service
@@ -70,7 +72,7 @@ func TestCreateNFTForArticle(t *testing.T) {
 	actualOwner, err := service.Contract.GetOwnerOfArticle(&bind.CallOpts{}, article0.ID)
 	assert.True(t, nftMinted)
 	assert.NoError(t, err)
-	assert.Equal(t, article0.OriginalAuthorAddress, actualOwner.String())
+	assert.Equal(t, testUsers[0].Address, actualOwner.String())
 
 	// Assert metadata existence.
 	getObjOutput, reqErr := service.S3Client.GetObject(context.Background(), &s3.GetObjectInput{

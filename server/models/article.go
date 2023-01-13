@@ -7,20 +7,20 @@ import (
 )
 
 type Article struct {
-	ID                    string   `gorm:"primarykey"`
-	Document              Document `gorm:"polymorphic:Owner; polymorphicValue:ARTICLE"`
-	OriginalAuthorAddress string   `gorm:"not null"`
-	IsTokenized           bool     `gorm:"not null"`
+	ID               string   `gorm:"primarykey"`
+	Document         Document `gorm:"polymorphic:Owner; polymorphicValue:ARTICLE"`
+	OriginalAuthorID string   `gorm:"not null"`
+	IsTokenized      bool     `gorm:"not null"`
 }
 
-func NewArticle(title string, content []byte, authorAddress string) *Article {
+func NewArticle(title string, content []byte, authorID string) *Article {
 	id, _ := nanoid.GenerateString(nanoid.DefaultAlphabet, 11)
 	doc := NewDocument(id, ArticleType, title, content)
 	return &Article{
-		ID:                    id,
-		Document:              *doc,
-		OriginalAuthorAddress: authorAddress,
-		IsTokenized:           false,
+		ID:               id,
+		Document:         *doc,
+		OriginalAuthorID: authorID,
+		IsTokenized:      false,
 	}
 }
 

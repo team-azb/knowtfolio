@@ -36,6 +36,18 @@ func articleOwnerAddressAttribute(fieldName string) {
 	})
 }
 
+func articleOwnerIdAttribute(fieldName string) {
+	dsl.Attribute(fieldName, dsl.String, func() {
+		dsl.Description("所有者のUserID")
+
+		dsl.Pattern("^[A-Za-z0-9_-]+$")
+		dsl.MinLength(1)
+		dsl.MaxLength(40)
+
+		dsl.Example("exampleId01")
+	})
+}
+
 var articleReadRequest = dsl.Type("ArticleReadRequest", func() {
 	articleIdAttribute("id")
 	dsl.Required("id")
@@ -71,8 +83,9 @@ var articleResult = dsl.ResultType("article-result", "ArticleResult", func() {
 		articleIdAttribute("id")
 		titleAttribute("title")
 		contentAttribute("content")
+		articleOwnerIdAttribute("owner_id")
 		articleOwnerAddressAttribute("owner_address")
-		dsl.Required("id", "title", "content", "owner_address")
+		dsl.Required("id", "title", "content", "owner_id")
 	})
 
 	dsl.View("default", func() {
@@ -81,10 +94,11 @@ var articleResult = dsl.ResultType("article-result", "ArticleResult", func() {
 		dsl.Attribute("content")
 	})
 
-	dsl.View("with-owner-address", func() {
+	dsl.View("with-owner-info", func() {
 		dsl.Attribute("id")
 		dsl.Attribute("title")
 		dsl.Attribute("content")
+		dsl.Attribute("owner_id")
 		dsl.Attribute("owner_address")
 	})
 
@@ -127,7 +141,7 @@ var _ = dsl.Service("articles", func() {
 		dsl.Payload(articleReadRequest)
 
 		dsl.Result(articleResult, func() {
-			dsl.View("with-owner-address")
+			dsl.View("with-owner-info")
 		})
 
 		dsl.HTTP(func() {

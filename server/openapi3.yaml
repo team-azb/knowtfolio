@@ -121,11 +121,12 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/ReadResponseBodyWithOwnerAddress'
+                                $ref: '#/components/schemas/ReadResponseBodyWithOwnerInfo'
                             example:
                                 content: <h1> Hello World! </h1>
                                 id: exampleId01
                                 owner_address: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 '
+                                owner_id: exampleId01
                                 title: My Awesome Title
                 "404":
                     description: 'not_found: IDに対応するリソースが見つからなかった場合'
@@ -629,14 +630,16 @@ paths:
                   example: Golang+NFT
                 - name: owned_by
                   in: query
-                  description: 記事の所有者。指定がない場合、全ての所有者の記事を検索する。
+                  description: 記事の所有者のUserID。指定がない場合、全ての所有者の記事を検索する。
                   allowEmptyValue: true
                   schema:
                     type: string
-                    description: 記事の所有者。指定がない場合、全ての所有者の記事を検索する。
-                    example: '''0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'''
-                    pattern: ^0x[a-fA-F0-9]{40}$
-                  example: '''0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'''
+                    description: 記事の所有者のUserID。指定がない場合、全ての所有者の記事を検索する。
+                    example: exampleId01
+                    pattern: ^[A-Za-z0-9_-]+$
+                    minLength: 1
+                    maxLength: 40
+                  example: exampleId01
                 - name: sort_by
                   in: query
                   description: 記事をソートするkey
@@ -684,12 +687,15 @@ paths:
                                 results:
                                     - id: exampleId01
                                       owner_address: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 '
+                                      owner_id: exampleId01
                                       title: My Awesome Title
                                     - id: exampleId01
                                       owner_address: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 '
+                                      owner_id: exampleId01
                                       title: My Awesome Title
                                     - id: exampleId01
                                       owner_address: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 '
+                                      owner_id: exampleId01
                                       title: My Awesome Title
                                 total_count: 18225424149782934695
     /articles/{id}:
@@ -959,7 +965,7 @@ components:
                 - temporary
                 - timeout
                 - fault
-        ReadResponseBodyWithOwnerAddress:
+        ReadResponseBodyWithOwnerInfo:
             type: object
             properties:
                 content:
@@ -978,20 +984,28 @@ components:
                     description: 所有者のウォレットのアドレス
                     example: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 '
                     pattern: ^0x[a-fA-F0-9]{40}$
+                owner_id:
+                    type: string
+                    description: 所有者のUserID
+                    example: exampleId01
+                    pattern: ^[A-Za-z0-9_-]+$
+                    minLength: 1
+                    maxLength: 40
                 title:
                     type: string
                     example: My Awesome Title
-            description: ReadResponseBody result type (with-owner-address view)
+            description: ReadResponseBody result type (with-owner-info view)
             example:
                 content: <h1> Hello World! </h1>
                 id: exampleId01
                 owner_address: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 '
+                owner_id: exampleId01
                 title: My Awesome Title
             required:
                 - id
                 - title
                 - content
-                - owner_address
+                - owner_id
         SearchResultEntry:
             type: object
             properties:
@@ -1007,17 +1021,25 @@ components:
                     description: 所有者のウォレットのアドレス
                     example: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 '
                     pattern: ^0x[a-fA-F0-9]{40}$
+                owner_id:
+                    type: string
+                    description: 所有者のUserID
+                    example: exampleId01
+                    pattern: ^[A-Za-z0-9_-]+$
+                    minLength: 1
+                    maxLength: 40
                 title:
                     type: string
                     example: My Awesome Title
             example:
                 id: exampleId01
                 owner_address: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 '
+                owner_id: exampleId01
                 title: My Awesome Title
             required:
                 - id
                 - title
-                - owner_address
+                - owner_id
         Searchresult:
             type: object
             properties:
@@ -1029,12 +1051,15 @@ components:
                     example:
                         - id: exampleId01
                           owner_address: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 '
+                          owner_id: exampleId01
                           title: My Awesome Title
                         - id: exampleId01
                           owner_address: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 '
+                          owner_id: exampleId01
                           title: My Awesome Title
                         - id: exampleId01
                           owner_address: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 '
+                          owner_id: exampleId01
                           title: My Awesome Title
                 total_count:
                     type: integer
@@ -1044,12 +1069,15 @@ components:
                 results:
                     - id: exampleId01
                       owner_address: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 '
+                      owner_id: exampleId01
                       title: My Awesome Title
                     - id: exampleId01
                       owner_address: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 '
+                      owner_id: exampleId01
                       title: My Awesome Title
                     - id: exampleId01
                       owner_address: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 '
+                      owner_id: exampleId01
                       title: My Awesome Title
                 total_count: 12784667946624386665
             required:

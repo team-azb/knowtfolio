@@ -50,8 +50,8 @@ func main() {
 	handler := services.NewHttpHandler()
 	handler.AddService(services.NewArticlesService(db, contract, cognitoClient, dynamoDBClient, *handler), "articles")
 	handler.AddService(services.NewArticlesHtmlService(db, *handler), "articles-html")
-	handler.AddService(services.NewNftsService(db, contract, s3Client, *handler), "nfts")
-	handler.AddService(services.NewSearchService(db, contract, *handler), "search")
+	handler.AddService(services.NewNftsService(db, contract, s3Client, dynamoDBClient, *handler), "nfts")
+	handler.AddService(services.NewSearchService(db, contract, dynamoDBClient, *handler), "search")
 	handler.AddService(services.NewHealthcheckService(db, contract, *handler), "healthcheck")
 
 	logger.Info().Msg("Starting backend server...")
