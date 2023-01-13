@@ -4,6 +4,14 @@
 # will be owned by the host user (not the root user).
 # Ref: https://qiita.com/yohm/items/047b2e68d008ebb0f001
 
+OS_ID=`cat /etc/os-release | grep -E "^ID=*" | awk -F'=' '{print $2}'`
+
+if [[ "${OS_ID}" = "alpine" ]]; then
+  EXEC_CMD=/sbin/su-exec
+else
+  EXEC_CMD=/usr/sbin/gosu
+fi
+
 groupadd -g $HOST_GID -o knowtfolio
 useradd -u $HOST_UID -g $HOST_GID -o -m knowtfolio
 export HOME=/home/knowtfolio
@@ -14,4 +22,4 @@ if [[ $CHOWN_WORKDIR ]]; then
   echo "chowning all files in WORKDIR"
   chown -R knowtfolio .
 fi
-exec /usr/sbin/gosu knowtfolio "$@"
+exec $EXEC_CMD knowtfolio "$@"
