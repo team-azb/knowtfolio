@@ -60,6 +60,7 @@ func handler(ctx context.Context, event *events.CognitoEventUserPoolsPreSignup) 
 		Password:      password,
 		PhoneNumber:   event.Request.UserAttributes["phone_number"],
 		WalletAddress: event.Request.ClientMetadata["wallet_address"],
+		Signature:     event.Request.ClientMetadata["signature"],
 	}
 
 	fieldErrs, internalErr := invokeValidationLambda(ctx, form)

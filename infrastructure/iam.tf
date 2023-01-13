@@ -55,7 +55,7 @@ resource "aws_iam_role_policy" "pre_sign_up_lambda" {
   name = "pre-sign-up-lambda"
   role = aws_iam_role.lambda["pre_sign_up"].name
   policy = templatefile("${path.module}/templates/iam/invoke_validate_lambda_policy.json", {
-    validate_lambda_arn = aws_lambda_function.validate_sign_up_form.arn
+    validate_lambda_arn = aws_lambda_function.auth_endpoints["validate_sign_up_form"].arn
   })
 }
 
@@ -74,6 +74,12 @@ data "aws_iam_policy_document" "update_wallet_table_policy" {
 resource "aws_iam_role_policy" "post_confirmation_lambda" {
   name   = "post-confirmation-lambda"
   role   = aws_iam_role.lambda["post_confirmation"].name
+  policy = data.aws_iam_policy_document.update_wallet_table_policy.json
+}
+
+resource "aws_iam_role_policy" "post_wallet_address_lambda" {
+  name   = "post-wallet-address-lambda"
+  role   = aws_iam_role.lambda["post_wallet_address"].name
   policy = data.aws_iam_policy_document.update_wallet_table_policy.json
 }
 

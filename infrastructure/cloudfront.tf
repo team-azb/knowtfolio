@@ -38,15 +38,19 @@ resource "aws_cloudfront_distribution" "knowtfolio" {
     }
   }
 
-  origin {
-    domain_name = "${aws_lambda_function_url.validate_sign_up_form.url_id}.lambda-url.ap-northeast-1.on.aws"
-    origin_id   = aws_lambda_function_url.validate_sign_up_form.url_id
+  dynamic "origin" {
+    for_each = local.auth_endpoint_functions
 
-    custom_origin_config {
-      http_port              = 80
-      https_port             = 443
-      origin_protocol_policy = "https-only"
-      origin_ssl_protocols   = ["TLSv1"]
+    content {
+      domain_name = "${aws_lambda_function_url.auth_endpoints[origin.key].url_id}.lambda-url.ap-northeast-1.on.aws"
+      origin_id   = aws_lambda_function_url.auth_endpoints[origin.key].url_id
+
+      custom_origin_config {
+        http_port              = 80
+        https_port             = 443
+        origin_protocol_policy = "https-only"
+        origin_ssl_protocols   = ["TLSv1"]
+      }
     }
   }
 
@@ -90,15 +94,19 @@ resource "aws_cloudfront_distribution" "knowtfolio" {
     compress               = true
   }
 
-  ordered_cache_behavior {
-    path_pattern             = "/api/validate_signup_form"
-    allowed_methods          = ["GET", "HEAD", "OPTIONS", "PUT", "POST", "PATCH", "DELETE"]
-    cached_methods           = ["GET", "HEAD", "OPTIONS"]
-    viewer_protocol_policy   = "allow-all"
-    target_origin_id         = aws_lambda_function_url.validate_sign_up_form.url_id
-    cache_policy_id          = "4135ea2d-6df8-44a3-9df3-4b5a84be39ad" // CachingDisabled
-    origin_request_policy_id = aws_cloudfront_origin_request_policy.lambda_function_url_request.id
-    compress                 = true
+  dynamic "ordered_cache_behavior" {
+    for_each = local.auth_endpoint_functions
+
+    content {
+      path_pattern             = "/api/${ordered_cache_behavior.value.api_resource_path}"
+      allowed_methods          = ["GET", "HEAD", "OPTIONS", "PUT", "POST", "PATCH", "DELETE"]
+      cached_methods           = ["GET", "HEAD", "OPTIONS"]
+      viewer_protocol_policy   = "allow-all"
+      target_origin_id         = aws_lambda_function_url.auth_endpoints[ordered_cache_behavior.key].url_id
+      cache_policy_id          = "4135ea2d-6df8-44a3-9df3-4b5a84be39ad" // CachingDisabled
+      origin_request_policy_id = aws_cloudfront_origin_request_policy.lambda_function_url_request.id
+      compress                 = true
+    }
   }
 
   ordered_cache_behavior {

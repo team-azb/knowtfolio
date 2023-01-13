@@ -149,3 +149,7 @@ services:
       - type: bind
         source: ./infrastructure
         target: /work
+      - type: bind
+        source: ./server
+        target: /server
+        read_only: true
