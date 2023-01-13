@@ -9,7 +9,6 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/team-azb/knowtfolio/server/config"
 	"github.com/team-azb/knowtfolio/server/gateways/api/gen/articles"
-	articlesviews "github.com/team-azb/knowtfolio/server/gateways/api/gen/articles/views"
 	"github.com/team-azb/knowtfolio/server/gateways/api/gen/http/articles/server"
 	"github.com/team-azb/knowtfolio/server/gateways/ethereum"
 	"github.com/team-azb/knowtfolio/server/models"
@@ -46,7 +45,7 @@ func (a articleService) Create(_ context.Context, request *articles.ArticleCreat
 
 	newArticle := models.NewArticle(request.Title, []byte(request.Content), request.Address)
 	result := a.DB.Create(newArticle)
-	return articleToResult(*newArticle), result.Error
+	return articleToResult(newArticle), result.Error
 }
 
 func (a articleService) Read(_ context.Context, request *articles.ArticleReadRequest) (res *articles.ArticleResult, err error) {
@@ -64,7 +63,7 @@ func (a articleService) Read(_ context.Context, request *articles.ArticleReadReq
 		return nil, err
 	}
 
-	return articleWithOwnerAddressToResult(target, *owner), nil
+	return articleToResult(&target, ownerAddress(owner)), nil
 }
 
 func (a articleService) Update(_ context.Context, request *articles.ArticleUpdateRequest) (res *articles.ArticleResult, err error) {
@@ -97,7 +96,7 @@ func (a articleService) Update(_ context.Context, request *articles.ArticleUpdat
 		return nil, articles.MakeNotFound(err)
 	}
 
-	return articleToResult(target), err
+	return articleToResult(&target), err
 }
 
 func (a articleService) Delete(_ context.Context, request *articles.ArticleDeleteRequest) (res *articles.ArticleResult, err error) {
@@ -119,7 +118,7 @@ func (a articleService) Delete(_ context.Context, request *articles.ArticleDelet
 
 	result = a.DB.Delete(&target)
 
-	return articleIdToResult(request.ID), result.Error
+	return articleToResult(&target), result.Error
 }
 
 func (a articleService) AuthorizeEdit(editorAddr string, target models.Article, requireNFT bool) error {
@@ -142,31 +141,25 @@ func (a articleService) AuthorizeEdit(editorAddr string, target models.Article, 
 	}
 }
 
-func articleToResult(src models.Article) *articles.ArticleResult {
-	return &articles.ArticleResult{
+type articleResultOpt func(articles.ArticleResult) articles.ArticleResult
+
+func articleToResult(src *models.Article, opts ...articleResultOpt) *articles.ArticleResult {
+	res := articles.ArticleResult{
 		ID:      src.ID,
 		Title:   src.Document.Title,
-		Content: string(src.Document.Content),
+		Content: string(src.Document.SanitizedContent()),
 	}
+	for _, opt := range opts {
+		res = opt(res)
+	}
+	return &res
 }
 
-func articleIdToResult(src string) *articles.ArticleResult {
-	return articles.NewArticleResult(&articlesviews.ArticleResult{
-		Projected: &articlesviews.ArticleResultView{ID: &src},
-		View:      "only-id",
-	})
-}
-
-func articleWithOwnerAddressToResult(src models.Article, owner common.Address) *articles.ArticleResult {
-	contentStr := string(src.Document.Content)
-	ownerAddressStr := owner.String()
-	return articles.NewArticleResult(&articlesviews.ArticleResult{
-		Projected: &articlesviews.ArticleResultView{
-			ID:           &src.ID,
-			Title:        &src.Document.Title,
-			Content:      &contentStr,
-			OwnerAddress: &ownerAddressStr,
-		},
-		View: "with-owner-address",
-	})
+func ownerAddress(addr *common.Address) articleResultOpt {
+	return func(res articles.ArticleResult) articles.ArticleResult {
+		if addr != nil {
+			res.OwnerAddress = addr.String()
+		}
+		return res
+	}
 }
