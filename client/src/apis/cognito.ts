@@ -92,15 +92,9 @@ export type SignUpForm = {
   username: string;
 };
 
-type metaData =
-  | {
-      password: string;
-      wallet_address: string;
-      signature: string;
-    }
-  | {
-      password: string;
-    };
+type metaData = {
+  password: string;
+};
 
 export const signUpToCognito = (form: SignUpForm) => {
   const attributeList = [
