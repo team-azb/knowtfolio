@@ -89,12 +89,6 @@ data "aws_iam_policy_document" "update_wallet_table_policy" {
   }
 }
 
-resource "aws_iam_role_policy" "post_confirmation_lambda" {
-  name   = "post-confirmation-lambda"
-  role   = aws_iam_role.lambda["post_confirmation"].name
-  policy = data.aws_iam_policy_document.update_wallet_table_policy.json
-}
-
 resource "aws_iam_role_policy" "post_wallet_address_lambda" {
   name   = "post-wallet-address-lambda"
   role   = aws_iam_role.lambda["post_wallet_address"].name
