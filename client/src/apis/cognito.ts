@@ -90,8 +90,6 @@ export type SignUpForm = {
   phone: string;
   password: string;
   username: string;
-  wallet?: string;
-  signature?: string;
 };
 
 type metaData =
@@ -110,24 +108,11 @@ export const signUpToCognito = (form: SignUpForm) => {
       Name: "phone_number",
       Value: form.phone,
     }),
-    // TODO: custom:wallet_address属性が削除されるときにここも削除
-    new CognitoUserAttribute({
-      Name: "custom:wallet_address",
-      Value: form.wallet || "",
-    }),
   ];
 
-  const { wallet, signature } = form;
-  const metaData: metaData =
-    wallet && signature
-      ? {
-          password: form.password,
-          wallet_address: wallet,
-          signature: signature,
-        }
-      : {
-          password: form.password,
-        };
+  const metaData: metaData = {
+    password: form.password,
+  };
 
   return new Promise<AmazonCognitoIdentity.CognitoUser>((resolve, reject) => {
     userPool.signUp(

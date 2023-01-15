@@ -4,16 +4,13 @@ import {
   SignUpForm,
   confirmSigningUpToCognito,
 } from "~/apis/cognito";
-import { useWeb3Context } from "~/components/organisms/providers/Web3Provider";
 import PhoneInput from "react-phone-number-input/input";
 import { E164Number } from "libphonenumber-js/types";
 import { Button, Grid } from "@mui/material";
 import Input, { InputStyle } from "~/components/atoms/authForm/Input";
 import Label from "~/components/atoms/authForm/Label";
-import Checkbox from "~/components/atoms/authForm/Checkbox";
 import Form from "~/components/atoms/authForm/Form";
 import Spacer from "~/components/atoms/Spacer";
-import WalletAddressDisplay from "~/components/organisms/WalletAddressDisplay";
 
 export const noteOnWalletAddress =
   "※一度連携したwallet addressは後から変更・削除できません。必ず正しいwallet addressが表示されているかどうかよく確認してから登録してください。";
@@ -26,7 +23,6 @@ const SignUpForm = () => {
   });
   const [hasSignedUp, setHasSignedUp] = useState(false);
   const [code, setCode] = useState("");
-  const { account, web3 } = useWeb3Context();
 
   const onChangeForm = useCallback<React.ChangeEventHandler<HTMLInputElement>>(
     (event) => {
@@ -38,22 +34,11 @@ const SignUpForm = () => {
             return { ...prev, [event.target.name]: event.target.value };
           });
           break;
-        case "wallet":
-          if (event.target.checked) {
-            setForm((prev) => {
-              return { ...prev, wallet: account };
-            });
-          } else {
-            setForm((prev) => {
-              return { ...prev, wallet: undefined };
-            });
-          }
-          break;
         default:
           break;
       }
     },
-    [account]
+    []
   );
 
   const onChangePhoneNumberInput = useCallback((value: E164Number) => {
@@ -69,14 +54,7 @@ const SignUpForm = () => {
     async (event) => {
       event.preventDefault();
       try {
-        const signature =
-          form.wallet &&
-          (await web3.eth.personal.sign(
-            "Sign up with wallet address",
-            account,
-            ""
-          ));
-        await signUpToCognito({ ...form, signature });
+        await signUpToCognito(form);
         alert("successfully signed up!");
         setHasSignedUp(true);
       } catch (error) {
@@ -84,7 +62,7 @@ const SignUpForm = () => {
         alert(`sign up failed: ${error}`);
       }
     },
-    [account, form, web3.eth.personal]
+    [form]
   );
 
   const onChangeCodeInput = useCallback<
@@ -99,6 +77,7 @@ const SignUpForm = () => {
       try {
         await confirmSigningUpToCognito(form.username, code);
         alert("successfully verifyed code!");
+        // TODO: サインインして/wallet-registerへ遷移させる
       } catch (error) {
         alert("verification failed...");
       }
@@ -143,22 +122,6 @@ const SignUpForm = () => {
           value={form.password}
           placeholder="Password"
         />
-        <Checkbox
-          id="wallet"
-          name="wallet"
-          disabled={hasSignedUp}
-          onChange={onChangeForm}
-          label={
-            <>
-              <WalletAddressDisplay
-                address={account}
-                style={{ display: "inline" }}
-              />
-              をwallet addressとして登録する(option)
-            </>
-          }
-        />
-        <Grid item>{noteOnWalletAddress}</Grid>
         <Grid item container justifyContent="center">
           <Button
             variant="outlined"
