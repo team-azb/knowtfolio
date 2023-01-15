@@ -24,10 +24,6 @@ func (f *SignUpForm) ToCognitoInput() *cognitoidentityprovider.SignUpInput {
 				Name:  aws.String("phone_number"),
 				Value: aws.String(f.PhoneNumber),
 			},
-			{
-				Name:  aws.String("custom:wallet_address"),
-				Value: aws.String(f.WalletAddress),
-			},
 		},
 		ClientId: &aws_utils.CognitoClientId,
 	}
