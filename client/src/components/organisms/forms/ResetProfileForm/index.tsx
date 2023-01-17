@@ -37,15 +37,22 @@ const ResetProfileForm = () => {
               <Label>Phone number</Label>
               <Grid item>{phoneNumber}</Grid>
             </Grid>
-            <Input name="email" id="email" label="Email" type="text" />
+            <Input
+              name="email"
+              id="email"
+              label="Email"
+              type="text"
+              placeholder="メールアドレスを入力"
+            />
             <Input
               name="website"
               id="website"
-              label="ウェブサイト"
+              label="Website"
               type="text"
+              placeholder="プロフィールがわかるウェブサイトを入力"
             />
             <Grid item container direction="column">
-              <Label htmlFor="description">自己紹介</Label>
+              <Label htmlFor="description">Biography</Label>
               <TextareaAutosize
                 minRows={3}
                 name="description"
