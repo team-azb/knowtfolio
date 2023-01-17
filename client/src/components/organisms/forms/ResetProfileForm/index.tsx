@@ -7,9 +7,11 @@ import Label from "~/components/atoms/authForm/Label";
 import TextareaAutosize from "@mui/base/TextareaAutosize";
 import { grey } from "@mui/material/colors";
 import { useAuthContext } from "~/components/organisms/providers/AuthProvider";
+import { useNavigate } from "react-router-dom";
 
 const ResetProfileForm = () => {
   const { user } = useAuthContext();
+  const navigate = useNavigate();
   return (
     <Form>
       <h2>プロフィールを編集</h2>
@@ -57,7 +59,11 @@ const ResetProfileForm = () => {
                 </Button>
               </Grid>
               <Grid item>
-                <Button variant="contained" style={{ fontSize: "1.4rem" }}>
+                <Button
+                  variant="contained"
+                  style={{ fontSize: "1.4rem" }}
+                  onClick={() => navigate("/mypage")}
+                >
                   cancel
                 </Button>
               </Grid>
