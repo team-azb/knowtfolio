@@ -68,7 +68,7 @@ const AccountInfoTable = () => {
       <Grid item container spacing={1}>
         <Grid item>
           <Button
-            variant="contained"
+            variant="outlined"
             onClick={() => {
               navigate("/settings/profile");
             }}
