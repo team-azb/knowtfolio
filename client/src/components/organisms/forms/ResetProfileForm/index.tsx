@@ -6,8 +6,10 @@ import Input from "~/components/atoms/authForm/Input";
 import Label from "~/components/atoms/authForm/Label";
 import TextareaAutosize from "@mui/base/TextareaAutosize";
 import { grey } from "@mui/material/colors";
+import { useAuthContext } from "~/components/organisms/providers/AuthProvider";
 
 const ResetProfileForm = () => {
+  const { user } = useAuthContext();
   return (
     <Form>
       <h2>プロフィールを編集</h2>
@@ -23,7 +25,7 @@ const ResetProfileForm = () => {
           <Grid container direction="column" spacing={2}>
             <Grid item container direction="column">
               <Label>Username</Label>
-              <Grid item></Grid>
+              <Grid item>{user.getUsername()}</Grid>
             </Grid>
             <Input name="email" id="email" label="Email" type="text" />
             <Input
