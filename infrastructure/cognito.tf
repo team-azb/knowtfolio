@@ -18,6 +18,17 @@ resource "aws_cognito_user_pool" "knowtfolio" {
   }
 
   schema {
+    name                = "description"
+    attribute_data_type = "String"
+    mutable             = true
+
+    string_attribute_constraints {
+      min_length = 0
+      max_length = 160
+    }
+  }
+
+  schema {
     name                = "wallet_address"
     attribute_data_type = "String"
     mutable             = true
