@@ -8,9 +8,13 @@ import TextareaAutosize from "@mui/base/TextareaAutosize";
 import { grey } from "@mui/material/colors";
 import { useAuthContext } from "~/components/organisms/providers/AuthProvider";
 import { useNavigate } from "react-router-dom";
+import { useMemo } from "react";
 
 const ResetProfileForm = () => {
-  const { user } = useAuthContext();
+  const { user, attributes } = useAuthContext();
+  const phoneNumber = useMemo(() => {
+    return attributes.find((atr) => atr.Name === "phone_number")?.Value;
+  }, [attributes]);
   const navigate = useNavigate();
   return (
     <Form>
@@ -28,6 +32,10 @@ const ResetProfileForm = () => {
             <Grid item container direction="column">
               <Label>Username</Label>
               <Grid item>{user.getUsername()}</Grid>
+            </Grid>
+            <Grid item container direction="column">
+              <Label>Phone number</Label>
+              <Grid item>{phoneNumber}</Grid>
             </Grid>
             <Input name="email" id="email" label="Email" type="text" />
             <Input
