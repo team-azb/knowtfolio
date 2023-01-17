@@ -46,25 +46,6 @@ const AccountInfoTable = () => {
         <Grid xs={2}>Phone number</Grid>
         <Grid xs={10}>{phoneNumber}</Grid>
       </Grid>
-      <Grid item container alignItems="center">
-        <Grid xs={2}>Wallet address</Grid>
-        <Grid xs={10}>
-          <WalletAddressDisplay
-            style={{ display: "inline" }}
-            address={walletAddress}
-            shouldTruncate={false}
-          />
-          <Button
-            variant="outlined"
-            onClick={() => {
-              navigate("/settings/wallet");
-            }}
-            style={{ marginLeft: "1rem", fontSize: "1.4rem" }}
-          >
-            変更/登録する
-          </Button>
-        </Grid>
-      </Grid>
       <Grid item container spacing={1}>
         <Grid item>
           <Button
@@ -84,6 +65,29 @@ const AccountInfoTable = () => {
             style={{ fontSize: "1.4rem" }}
           >
             sign out
+          </Button>
+        </Grid>
+      </Grid>
+      <Grid item>
+        <h2>Wallet address</h2>
+        <hr />
+      </Grid>
+      <Grid item container alignItems="center">
+        <Grid xs={2}>Wallet address</Grid>
+        <Grid xs={10}>
+          <WalletAddressDisplay
+            style={{ display: "inline" }}
+            address={walletAddress}
+            shouldTruncate={false}
+          />
+          <Button
+            variant="outlined"
+            onClick={() => {
+              navigate("/settings/wallet");
+            }}
+            style={{ marginLeft: "1rem", fontSize: "1.4rem" }}
+          >
+            変更/登録する
           </Button>
         </Grid>
       </Grid>
