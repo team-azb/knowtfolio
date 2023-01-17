@@ -57,7 +57,7 @@ const AccountInfoTable = () => {
           <Button
             variant="outlined"
             onClick={() => {
-              navigate("/reset-wallet");
+              navigate("/settings/wallet");
             }}
             style={{ marginLeft: "1rem", fontSize: "1.4rem" }}
           >
@@ -65,14 +65,27 @@ const AccountInfoTable = () => {
           </Button>
         </Grid>
       </Grid>
-      <Grid item>
-        <Button
-          variant="contained"
-          onClick={signOut}
-          style={{ fontSize: "1.4rem" }}
-        >
-          sign out
-        </Button>
+      <Grid item container spacing={1}>
+        <Grid item>
+          <Button
+            variant="contained"
+            onClick={() => {
+              navigate("/settings/profile");
+            }}
+            style={{ fontSize: "1.4rem" }}
+          >
+            アカウント情報を編集
+          </Button>
+        </Grid>
+        <Grid item>
+          <Button
+            variant="contained"
+            onClick={signOut}
+            style={{ fontSize: "1.4rem" }}
+          >
+            sign out
+          </Button>
+        </Grid>
       </Grid>
     </Grid>
   );

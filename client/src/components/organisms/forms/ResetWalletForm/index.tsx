@@ -40,7 +40,7 @@ const ResetWalletForm = () => {
           return;
         }
         toast.success("Wallet addressの更新に成功しました。");
-        navigate("/reset-wallet", {
+        navigate("/settings/wallet", {
           state: {
             shouldLoadCurrentUser: true,
           },
