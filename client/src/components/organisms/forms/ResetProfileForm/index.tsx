@@ -8,7 +8,7 @@ import TextareaAutosize from "@mui/base/TextareaAutosize";
 import { grey } from "@mui/material/colors";
 import { useAuthContext } from "~/components/organisms/providers/AuthProvider";
 import { useNavigate } from "react-router-dom";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useState } from "react";
 import { toast } from "react-toastify";
 import { CognitoUserAttribute } from "amazon-cognito-identity-js";
 
