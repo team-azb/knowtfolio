@@ -1,4 +1,4 @@
-import { useCallback, useMemo } from "react";
+import { useCallback } from "react";
 import { useAuthContext } from "~/components/organisms/providers/AuthProvider";
 import { signOutFromCognito } from "~/apis/cognito";
 import WalletAddressDisplay from "~/components/organisms/WalletAddressDisplay";
@@ -7,16 +7,10 @@ import { Button, Grid } from "@mui/material";
 import { toast } from "react-toastify";
 
 const AccountInfoTable = () => {
-  const { user, attributes } = useAuthContext();
-  const [phoneNumber, walletAddress] = useMemo(() => {
-    const phoneNumber = attributes.find(
-      (atr) => atr.Name === "phone_number"
-    )?.Value;
-    const walletAddress = attributes.find(
-      (atr) => atr.Name === "custom:wallet_address"
-    )?.Value;
-    return [phoneNumber, walletAddress];
-  }, [attributes]);
+  const {
+    user,
+    attributes: { phoneNumber, walletAddress },
+  } = useAuthContext();
   const navigate = useNavigate();
 
   const signOut = useCallback(async () => {

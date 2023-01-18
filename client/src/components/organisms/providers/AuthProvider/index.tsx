@@ -1,8 +1,4 @@
-import {
-  CognitoUser,
-  CognitoUserAttribute,
-  CognitoUserSession,
-} from "amazon-cognito-identity-js";
+import { CognitoUser, CognitoUserSession } from "amazon-cognito-identity-js";
 import React, {
   createContext,
   useCallback,
@@ -16,10 +12,18 @@ import { loadAttributes, loadSession } from "~/apis/cognito";
 import { Link, useLocation } from "react-router-dom";
 import LoadingDisplay from "~/components/atoms/LoadingDisplay";
 
+type UserAttributes = {
+  phoneNumber: string;
+  email?: string;
+  website?: string;
+  description?: string;
+  walletAddress?: string;
+};
+
 export type AuthContext = {
   user: CognitoUser;
   session: CognitoUserSession;
-  attributes: CognitoUserAttribute[];
+  attributes: UserAttributes;
 };
 
 const authContext = createContext<AuthContext>({} as AuthContext);
@@ -68,11 +72,32 @@ const AuthProvider = ({
     if (cognitoUser) {
       const session = await loadSession(cognitoUser);
       const attributes = await loadAttributes(cognitoUser);
-      setAuth({
-        user: cognitoUser,
-        session: session,
-        attributes: attributes,
-      });
+
+      const phoneNumber = attributes.find(
+        (atr) => atr.Name === "phone_number"
+      )?.Value;
+      const email = attributes.find((atr) => atr.Name === "email")?.Value;
+      const website = attributes.find((atr) => atr.Name === "website")?.Value;
+      const description = attributes.find(
+        (atr) => atr.Name === "custom:description"
+      )?.Value;
+      const walletAddress = attributes.find(
+        (atr) => atr.Name === "custom:wallet_address"
+      )?.Value;
+
+      if (phoneNumber) {
+        setAuth({
+          user: cognitoUser,
+          session: session,
+          attributes: {
+            phoneNumber,
+            email,
+            website,
+            description,
+            walletAddress,
+          },
+        });
+      }
     } else {
       setAuth(null);
     }

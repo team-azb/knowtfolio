@@ -11,14 +11,10 @@ const pageSize = 12;
  * ユーザーが所有している記事を一覧表示できるテーブル
  */
 const OwnedArticleTable = () => {
-  const { attributes } = useAuthContext();
+  const {
+    attributes: { walletAddress },
+  } = useAuthContext();
   const [articles, setArticles] = useState<SearchResultEntry[]>([]);
-  const walletAddress = useMemo(() => {
-    const walletAddress = attributes.find(
-      (atr) => atr.Name === "custom:wallet_address"
-    )?.Value;
-    return walletAddress || "";
-  }, [attributes]);
   const [searchParams, setSearchParams] = useSearchParams();
   const [totalNumOfPage, setTotalNumOfPage] = useState(1);
 

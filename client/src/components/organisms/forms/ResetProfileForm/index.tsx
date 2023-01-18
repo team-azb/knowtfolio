@@ -26,18 +26,10 @@ const convertToCognitoKey = (value: keyof profileForm) => {
 };
 
 const ResetProfileForm = () => {
-  const { user, attributes } = useAuthContext();
-  const [phoneNumber, email, website, description] = useMemo(() => {
-    const phoneNumber = attributes.find(
-      (atr) => atr.Name === "phone_number"
-    )?.Value;
-    const email = attributes.find((atr) => atr.Name === "email")?.Value;
-    const website = attributes.find((atr) => atr.Name === "website")?.Value;
-    const description = attributes.find(
-      (atr) => atr.Name === "custom:description"
-    )?.Value;
-    return [phoneNumber, email, website, description];
-  }, [attributes]);
+  const {
+    user,
+    attributes: { phoneNumber, email, website, description },
+  } = useAuthContext();
   const [profileForm, setProfileForm] = useState<profileForm>({
     email,
     website,

@@ -6,17 +6,13 @@ import AuthProvider, {
 import { grey } from "@mui/material/colors";
 import LoadingDisplay from "~/components/atoms/LoadingDisplay";
 import WalletAddressDisplay from "~/components/organisms/WalletAddressDisplay";
-import { useMemo } from "react";
 
 const AcountInfo = () => {
-  const { user, attributes } = useAuthContext();
+  const {
+    user,
+    attributes: { walletAddress },
+  } = useAuthContext();
   const navigate = useNavigate();
-  const walletAddress = useMemo(() => {
-    const walletAddress = attributes.find(
-      (atr) => atr.Name === "custom:wallet_address"
-    )?.Value;
-    return walletAddress || "";
-  }, [attributes]);
 
   return (
     <Button

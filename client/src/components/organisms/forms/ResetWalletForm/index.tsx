@@ -1,5 +1,5 @@
 import { CognitoUserAttribute } from "amazon-cognito-identity-js";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useState } from "react";
 import { RadioGroup, Radio, FormControlLabel } from "@mui/material";
 import { useAuthContext } from "~/components/organisms/providers/AuthProvider";
 import { useWeb3Context } from "~/components/organisms/providers/Web3Provider";
@@ -15,13 +15,10 @@ import { toast } from "react-toastify";
  */
 const ResetWalletForm = () => {
   const [walletAddressInput, setWalletAddressInput] = useState<string>("");
-  const { user, attributes } = useAuthContext();
-  const walletAddress = useMemo(() => {
-    const walletAddress = attributes.find(
-      (atr) => atr.Name === "custom:wallet_address"
-    )?.Value;
-    return walletAddress;
-  }, [attributes]);
+  const {
+    user,
+    attributes: { walletAddress },
+  } = useAuthContext();
   const { account } = useWeb3Context();
   const navigate = useNavigate();
 
