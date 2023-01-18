@@ -8,14 +8,79 @@ import TextareaAutosize from "@mui/base/TextareaAutosize";
 import { grey } from "@mui/material/colors";
 import { useAuthContext } from "~/components/organisms/providers/AuthProvider";
 import { useNavigate } from "react-router-dom";
-import { useMemo } from "react";
+import { useCallback, useMemo, useState } from "react";
+import { toast } from "react-toastify";
+import { CognitoUserAttribute } from "amazon-cognito-identity-js";
+
+type profileForm = {
+  email?: string;
+  website?: string;
+  description?: string;
+};
+
+const convertToCognitoKey = (value: keyof profileForm) => {
+  if (value === "description") {
+    return `custom:${value}`;
+  }
+  return value;
+};
 
 const ResetProfileForm = () => {
   const { user, attributes } = useAuthContext();
-  const phoneNumber = useMemo(() => {
-    return attributes.find((atr) => atr.Name === "phone_number")?.Value;
+  const [phoneNumber, email, website, description] = useMemo(() => {
+    const phoneNumber = attributes.find(
+      (atr) => atr.Name === "phone_number"
+    )?.Value;
+    const email = attributes.find((atr) => atr.Name === "email")?.Value;
+    const website = attributes.find((atr) => atr.Name === "website")?.Value;
+    const description = attributes.find(
+      (atr) => atr.Name === "custom:description"
+    )?.Value;
+    return [phoneNumber, email, website, description];
   }, [attributes]);
+  const [profileForm, setProfileForm] = useState<profileForm>({
+    email,
+    website,
+    description,
+  });
   const navigate = useNavigate();
+
+  const handleSubmitForm = useCallback(() => {
+    const attributes = (Object.keys(profileForm) as (keyof profileForm)[]).map(
+      (key) => {
+        return new CognitoUserAttribute({
+          Name: convertToCognitoKey(key),
+          Value: profileForm[key] || "",
+        });
+      }
+    );
+    user.updateAttributes(attributes, (err) => {
+      if (err) {
+        console.error(err.message || JSON.stringify(err));
+        toast.error("プロフィールの更新に失敗しました。");
+        return;
+      }
+      toast.success("プロフィールの更新に成功しました。");
+      navigate("/settings/profile", {
+        state: {
+          shouldLoadCurrentUser: true,
+        },
+      });
+    });
+  }, [navigate, profileForm, user]);
+
+  const handleChangeForm = useCallback<
+    React.ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement>
+  >((event) => {
+    const field = event.target.name as keyof profileForm;
+    setProfileForm((prev) => {
+      return {
+        ...prev,
+        [field]: event.target.value,
+      };
+    });
+  }, []);
+
   return (
     <Form>
       <h2>プロフィールを編集</h2>
@@ -43,6 +108,8 @@ const ResetProfileForm = () => {
               label="Email"
               type="text"
               placeholder="メールアドレスを入力"
+              value={profileForm.email}
+              onChange={handleChangeForm}
             />
             <Input
               name="website"
@@ -50,6 +117,8 @@ const ResetProfileForm = () => {
               label="Website"
               type="text"
               placeholder="プロフィールがわかるウェブサイトを入力"
+              value={profileForm.website}
+              onChange={handleChangeForm}
             />
             <Grid item container direction="column">
               <Label htmlFor="description">Biography</Label>
@@ -65,11 +134,17 @@ const ResetProfileForm = () => {
                   paddingLeft: 5,
                   resize: "none",
                 }}
+                value={profileForm.description}
+                onChange={handleChangeForm}
               />
             </Grid>
             <Grid item container justifyContent="center" spacing={3}>
               <Grid item>
-                <Button variant="outlined" style={{ fontSize: "1.4rem" }}>
+                <Button
+                  variant="outlined"
+                  style={{ fontSize: "1.4rem" }}
+                  onClick={handleSubmitForm}
+                >
                   update
                 </Button>
               </Grid>
