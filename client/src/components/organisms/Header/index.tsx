@@ -40,7 +40,7 @@ const AuthButtons = () => {
 
   return (
     <>
-      <Grid xs={2}>
+      <Grid item xs={2}>
         <Button
           onClick={() => {
             navigate("/signup");
@@ -51,7 +51,7 @@ const AuthButtons = () => {
           sign up
         </Button>{" "}
       </Grid>
-      <Grid xs={2}>
+      <Grid item xs={2}>
         <Button
           onClick={() => {
             navigate("/signin");
@@ -87,7 +87,7 @@ const Header = () => {
         borderColor: grey[500],
       }}
     >
-      <Grid xs={6}>
+      <Grid item xs={6}>
         <p
           style={{
             padding: "1rem",
@@ -103,13 +103,13 @@ const Header = () => {
           Knowtfolio
         </p>
       </Grid>
-      <Grid xs={6}>
+      <Grid item xs={6}>
         <Grid container direction="row-reverse" alignItems="center">
           <AuthProvider
             contentOnUnauthenticated={<AuthButtons />}
             contentWhileLoadingSession={<LoadingAuthDisplay />}
           >
-            <Grid xs={2}>
+            <Grid item xs={2}>
               <AcountInfo />
             </Grid>
             <Grid item xs={2}>
