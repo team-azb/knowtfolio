@@ -15,10 +15,7 @@ import { userPool } from "~/configs/cognito";
 import { loadAttributes, loadSession } from "~/apis/cognito";
 import { Link } from "react-router-dom";
 import LoadingDisplay from "~/components/atoms/LoadingDisplay";
-import {
-  fetchWalletAddress,
-  initDynamodbClientWithJwtToken,
-} from "~/apis/dynamodb";
+import { fetchWalletAddress, initDynamodbClient } from "~/apis/dynamodb";
 
 export type AuthContext = {
   user: CognitoUser;
@@ -75,7 +72,7 @@ const AuthProvider = ({
         const session = await loadSession(cognitoUser);
         const attributes = await loadAttributes(cognitoUser);
 
-        const dynamodbClient = initDynamodbClientWithJwtToken(
+        const dynamodbClient = initDynamodbClient(
           session.getIdToken().getJwtToken()
         );
         const walletAddress = await fetchWalletAddress(

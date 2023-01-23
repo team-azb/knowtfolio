@@ -8,16 +8,16 @@ import { COGNITO_USER_POOL_ID } from "~/configs/cognito";
 import { COGNITO_IDENTITY_POOL_ID } from "~/configs/s3";
 
 /**
- * jwtTokenを使ってdynamodbクライアントを初期化する
- * @param jwtToken ログイン済みユーザーのjwtトークン
+ * idTokenを使ってdynamodbクライアントを初期化する
+ * @param idToken ログイン済みcognitoユーザーのidToken
  * @returns dynamodbクライアント
  */
-export const initDynamodbClientWithJwtToken = (jwtToken: string) => {
+export const initDynamodbClient = (idToken: string) => {
   const credentialProvider = fromCognitoIdentityPool({
     identityPoolId: COGNITO_IDENTITY_POOL_ID,
     logins: {
       [`cognito-idp.ap-northeast-1.amazonaws.com/${COGNITO_USER_POOL_ID}`]:
-        jwtToken,
+        idToken,
     },
     clientConfig: {
       region: "ap-northeast-1",
