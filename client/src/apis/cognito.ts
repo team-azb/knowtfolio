@@ -92,10 +92,6 @@ export type SignUpForm = {
   username: string;
 };
 
-type metaData = {
-  password: string;
-};
-
 export const signUpToCognito = (form: SignUpForm) => {
   const attributeList = [
     new CognitoUserAttribute({
@@ -103,10 +99,6 @@ export const signUpToCognito = (form: SignUpForm) => {
       Value: form.phone,
     }),
   ];
-
-  const metaData: metaData = {
-    password: form.password,
-  };
 
   return new Promise<AmazonCognitoIdentity.CognitoUser>((resolve, reject) => {
     userPool.signUp(
@@ -124,7 +116,9 @@ export const signUpToCognito = (form: SignUpForm) => {
         }
         reject("unexpected error");
       },
-      metaData
+      {
+        password: form.password,
+      }
     );
   });
 };
