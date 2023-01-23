@@ -29,7 +29,6 @@ resource "aws_iam_role_policy" "knowtfolio_put_article_images_policy" {
   })
 }
 
-// TODO: 他のpolicyもこの記法で統一する
 data "aws_iam_policy_document" "read_wallet_table_policy" {
   statement {
     actions = [
