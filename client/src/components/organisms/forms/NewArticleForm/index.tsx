@@ -9,6 +9,8 @@ import ArrowBackIosNewRoundedIcon from "@mui/icons-material/ArrowBackIosNewRound
 /**
  * 記事の新規作成用のフォーム
  */
+import { toast } from "react-toastify";
+
 const NewArticleForm = () => {
   const [content, setContent] = useState("");
   const [titleInput, setTitleInput] = useState("");
@@ -49,10 +51,11 @@ const NewArticleForm = () => {
         address: account,
         signature: signatureForMint,
       });
-      navigate(`/articles/${id}/edit`);
+      navigate("/mypage");
+      toast.success("記事を作成しました。");
     } catch (error) {
       console.error(error);
-      alert("記事の作成に失敗しました。");
+      toast.error("記事の作成に失敗しました。");
     }
   }, [account, content, navigate, titleInput, web3.eth.personal]);
   return (

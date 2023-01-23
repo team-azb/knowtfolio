@@ -116,7 +116,7 @@ services:
         source: ./server
         target: /server
       - type: bind
-        source: ./entrypoint.alpine.sh
+        source: ./entrypoint.sh
         target: /entrypoint.sh
 
   hardhat:

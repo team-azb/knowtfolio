@@ -5,19 +5,25 @@ import AuthProvider, {
 } from "~/components/organisms/providers/AuthProvider";
 import { grey } from "@mui/material/colors";
 import LoadingDisplay from "~/components/atoms/LoadingDisplay";
+import WalletAddressDisplay from "~/components/organisms/WalletAddressDisplay";
 
 const AcountInfo = () => {
-  const { user } = useAuthContext();
+  const { user, userWalletAddress } = useAuthContext();
   const navigate = useNavigate();
+
   return (
     <Button
       onClick={() => {
         navigate("/mypage");
       }}
       variant="outlined"
-      style={{ fontSize: "1.4rem" }}
+      style={{ fontSize: "1.4rem", flexDirection: "column" }}
     >
       {user.getUsername()}
+      <WalletAddressDisplay
+        address={userWalletAddress}
+        style={{ fontSize: "1rem" }}
+      />
     </Button>
   );
 };
@@ -27,7 +33,7 @@ const AuthButtons = () => {
 
   return (
     <>
-      <Grid xs={2}>
+      <Grid item xs={2}>
         <Button
           onClick={() => {
             navigate("/signup");
@@ -38,7 +44,7 @@ const AuthButtons = () => {
           sign up
         </Button>{" "}
       </Grid>
-      <Grid xs={2}>
+      <Grid item xs={2}>
         <Button
           onClick={() => {
             navigate("/signin");
@@ -74,7 +80,7 @@ const Header = () => {
         borderColor: grey[500],
       }}
     >
-      <Grid xs={6}>
+      <Grid item xs={6}>
         <p
           style={{
             padding: "1rem",
@@ -90,16 +96,16 @@ const Header = () => {
           Knowtfolio
         </p>
       </Grid>
-      <Grid xs={6}>
+      <Grid item xs={6}>
         <Grid container direction="row-reverse" alignItems="center">
           <AuthProvider
             contentOnUnauthenticated={<AuthButtons />}
             contentWhileLoadingSession={<LoadingAuthDisplay />}
           >
-            <Grid xs={2}>
+            <Grid item xs={2}>
               <AcountInfo />
             </Grid>
-            <Grid xs={2}>
+            <Grid item xs={2}>
               <Button
                 onClick={() => {
                   navigate("/articles/new");
@@ -107,6 +113,16 @@ const Header = () => {
                 style={{ fontSize: "1.4rem" }}
               >
                 create article
+              </Button>
+            </Grid>
+            <Grid item>
+              <Button
+                onClick={() => {
+                  navigate("/search");
+                }}
+                style={{ fontSize: "1.4rem" }}
+              >
+                search
               </Button>
             </Grid>
           </AuthProvider>

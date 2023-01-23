@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import LoadingDisplay from "~/components/atoms/LoadingDisplay";
 import EditArticleForm from "~/components/organisms/forms/EditArticleForm";
+import { useAuthContext } from "~/components/organisms/providers/AuthProvider";
 import { useWeb3Context } from "~/components/organisms/providers/Web3Provider";
 
 const ContentOnEditable = ({ articleId }: { articleId: string }) => {
@@ -25,11 +26,13 @@ const contentOnNotEditable = (
  */
 const EditArticlePage = () => {
   const { articleId } = useParams();
-  const { account, contract } = useWeb3Context();
+  const { contract } = useWeb3Context();
+  const { userWalletAddress } = useAuthContext();
   const [ownerIdOfArticle, setOwnerIdOfArticle] = useState<null | string>(null);
+
   const isAuthorized = useMemo(() => {
-    return ownerIdOfArticle === account;
-  }, [account, ownerIdOfArticle]);
+    return ownerIdOfArticle === userWalletAddress;
+  }, [ownerIdOfArticle, userWalletAddress]);
 
   const content = useMemo(() => {
     if (ownerIdOfArticle === null) {

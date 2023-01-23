@@ -2,10 +2,11 @@ package models
 
 import (
 	"encoding/json"
-	"github.com/go-playground/validator/v10"
-	"github.com/team-azb/knowtfolio/server/gateways/ethereum"
 	"reflect"
 	"regexp"
+
+	"github.com/go-playground/validator/v10"
+	"github.com/team-azb/knowtfolio/server/gateways/ethereum"
 )
 
 var requestValidator = validator.New()
@@ -40,7 +41,7 @@ func validateCognitoPassword(fl validator.FieldLevel) bool {
 	containsNumber, _ := regexp.MatchString("[0-9]", val)
 	containsLowercase, _ := regexp.MatchString("[a-z]", val)
 	containsUppercase, _ := regexp.MatchString("[A-Z]", val)
-	containsSpecialCharacter, _ := regexp.MatchString("[^$*.[\\]{}()?\"!@#%&/\\\\,><':;|_~`=+\\-]", val)
+	containsSpecialCharacter, _ := regexp.MatchString("[\\^$*.[\\]{}()?\"!@#%&/\\\\,><':;|_~`=+\\-]", val)
 	containsValidCharactersOnly, _ := regexp.MatchString("^[0-9a-zA-Z^$*.[\\]{}()?\"!@#%&/\\\\,><':;|_~`=+\\-]+$", val)
 	isLengthInRange := 8 <= len(val) && len(val) <= 256
 

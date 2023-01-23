@@ -1,15 +1,20 @@
 #!/bin/bash
-sudo apt-get update
-sudo apt-get -y install make
+sudo apt update -y
+
+# install code deploy agent
+sudo apt install make g++ ruby ruby-full wget python3 python3-pip awscli pv -y
+wget https://aws-codedeploy-ap-northeast-1.s3.ap-northeast-1.amazonaws.com/latest/install -O install-aws-codedeploy-agent
+chmod +x ./install-aws-codedeploy-agent
+sudo ./install-aws-codedeploy-agent auto > /tmp/logfile
 
 # install docker
 # https://docs.docker.com/engine/install/ubuntu/
-sudo apt-get -y install ca-certificates curl gnupg lsb-release
+sudo apt install ca-certificates curl gnupg lsb-release -y
 sudo mkdir -p /etc/apt/keyrings
 curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
 echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-sudo apt-get update
-sudo apt-get -y install docker-ce docker-ce-cli containerd.io docker-compose-plugin
+sudo apt update
+sudo apt install docker-ce docker-ce-cli containerd.io docker-compose-plugin -y
 
 # enable to use docker without sudo
 # https://docs.docker.com/engine/install/linux-postinstall/

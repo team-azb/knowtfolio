@@ -8,6 +8,7 @@ import Spacer from "~/components/atoms/Spacer";
 import { useNavigate } from "react-router-dom";
 import { postWalletAddress } from "~/apis/lambda";
 import { noteOnWalletAddress } from "~/components/organisms/forms/SignUpForm";
+import { toast } from "react-toastify";
 
 /**
  * wallet addressがすでに登録されていた場合に表示するメッセージ
@@ -63,6 +64,7 @@ const RegisteredWalletAddressMessage = () => {
 const RegisterWalletFormContent = () => {
   const { user } = useAuthContext();
   const { account, web3 } = useWeb3Context();
+  const navigate = useNavigate();
 
   const registerWalletAddress = useCallback(async () => {
     const signature = await web3.eth.personal.sign(
@@ -76,16 +78,17 @@ const RegisterWalletFormContent = () => {
         walletAddress: account,
         signature: signature,
       });
-      // TODO: toastで実装する
-      alert("Walletの登録が完了しました。");
-      window.location.reload();
+      toast.success("Wallet addressの登録に成功しました。");
+      navigate("/register-wallet", {
+        state: {
+          shouldLoadCurrentUser: true,
+        },
+      });
     } catch (error) {
       // TODO: toastで実装する
-      alert("Walletの登録に失敗しました。");
+      toast.error("Wallet addressの登録に失敗しました。");
     }
-  }, [account, user, web3.eth.personal]);
-
-  const navigate = useNavigate();
+  }, [account, navigate, user, web3.eth.personal]);
 
   return (
     <Grid container direction="column" spacing={3}>

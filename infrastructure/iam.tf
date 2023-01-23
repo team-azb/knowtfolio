@@ -55,13 +55,13 @@ resource "aws_iam_role" "knowtfolio_viewer" {
 
 resource "aws_iam_role" "lambda" {
   for_each           = local.lambda_functions
-  name               = "${each.key}_lambda"
+  name               = "${replace(each.key, "_", "-")}-lambda"
   assume_role_policy = file("${path.module}/templates/iam/basic_lambda_assume_policy.json")
 }
 
 resource "aws_iam_role_policy" "basic_lambda" {
   for_each = local.lambda_functions
-  name     = "${each.key}_lambda"
+  name     = "basic-lambda"
   role     = aws_iam_role.lambda[each.key].name
   policy = templatefile("${path.module}/templates/iam/basic_lambda_policy.json", {
     user_to_wallet_table_arn = aws_dynamodb_table.user_to_wallet.arn
@@ -113,4 +113,27 @@ resource "aws_iam_role_policy" "sns_publish" {
   name   = "sns-publish"
   role   = aws_iam_role.cognito_sms_sender.name
   policy = file("${path.module}/templates/iam/sns_publish_policy.json")
+}
+
+resource "aws_iam_role" "code_deploy_backend" {
+  name               = "code-deploy-backend"
+  assume_role_policy = file("${path.module}/templates/iam/code_deploy/assume_policy.json")
+}
+
+resource "aws_iam_role_policy_attachment" "aws_code_deploy_role" {
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSCodeDeployRole"
+  role       = aws_iam_role.code_deploy_backend.name
+}
+
+resource "aws_iam_role" "backend" {
+  name               = "knowtfolio-backend"
+  assume_role_policy = file("${path.module}/templates/iam/ec2/assume_policy.json")
+}
+
+resource "aws_iam_role_policy" "fetch_build_artifacts" {
+  name = "knowtfolio"
+  role = aws_iam_role.backend.name
+  policy = templatefile("${path.module}/templates/iam/ec2/knowtfolio_backend_policy.json", {
+    bucket = aws_s3_bucket.code_deploy.arn
+  })
 }

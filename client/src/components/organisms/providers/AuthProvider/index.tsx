@@ -13,7 +13,7 @@ import React, {
 } from "react";
 import { userPool } from "~/configs/cognito";
 import { loadAttributes, loadSession } from "~/apis/cognito";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import LoadingDisplay from "~/components/atoms/LoadingDisplay";
 import { fetchWalletAddress, initDynamodbClient } from "~/apis/dynamodb";
 
@@ -65,7 +65,7 @@ const AuthProvider = ({
   const [auth, setAuth] = useState<AuthContext | null>(null);
   const [hasLoadedSession, setHasLoadedSession] = useState(false);
 
-  const setCurrentUser = useCallback(async () => {
+  const loadCurrentUser = useCallback(async () => {
     const cognitoUser = userPool.getCurrentUser();
     if (cognitoUser) {
       try {
@@ -91,17 +91,19 @@ const AuthProvider = ({
         console.error(error);
         alert("正常にログインできませんでした。");
       }
+    } else {
+      setAuth(null);
     }
     setHasLoadedSession(true);
   }, []);
 
   useEffect(() => {
-    window.addEventListener("storage", setCurrentUser);
-    setCurrentUser();
+    window.addEventListener("storage", loadCurrentUser);
+    loadCurrentUser();
     return () => {
-      window.removeEventListener("storage", setCurrentUser);
+      window.removeEventListener("storage", loadCurrentUser);
     };
-  }, [setCurrentUser]);
+  }, [loadCurrentUser]);
 
   const content = useMemo(() => {
     if (!hasLoadedSession) {
@@ -120,6 +122,13 @@ const AuthProvider = ({
     contentOnUnauthenticated,
     hasLoadedSession,
   ]);
+
+  const location = useLocation();
+  useEffect(() => {
+    if (location.state && location.state.shouldLoadCurrentUser) {
+      loadCurrentUser();
+    }
+  }, [loadCurrentUser, location.state]);
 
   return <>{content}</>;
 };

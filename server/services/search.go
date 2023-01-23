@@ -59,12 +59,15 @@ func (s searchService) SearchForArticles(_ context.Context, request *search.Sear
 		baseQuery = baseQuery.Where(`MATCH(title, raw_text) against(? IN BOOLEAN MODE)`, strings.Join(keywords, " "))
 	}
 
+	// NOTE: Need to call `Session` here to make baseQuery sharable.
+	// https://gorm.io/ja_JP/docs/method_chaining.html#New-Session-Method
+	baseQuery = baseQuery.Joins("Document").Session(&gorm.Session{})
+
 	// Branch loading query and counting query from baseQuery.
 	offset := int((request.PageNum - 1) * request.PageSize)
 	limit := int(request.PageSize)
 	loadQuery := baseQuery.
 		Select("articles.id", "original_author_address").
-		Joins("Document").
 		Offset(offset).Limit(limit).Order(request.SortBy)
 	countQuery := baseQuery.Model(&models.Article{})
 
