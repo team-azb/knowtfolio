@@ -58,10 +58,10 @@ const RegisteredWalletAddressMessage = () => {
 };
 
 /**
- * walletを登録するためのフォーム
+ * walletを登録するフォームの本体
  */
-const RegisterWalletForm = () => {
-  const { user, userWalletAddress } = useAuthContext();
+const RegisterWalletFormContent = () => {
+  const { user } = useAuthContext();
   const { account, web3 } = useWeb3Context();
 
   const registerWalletAddress = useCallback(async () => {
@@ -88,6 +88,62 @@ const RegisterWalletForm = () => {
   const navigate = useNavigate();
 
   return (
+    <Grid container direction="column" spacing={3}>
+      <Grid item>
+        表示されているwallet addressとユーザーidを連携します。
+        <br />
+        <b>{noteOnWalletAddress}</b>
+      </Grid>
+      <Grid item container alignItems="center">
+        <Grid item xs={2.5}>
+          <p>ユーザーid</p>
+        </Grid>
+        <Grid item xs={9.5}>
+          {user.getUsername()}
+        </Grid>
+      </Grid>
+      <Grid item container alignItems="flex-start">
+        <Grid item xs={2.5}>
+          wallet address
+        </Grid>
+        <Grid item xs={9.5}>
+          <WalletAddressDisplay address={account} shouldTruncate={false} />
+        </Grid>
+      </Grid>
+      <Grid item container justifyContent="center">
+        <Grid item xs={2.5}></Grid>
+        <Grid item xs={7.5}>
+          <Button
+            variant="outlined"
+            onClick={registerWalletAddress}
+            style={{ fontSize: "1.4rem" }}
+          >
+            register wallet address
+          </Button>
+        </Grid>
+        <Grid item container xs={2} direction="row-reverse">
+          <Button
+            onClick={() => {
+              navigate("/mypage");
+            }}
+            variant="contained"
+            style={{ fontSize: "1.4rem" }}
+          >
+            cancel
+          </Button>
+        </Grid>
+      </Grid>
+    </Grid>
+  );
+};
+
+/**
+ * walletを登録するためのフォーム。
+ * ※既にwalletが登録されている場合は登録ができない仕様
+ */
+const RegisterWalletForm = () => {
+  const { userWalletAddress } = useAuthContext();
+  return (
     <Form>
       <h2>Wallet addressを登録する</h2>
       <hr />
@@ -95,52 +151,7 @@ const RegisterWalletForm = () => {
       {userWalletAddress ? (
         <RegisteredWalletAddressMessage />
       ) : (
-        <Grid container direction="column" spacing={3}>
-          <Grid item>
-            表示されているwallet addressとユーザーidを連携します。
-            <br />
-            <b>{noteOnWalletAddress}</b>
-          </Grid>
-          <Grid item container alignItems="center">
-            <Grid item xs={2.5}>
-              <p>ユーザーid</p>
-            </Grid>
-            <Grid item xs={9.5}>
-              {user.getUsername()}
-            </Grid>
-          </Grid>
-          <Grid item container alignItems="flex-start">
-            <Grid item xs={2.5}>
-              wallet address
-            </Grid>
-            <Grid item xs={9.5}>
-              <WalletAddressDisplay address={account} shouldTruncate={false} />
-            </Grid>
-          </Grid>
-          <Grid item container justifyContent="center">
-            <Grid item xs={2.5}></Grid>
-            <Grid item xs={7.5}>
-              <Button
-                variant="outlined"
-                onClick={registerWalletAddress}
-                style={{ fontSize: "1.4rem" }}
-              >
-                register wallet address
-              </Button>
-            </Grid>
-            <Grid item container xs={2} direction="row-reverse">
-              <Button
-                onClick={() => {
-                  navigate("/mypage");
-                }}
-                variant="contained"
-                style={{ fontSize: "1.4rem" }}
-              >
-                cancel
-              </Button>
-            </Grid>
-          </Grid>
-        </Grid>
+        <RegisterWalletFormContent />
       )}
     </Form>
   );
