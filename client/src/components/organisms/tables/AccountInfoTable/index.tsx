@@ -7,15 +7,12 @@ import { Button, Grid } from "@mui/material";
 import { toast } from "react-toastify";
 
 const AccountInfoTable = () => {
-  const { user, attributes } = useAuthContext();
-  const [phoneNumber, walletAddress] = useMemo(() => {
+  const { user, attributes, userWalletAddress } = useAuthContext();
+  const phoneNumber = useMemo(() => {
     const phoneNumber = attributes.find(
       (atr) => atr.Name === "phone_number"
     )?.Value;
-    const walletAddress = attributes.find(
-      (atr) => atr.Name === "custom:wallet_address"
-    )?.Value;
-    return [phoneNumber, walletAddress];
+    return phoneNumber;
   }, [attributes]);
   const navigate = useNavigate();
 
@@ -49,20 +46,23 @@ const AccountInfoTable = () => {
       <Grid item container alignItems="center">
         <Grid xs={2}>Wallet address</Grid>
         <Grid xs={10}>
-          <WalletAddressDisplay
-            style={{ display: "inline" }}
-            address={walletAddress}
-            shouldTruncate={false}
-          />
-          <Button
-            variant="outlined"
-            onClick={() => {
-              navigate("/reset-wallet");
-            }}
-            style={{ marginLeft: "1rem", fontSize: "1.4rem" }}
-          >
-            変更/登録する
-          </Button>
+          {userWalletAddress ? (
+            <WalletAddressDisplay
+              style={{ display: "inline" }}
+              address={userWalletAddress}
+              shouldTruncate={false}
+            />
+          ) : (
+            <Button
+              variant="outlined"
+              onClick={() => {
+                navigate("/register-wallet");
+              }}
+              style={{ marginLeft: "1rem", fontSize: "1.4rem" }}
+            >
+              登録する
+            </Button>
+          )}
         </Grid>
       </Grid>
       <Grid item>
