@@ -9,7 +9,7 @@ import { toast } from "react-toastify";
 const AccountInfoTable = () => {
   const {
     user,
-    attributes: { phoneNumber, walletAddress },
+    attributes: { phoneNumber, walletAddress, email, description },
   } = useAuthContext();
   const navigate = useNavigate();
 
@@ -39,6 +39,14 @@ const AccountInfoTable = () => {
       <Grid item container>
         <Grid xs={2}>Phone number</Grid>
         <Grid xs={10}>{phoneNumber}</Grid>
+      </Grid>
+      <Grid item container>
+        <Grid xs={2}>Email</Grid>
+        <Grid xs={10}>{email}</Grid>
+      </Grid>
+      <Grid item container>
+        <Grid xs={2}>Biography</Grid>
+        <Grid xs={10}>{description}</Grid>
       </Grid>
       <Grid item container spacing={1}>
         <Grid item>
