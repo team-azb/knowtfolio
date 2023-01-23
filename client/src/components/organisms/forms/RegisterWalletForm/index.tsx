@@ -12,7 +12,7 @@ import { noteOnWalletAddress } from "~/components/organisms/forms/SignUpForm";
 /**
  * wallet addressがすでに登録されていた場合に表示するメッセージ
  */
-const MessageToRejectRegistration = () => {
+const RegisteredWalletAddressMessage = () => {
   const { user, userWalletAddress } = useAuthContext();
   const navigate = useNavigate();
 
@@ -93,7 +93,7 @@ const RegisterWalletForm = () => {
       <hr />
       <Spacer height="3rem" />
       {userWalletAddress ? (
-        <MessageToRejectRegistration />
+        <RegisteredWalletAddressMessage />
       ) : (
         <Grid container direction="column" spacing={3}>
           <Grid item>
