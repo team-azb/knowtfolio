@@ -29,6 +29,23 @@ resource "aws_iam_role_policy" "knowtfolio_put_article_images_policy" {
   })
 }
 
+data "aws_iam_policy_document" "read_wallet_table_policy" {
+  statement {
+    actions = [
+      "dynamodb:GetItem"
+    ]
+    resources = [
+      aws_dynamodb_table.user_to_wallet.arn
+    ]
+  }
+}
+
+resource "aws_iam_role_policy" "get_item_from_dynamodb" {
+  name   = "get-item-from-dynamodb-policy"
+  role   = aws_iam_role.knowtfolio_article_writer.name
+  policy = data.aws_iam_policy_document.read_wallet_table_policy.json
+}
+
 resource "aws_iam_role" "knowtfolio_viewer" {
   name = "knowtfolio-viewer"
   assume_role_policy = templatefile("${path.module}/templates/iam/knowtfolio_user_assume_policy.json", {
@@ -69,12 +86,6 @@ data "aws_iam_policy_document" "update_wallet_table_policy" {
       aws_dynamodb_table.user_to_wallet.arn
     ]
   }
-}
-
-resource "aws_iam_role_policy" "post_confirmation_lambda" {
-  name   = "post-confirmation-lambda"
-  role   = aws_iam_role.lambda["post_confirmation"].name
-  policy = data.aws_iam_policy_document.update_wallet_table_policy.json
 }
 
 resource "aws_iam_role_policy" "post_wallet_address_lambda" {

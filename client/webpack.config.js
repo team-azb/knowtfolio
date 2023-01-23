@@ -105,6 +105,11 @@ module.exports = {
         target: "https://knowtfolio.com",
       },
       {
+        context: "/api/wallet_address",
+        changeOrigin: true,
+        target: "https://knowtfolio.com",
+      },
+      {
         context: (path) => {
           if (path.includes("/api")) {
             return true;

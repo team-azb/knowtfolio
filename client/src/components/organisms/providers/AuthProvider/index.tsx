@@ -15,11 +15,13 @@ import { userPool } from "~/configs/cognito";
 import { loadAttributes, loadSession } from "~/apis/cognito";
 import { Link } from "react-router-dom";
 import LoadingDisplay from "~/components/atoms/LoadingDisplay";
+import { fetchWalletAddress, initDynamodbClient } from "~/apis/dynamodb";
 
 export type AuthContext = {
   user: CognitoUser;
   session: CognitoUserSession;
   attributes: CognitoUserAttribute[];
+  userWalletAddress?: string;
 };
 
 const authContext = createContext<AuthContext>({} as AuthContext);
@@ -66,13 +68,29 @@ const AuthProvider = ({
   const setCurrentUser = useCallback(async () => {
     const cognitoUser = userPool.getCurrentUser();
     if (cognitoUser) {
-      const session = await loadSession(cognitoUser);
-      const attributes = await loadAttributes(cognitoUser);
-      setAuth({
-        user: cognitoUser,
-        session: session,
-        attributes: attributes,
-      });
+      try {
+        const session = await loadSession(cognitoUser);
+        const attributes = await loadAttributes(cognitoUser);
+
+        const dynamodbClient = initDynamodbClient(
+          session.getIdToken().getJwtToken()
+        );
+        const walletAddress = await fetchWalletAddress(
+          dynamodbClient,
+          cognitoUser.getUsername()
+        );
+
+        setAuth({
+          user: cognitoUser,
+          session: session,
+          attributes: attributes,
+          userWalletAddress: walletAddress,
+        });
+      } catch (error) {
+        // TODO: toastでUIを整える
+        console.error(error);
+        alert("正常にログインできませんでした。");
+      }
     }
     setHasLoadedSession(true);
   }, []);
