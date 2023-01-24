@@ -4,6 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"net/http"
+
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/aws/aws-sdk-go-v2/aws"
@@ -11,7 +13,6 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/team-azb/knowtfolio/infrastructure/function_scripts/pkg/aws_utils"
 	"github.com/team-azb/knowtfolio/infrastructure/function_scripts/pkg/models"
-	"net/http"
 )
 
 // checkDuplicateValueForField asks cognito if `value` is already used for user attribute `field`.
@@ -40,14 +41,7 @@ func handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 	fieldErrs := make([]models.FieldError, 0)
 
 	// Validate request body format.
-	err := json.Unmarshal([]byte(request.Body), &form)
-	if err != nil {
-		return events.APIGatewayProxyResponse{
-			StatusCode: http.StatusBadRequest,
-			Body:       err.Error(),
-		}, nil
-	}
-	err = models.SignUpFormValidator.Struct(form)
+	err := models.ValidateJSONRequest([]byte(request.Body), &form)
 	if err != nil {
 		if valErrs, ok := err.(validator.ValidationErrors); ok {
 			for _, valErr := range valErrs {
@@ -57,7 +51,10 @@ func handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 				})
 			}
 		} else {
-			return events.APIGatewayProxyResponse{}, err
+			return events.APIGatewayProxyResponse{
+				StatusCode: http.StatusBadRequest,
+				Body:       err.Error(),
+			}, nil
 		}
 	}
 

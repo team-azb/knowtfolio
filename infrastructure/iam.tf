@@ -29,6 +29,23 @@ resource "aws_iam_role_policy" "knowtfolio_put_article_images_policy" {
   })
 }
 
+data "aws_iam_policy_document" "read_wallet_table_policy" {
+  statement {
+    actions = [
+      "dynamodb:GetItem"
+    ]
+    resources = [
+      aws_dynamodb_table.user_to_wallet.arn
+    ]
+  }
+}
+
+resource "aws_iam_role_policy" "get_item_from_dynamodb" {
+  name   = "get-item-from-dynamodb-policy"
+  role   = aws_iam_role.knowtfolio_article_writer.name
+  policy = data.aws_iam_policy_document.read_wallet_table_policy.json
+}
+
 resource "aws_iam_role" "knowtfolio_viewer" {
   name = "knowtfolio-viewer"
   assume_role_policy = templatefile("${path.module}/templates/iam/knowtfolio_user_assume_policy.json", {
@@ -55,8 +72,26 @@ resource "aws_iam_role_policy" "pre_sign_up_lambda" {
   name = "pre-sign-up-lambda"
   role = aws_iam_role.lambda["pre_sign_up"].name
   policy = templatefile("${path.module}/templates/iam/invoke_validate_lambda_policy.json", {
-    validate_lambda_arn = aws_lambda_function.validate_sign_up_form.arn
+    validate_lambda_arn = aws_lambda_function.auth_endpoints["validate_sign_up_form"].arn
   })
+}
+
+// TODO: 他のpolicyもこの記法で統一する
+data "aws_iam_policy_document" "update_wallet_table_policy" {
+  statement {
+    actions = [
+      "dynamodb:PutItem"
+    ]
+    resources = [
+      aws_dynamodb_table.user_to_wallet.arn
+    ]
+  }
+}
+
+resource "aws_iam_role_policy" "post_wallet_address_lambda" {
+  name   = "post-wallet-address-lambda"
+  role   = aws_iam_role.lambda["post_wallet_address"].name
+  policy = data.aws_iam_policy_document.update_wallet_table_policy.json
 }
 
 resource "aws_iam_role_policy" "validate_sign_up_form_lambda" {

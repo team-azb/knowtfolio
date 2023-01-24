@@ -117,13 +117,12 @@ module.exports = [
       port: 3000,
       proxy: [
         {
-          context: "/api/signup",
+          context: "/api/validate_sign_up_form",
           changeOrigin: true,
           target: "https://knowtfolio.com",
         },
         {
-          // TODO: https://github.com/team-azb/knowtfolio/pull/174 とマージするときにエンドポイントを変更
-          context: "/api/validate_signup_form",
+          context: "/api/wallet_address",
           changeOrigin: true,
           target: "https://knowtfolio.com",
         },

@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/cognitoidentityprovider"
+	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	"github.com/aws/aws-sdk-go-v2/service/lambda"
 	"os"
 )
@@ -24,10 +25,15 @@ var (
 	})
 )
 
-// lambda
+// other services
 var (
 	LambdaClient = lambda.New(lambda.Options{
 		Credentials: DefaultConfig.Credentials,
 		Region:      Region,
 	})
+	DynamoDBClient = dynamodb.New(dynamodb.Options{
+		Credentials: DefaultConfig.Credentials,
+		Region:      Region,
+	})
+	DynamoDBUserTableName = "user_to_wallet"
 )

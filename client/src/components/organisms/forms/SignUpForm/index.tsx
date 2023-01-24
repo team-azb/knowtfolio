@@ -6,17 +6,13 @@ import {
   signInToCognitoWithPassword,
   SignUpFormKey,
 } from "~/apis/cognito";
-import { useWeb3Context } from "~/components/organisms/providers/Web3Provider";
 import PhoneInput from "react-phone-number-input/input";
 import { E164Number } from "libphonenumber-js/types";
-import { AxiosError } from "axios";
 import { Button, Grid } from "@mui/material";
 import Input, { InputStyle } from "~/components/atoms/authForm/Input";
 import Label from "~/components/atoms/authForm/Label";
-import Checkbox from "~/components/atoms/authForm/Checkbox";
 import Form from "~/components/atoms/authForm/Form";
 import Spacer from "~/components/atoms/Spacer";
-import WalletAddressDisplay from "~/components/organisms/WalletAddressDisplay";
 import { toast } from "react-toastify";
 import { Link, useNavigate } from "react-router-dom";
 import { signUpErrorCode, validateSignUpForm } from "~/apis/lambda";
@@ -89,6 +85,9 @@ const createFieldMessages = async (form: SignUpForm) => {
   }, messagesWhenValid);
 };
 
+export const noteOnWalletAddress =
+  "※一度連携したwallet addressは後から変更・削除できません。必ず正しいwallet addressが表示されているかどうかよく確認してから登録してください。";
+
 const SignUpForm = () => {
   const [form, setForm] = useState<SignUpForm>({
     phone_number: "",
@@ -98,7 +97,6 @@ const SignUpForm = () => {
   const [fieldMessages, setFieldMessages] = useState<formFieldMessages>({});
   const [hasSignedUp, setHasSignedUp] = useState(false);
   const [code, setCode] = useState("");
-  const { account } = useWeb3Context();
   const navigate = useNavigate();
 
   const onChangeForm = useCallback<React.ChangeEventHandler<HTMLInputElement>>(
@@ -110,22 +108,11 @@ const SignUpForm = () => {
             return { ...prev, [event.target.name]: event.target.value };
           });
           break;
-        case "wallet_address":
-          if (event.target.checked) {
-            setForm((prev) => {
-              return { ...prev, wallet_address: account };
-            });
-          } else {
-            setForm((prev) => {
-              return { ...prev, wallet_address: undefined };
-            });
-          }
-          break;
         default:
           break;
       }
     },
-    [account]
+    []
   );
 
   useEffect(() => {
@@ -179,7 +166,7 @@ const SignUpForm = () => {
       try {
         await signInToCognitoWithPassword(form.username, form.password);
         toast.success("サインインしました。");
-        navigate("/mypage", {
+        navigate("/register-wallet", {
           state: {
             shouldLoadCurrentUser: true,
           },
@@ -233,21 +220,6 @@ const SignUpForm = () => {
           value={form.password}
           placeholder="Password"
           message={fieldMessages.password}
-        />
-        <Checkbox
-          id="wallet_address"
-          name="wallet_address"
-          disabled={hasSignedUp}
-          onChange={onChangeForm}
-          label={
-            <>
-              <WalletAddressDisplay
-                address={account}
-                style={{ display: "inline" }}
-              />
-              をwallet addressとして登録する(option)
-            </>
-          }
         />
         <Grid item container justifyContent="center">
           <Button

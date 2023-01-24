@@ -6,7 +6,6 @@
   "scripts": {
     "start": "NODE_OPTIONS='--max-old-space-size=8192' webpack serve --mode=development --progress --open",
     "build": "NODE_OPTIONS='--max-old-space-size=8192' webpack --mode=production --progress",
-    "deploy": "sh bin/deploy.sh",
     "format": "prettier --write 'src/**/*.ts' 'src/**/*.tsx' 'src/**/*.html' 'src/**/*.css' 'webpack.*.js'",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -14,6 +13,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.231.0",
     "@aws-sdk/client-s3": "^3.118.0",
     "@aws-sdk/credential-providers": "^3.118.0",
     "@aws-sdk/signature-v4-crt": "^3.226.0",
