@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/aws/aws-sdk-go-v2/aws"
@@ -56,10 +57,9 @@ func handler(ctx context.Context, event *events.CognitoEventUserPoolsPreSignup) 
 	}
 
 	form := models.SignUpForm{
-		UserName:      event.UserName,
-		Password:      password,
-		PhoneNumber:   event.Request.UserAttributes["phone_number"],
-		WalletAddress: event.Request.UserAttributes["custom:wallet_address"],
+		UserName:    event.UserName,
+		Password:    password,
+		PhoneNumber: event.Request.UserAttributes["phone_number"],
 	}
 
 	fieldErrs, internalErr := invokeValidationLambda(ctx, form)

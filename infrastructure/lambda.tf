@@ -12,9 +12,20 @@ locals {
     create_auth_challenge          = ""
     verify_auth_challenge_response = ""
   }
+  auth_endpoint_functions = {
+    validate_sign_up_form = {
+      allow_methods     = ["POST"]
+      api_resource_path = "validate_sign_up_form"
+    }
+    post_wallet_address = {
+      allow_methods     = ["POST"]
+      api_resource_path = "wallet_address"
+    }
+  }
+
   golang_functions = merge(
     local.cognito_trigger_functions,
-    { validate_sign_up_form = "" }
+    local.auth_endpoint_functions
   )
   lambda_functions = local.golang_functions
 }
@@ -87,13 +98,14 @@ resource "aws_lambda_function" "cognito_triggers" {
   runtime          = "go1.x"
 }
 
-resource "aws_lambda_function" "validate_sign_up_form" {
-  function_name    = "validate_sign_up_form"
-  role             = aws_iam_role.lambda["validate_sign_up_form"].arn
+resource "aws_lambda_function" "auth_endpoints" {
+  for_each         = local.auth_endpoint_functions
+  function_name    = each.key
+  role             = aws_iam_role.lambda[each.key].arn
   s3_bucket        = aws_s3_bucket.lambda_artifacts.bucket
-  s3_key           = data.aws_s3_object.golang_function_zip["validate_sign_up_form"].key
-  source_code_hash = data.aws_s3_object.golang_function_zip_hash["validate_sign_up_form"].body
-  handler          = "validate_sign_up_form"
+  s3_key           = data.aws_s3_object.golang_function_zip[each.key].key
+  source_code_hash = data.aws_s3_object.golang_function_zip_hash[each.key].body
+  handler          = each.key
   runtime          = "go1.x"
 
   environment {
@@ -112,12 +124,13 @@ resource "aws_lambda_permission" "cognito_triggers" {
   source_arn    = aws_cognito_user_pool.knowtfolio.arn
 }
 
-resource "aws_lambda_function_url" "validate_sign_up_form" {
-  function_name      = aws_lambda_function.validate_sign_up_form.function_name
+resource "aws_lambda_function_url" "auth_endpoints" {
+  for_each           = local.auth_endpoint_functions
+  function_name      = aws_lambda_function.auth_endpoints[each.key].function_name
   authorization_type = "NONE"
   cors {
     # NOTE: 開発用にlocalhostを許容している。環境で分けるようになった場合は、本番環境ではこれは除く必要がある。
     allow_origins = ["https://knowtfolio.com", "http://localhost:3000"]
-    allow_methods = ["GET", "POST", "DELETE"]
+    allow_methods = each.value.allow_methods
   }
 }

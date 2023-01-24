@@ -8,10 +8,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/feature/s3/manager"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
-	"github.com/ethereum/go-ethereum/accounts"
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/common/hexutil"
-	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/team-azb/knowtfolio/server/config"
 	"github.com/team-azb/knowtfolio/server/gateways/api/gen/http/nfts/server"
 	"github.com/team-azb/knowtfolio/server/gateways/api/gen/nfts"
@@ -39,7 +36,7 @@ func NewNftsService(db *gorm.DB, contract *ethereum.ContractClient, s3Client *s3
 }
 
 func (s nftsService) CreateForArticle(ctx context.Context, request *nfts.CreateNftForArticleRequest) (res *nfts.CreateNftForArticleResult, err error) {
-	err = VerifySignature(request.Address, request.Signature, config.SignData["CreateNFT"])
+	err = ethereum.VerifySignature(request.Address, request.Signature, config.SignData["CreateNFT"])
 	if err != nil {
 		return nil, nfts.MakeUnauthenticated(err)
 	}
@@ -106,31 +103,4 @@ func (s nftsService) CreateForArticle(ctx context.Context, request *nfts.CreateN
 	})
 
 	return
-}
-
-// VerifySignature checks if `sign` is a signature that is signed by `addr` using `signedData`.
-func VerifySignature(addr string, sign string, signedData string) error {
-	decodedSign, err := hexutil.Decode(sign)
-	if err != nil {
-		return err
-	}
-
-	// NOTE: Some client generates 27/28 instead of 0/1 due to Legacy Ethereum
-	// ref) https://github.com/ethereum/go-ethereum/issues/19751#issuecomment-504900739
-	if decodedSign[crypto.RecoveryIDOffset] >= 27 {
-		decodedSign[crypto.RecoveryIDOffset] -= 27
-	}
-
-	hash := accounts.TextHash([]byte(signedData))
-	pubKey, err := crypto.SigToPub(hash, decodedSign)
-	if err != nil {
-		return err
-	}
-
-	signedAddr := crypto.PubkeyToAddress(*pubKey)
-	if addr != signedAddr.String() {
-		return errors.New("`address` didn't match the signer")
-	}
-
-	return nil
 }
