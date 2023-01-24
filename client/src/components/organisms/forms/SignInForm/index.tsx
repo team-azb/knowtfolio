@@ -29,7 +29,7 @@ const SignInForm = () => {
     username: "",
     password: "",
   });
-  const { isConnectedMetamask, account, web3 } = useWeb3Context();
+  const { isConnectedToMetamask, account, web3 } = useWeb3Context();
   const navigate = useNavigate();
 
   const onChangeForm = useCallback<React.ChangeEventHandler<HTMLInputElement>>(
@@ -75,7 +75,7 @@ const SignInForm = () => {
     async (event) => {
       event.preventDefault();
       try {
-        assertMetamask(isConnectedMetamask);
+        assertMetamask(isConnectedToMetamask);
         await signInToCognitoWithWallet(form.username, web3, account);
         navigate("/mypage", {
           state: {
@@ -88,7 +88,7 @@ const SignInForm = () => {
         toast.error("サインインに失敗しました。");
       }
     },
-    [account, form.username, isConnectedMetamask, navigate, web3]
+    [account, form.username, isConnectedToMetamask, navigate, web3]
   );
 
   return (
@@ -136,7 +136,7 @@ const SignInForm = () => {
           </Grid>
           <Grid item container xs={5}>
             <RequireWeb3Wrapper
-              isConnectedMetamask={isConnectedMetamask}
+              isConnectedToMetamask={isConnectedToMetamask}
               contentOnNotConnected={
                 <Grid item container direction="column">
                   <Label>Connect to Metamask</Label>

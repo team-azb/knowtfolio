@@ -18,7 +18,7 @@ import RequireWeb3Wrapper from "~/components/organisms/RequireWeb3Wrapper";
 const NewArticleForm = () => {
   const [content, setContent] = useState("");
   const [titleInput, setTitleInput] = useState("");
-  const { isConnectedMetamask, web3, account } = useWeb3Context();
+  const { isConnectedToMetamask, web3, account } = useWeb3Context();
   const handleEditorChange = useCallback<
     (value: string, editor: TinyMCEEditor) => void
   >((value) => {
@@ -34,7 +34,7 @@ const NewArticleForm = () => {
 
   const handlePost = useCallback(async () => {
     try {
-      assertMetamask(isConnectedMetamask);
+      assertMetamask(isConnectedToMetamask);
       const signatureForCreate = await web3.eth.personal.sign(
         "Create Article",
         account,
@@ -62,7 +62,7 @@ const NewArticleForm = () => {
       console.error(error);
       toast.error("記事の作成に失敗しました。");
     }
-  }, [account, content, isConnectedMetamask, navigate, titleInput, web3]);
+  }, [account, content, isConnectedToMetamask, navigate, titleInput, web3]);
   return (
     <div
       style={{
@@ -96,7 +96,7 @@ const NewArticleForm = () => {
           </Grid>
         </Grid>
         <Grid item xs={9} container direction="row-reverse">
-          <RequireWeb3Wrapper isConnectedMetamask={isConnectedMetamask}>
+          <RequireWeb3Wrapper isConnectedToMetamask={isConnectedToMetamask}>
             <Button
               variant="contained"
               onClick={handlePost}

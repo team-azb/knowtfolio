@@ -20,16 +20,18 @@ type web3Context =
       account?: string;
       contract?: Contract;
       connectMetamask?: () => Promise<void>;
-      isConnectedMetamask: false;
+      isConnectedToMetamask: false;
     }
   | {
       web3: Web3;
       account: string;
       contract: Contract;
       connectMetamask: () => Promise<void>;
-      isConnectedMetamask: true;
+      isConnectedToMetamask: true;
     };
-const web3Context = createContext<web3Context>({ isConnectedMetamask: false });
+const web3Context = createContext<web3Context>({
+  isConnectedToMetamask: false,
+});
 
 type props = {
   children: React.ReactNode;
@@ -37,7 +39,7 @@ type props = {
 };
 const Web3Provider = ({ children }: props) => {
   const [web3Obj, setWeb3Obj] = useState<web3Context>({
-    isConnectedMetamask: false,
+    isConnectedToMetamask: false,
   });
 
   const connectMetamask = useCallback(async () => {
@@ -58,7 +60,7 @@ const Web3Provider = ({ children }: props) => {
       account,
       contract,
       connectMetamask,
-      isConnectedMetamask: true,
+      isConnectedToMetamask: true,
     });
   }, []);
 
@@ -108,12 +110,12 @@ export const useWeb3Context = () => {
 type assertMeatamask = (value: boolean) => asserts value is true;
 /**
  * Metamaskが必要な処理を実装する際に、接続が失敗している場合にassertionを行う関数
- * @param isConnectedMetamask 接続ができているかのフラグ
+ * @param isConnectedToMetamask 接続ができているかのフラグ
  */
 export const assertMetamask: assertMeatamask = (
-  isConnectedMetamask: boolean
-): asserts isConnectedMetamask is true => {
-  if (!isConnectedMetamask) {
+  isConnectedToMetamask: boolean
+): asserts isConnectedToMetamask is true => {
+  if (!isConnectedToMetamask) {
     throw new Error("Metamaskに接続されていません。");
   }
 };

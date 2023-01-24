@@ -67,11 +67,11 @@ const RegisteredWalletAddressMessage = () => {
  */
 const RegisterWalletFormContent = () => {
   const { user } = useAuthContext();
-  const { isConnectedMetamask, account, web3 } = useWeb3Context();
+  const { isConnectedToMetamask, account, web3 } = useWeb3Context();
   const navigate = useNavigate();
 
   const registerWalletAddress = useCallback(async () => {
-    assertMetamask(isConnectedMetamask);
+    assertMetamask(isConnectedToMetamask);
     const signature = await web3.eth.personal.sign(
       "Register wallet address",
       account,
@@ -92,7 +92,7 @@ const RegisterWalletFormContent = () => {
     } catch (error) {
       toast.error("Wallet addressの登録に失敗しました。");
     }
-  }, [account, isConnectedMetamask, navigate, user, web3]);
+  }, [account, isConnectedToMetamask, navigate, user, web3]);
 
   return (
     <Grid container direction="column" spacing={3}>
@@ -120,7 +120,7 @@ const RegisterWalletFormContent = () => {
       <Grid item container justifyContent="center">
         <Grid item xs={2.5}></Grid>
         <Grid item xs={7.5}>
-          <RequireWeb3Wrapper isConnectedMetamask={isConnectedMetamask}>
+          <RequireWeb3Wrapper isConnectedToMetamask={isConnectedToMetamask}>
             <Button
               variant="outlined"
               onClick={registerWalletAddress}
