@@ -9,7 +9,10 @@ export type FieldError = {
 
 export const validateSignUpForm = async (form: SignUpForm) => {
   // TODO: https://github.com/team-azb/knowtfolio/pull/174 とマージするときにエンドポイントを変更
-  const { data: errData } = await axios.post("/api/validate_sign_up_form", form);
+  const { data: errData } = await axios.post(
+    "/api/validate_sign_up_form",
+    form
+  );
   return errData as FieldError[];
 };
 
