@@ -10,7 +10,7 @@ import ArticleEditor from "~/components/organisms/ArticleEditor";
 import { Button, Grid } from "@mui/material";
 import ArrowBackIosNewRoundedIcon from "@mui/icons-material/ArrowBackIosNewRounded";
 import { toast } from "react-toastify";
-import ConnectToMetamaskButton from "~/components/organisms/ConnectToMetamaskButton";
+import RequireWeb3Wrapper from "~/components/organisms/RequireWeb3Wrapper";
 
 /**
  * 記事の新規作成用のフォーム
@@ -96,7 +96,7 @@ const NewArticleForm = () => {
           </Grid>
         </Grid>
         <Grid item xs={9} container direction="row-reverse">
-          {web3 && account ? (
+          <RequireWeb3Wrapper isConnectedMetamask={isConnectedMetamask}>
             <Button
               variant="contained"
               onClick={handlePost}
@@ -104,9 +104,7 @@ const NewArticleForm = () => {
             >
               create article
             </Button>
-          ) : (
-            <ConnectToMetamaskButton />
-          )}
+          </RequireWeb3Wrapper>
         </Grid>
       </Grid>
       <Grid flexGrow={1}>

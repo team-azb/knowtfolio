@@ -17,6 +17,7 @@ import { toast } from "react-toastify";
 import { Link, useNavigate } from "react-router-dom";
 import MetamaskButton from "~/components/atoms/MetamaskButton";
 import ConnectToMetamaskButton from "~/components/organisms/ConnectToMetamaskButton";
+import RequireWeb3Wrapper from "~/components/organisms/RequireWeb3Wrapper";
 
 type signInWithPasswordForm = {
   username: string;
@@ -133,7 +134,15 @@ const SignInForm = () => {
             <b>OR</b>
           </Grid>
           <Grid item container xs={5}>
-            {isConnectedMetamask ? (
+            <RequireWeb3Wrapper
+              isConnectedMetamask={isConnectedMetamask}
+              contentOnNotConnected={
+                <Grid item container direction="column">
+                  <Label>Connect to Metamask</Label>
+                  <ConnectToMetamaskButton />
+                </Grid>
+              }
+            >
               <Grid item container direction="column">
                 <Label>Connected wallet address</Label>
                 <WalletAddressDisplay
@@ -145,12 +154,7 @@ const SignInForm = () => {
                   Sign in with metamask
                 </MetamaskButton>
               </Grid>
-            ) : (
-              <Grid item container direction="column">
-                <Label>Connect to Metamask</Label>
-                <ConnectToMetamaskButton />
-              </Grid>
-            )}
+            </RequireWeb3Wrapper>
           </Grid>
         </Grid>
         <Grid item container justifyContent="center">
