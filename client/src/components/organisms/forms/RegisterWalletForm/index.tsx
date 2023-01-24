@@ -90,7 +90,6 @@ const RegisterWalletFormContent = () => {
         },
       });
     } catch (error) {
-      // TODO: toastで実装する
       toast.error("Wallet addressの登録に失敗しました。");
     }
   }, [account, isConnectedMetamask, navigate, user, web3]);
