@@ -82,6 +82,7 @@ const SignInForm = () => {
             shouldLoadCurrentUser: true,
           },
         });
+        toast.success("サインインしました。");
       } catch (error) {
         console.error(error);
         toast.error("サインインに失敗しました。");
