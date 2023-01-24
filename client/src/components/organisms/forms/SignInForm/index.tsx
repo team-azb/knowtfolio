@@ -8,7 +8,10 @@ import Form from "~/components/atoms/authForm/Form";
 import Input from "~/components/atoms/authForm/Input";
 import Label from "~/components/atoms/authForm/Label";
 import Spacer from "~/components/atoms/Spacer";
-import { useWeb3Context } from "~/components/organisms/providers/Web3Provider";
+import {
+  assertMetamask,
+  useWeb3Context,
+} from "~/components/organisms/providers/Web3Provider";
 import WalletAddressDisplay from "../../WalletAddressDisplay";
 import { toast } from "react-toastify";
 import { Link, useNavigate } from "react-router-dom";
@@ -25,7 +28,7 @@ const SignInForm = () => {
     username: "",
     password: "",
   });
-  const { account, web3 } = useWeb3Context();
+  const { isConnectedMetamask, account, web3 } = useWeb3Context();
   const navigate = useNavigate();
 
   const onChangeForm = useCallback<React.ChangeEventHandler<HTMLInputElement>>(
@@ -71,23 +74,19 @@ const SignInForm = () => {
     async (event) => {
       event.preventDefault();
       try {
-        if (web3 && account) {
-          await signInToCognitoWithWallet(form.username, web3, account);
-          navigate("/mypage", {
-            state: {
-              shouldLoadCurrentUser: true,
-            },
-          });
-          toast.success("サインインしました。");
-        } else {
-          throw new Error("Metamaskに接続されていません。");
-        }
+        assertMetamask(isConnectedMetamask);
+        await signInToCognitoWithWallet(form.username, web3, account);
+        navigate("/mypage", {
+          state: {
+            shouldLoadCurrentUser: true,
+          },
+        });
       } catch (error) {
         console.error(error);
         toast.error("サインインに失敗しました。");
       }
     },
-    [account, form.username, navigate, web3]
+    [account, form.username, isConnectedMetamask, navigate, web3]
   );
 
   return (
@@ -134,7 +133,7 @@ const SignInForm = () => {
             <b>OR</b>
           </Grid>
           <Grid item container xs={5}>
-            {account ? (
+            {isConnectedMetamask ? (
               <Grid item container direction="column">
                 <Label>Connected wallet address</Label>
                 <WalletAddressDisplay

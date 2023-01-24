@@ -104,3 +104,16 @@ export default Web3Provider;
 export const useWeb3Context = () => {
   return useContext(web3Context);
 };
+
+type assertMeatamask = (value: boolean) => asserts value is true;
+/**
+ * Metamaskが必要な処理を実装する際に、接続が失敗している場合にassertionを行う関数
+ * @param isConnectedMetamask 接続ができているかのフラグ
+ */
+export const assertMetamask: assertMeatamask = (
+  isConnectedMetamask: boolean
+): asserts isConnectedMetamask is true => {
+  if (!isConnectedMetamask) {
+    throw new Error("Metamaskに接続されていません。");
+  }
+};

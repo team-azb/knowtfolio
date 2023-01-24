@@ -1,7 +1,10 @@
 import { Editor as TinyMCEEditor } from "tinymce";
 import { useCallback, useEffect, useState } from "react";
 import { getArticle, putArticle } from "~/apis/knowtfolio";
-import { useWeb3Context } from "~/components/organisms/providers/Web3Provider";
+import {
+  assertMetamask,
+  useWeb3Context,
+} from "~/components/organisms/providers/Web3Provider";
 import ArticleEditor from "~/components/organisms/ArticleEditor";
 import { Button, Grid } from "@mui/material";
 import ArrowBackIosNewRoundedIcon from "@mui/icons-material/ArrowBackIosNewRounded";
@@ -44,24 +47,21 @@ const EditArticleForm = ({ articleId }: editArticleFormProps) => {
 
   const handleUpdate = useCallback(async () => {
     try {
-      if (isConnectedMetamask) {
-        const signature = await web3.eth.personal.sign(
-          "Update Article",
-          account,
-          ""
-        );
-        await putArticle({
-          articleId: articleId || "",
-          title,
-          content,
-          address: account,
-          signature,
-        });
-        navigate("/mypage");
-        toast.success("記事が更新されました。");
-      } else {
-        throw new Error("metamaskに接続されていません。");
-      }
+      assertMetamask(isConnectedMetamask);
+      const signature = await web3.eth.personal.sign(
+        "Update Article",
+        account,
+        ""
+      );
+      await putArticle({
+        articleId: articleId || "",
+        title,
+        content,
+        address: account,
+        signature,
+      });
+      navigate("/mypage");
+      toast.success("記事が更新されました。");
     } catch (error) {
       console.error(error);
       toast.error("記事の更新に失敗しました。");

@@ -2,7 +2,10 @@ import { Editor as TinyMCEEditor } from "tinymce";
 import { useCallback, useState } from "react";
 import { mintArticleNft, postArticle } from "~/apis/knowtfolio";
 import { useNavigate } from "react-router-dom";
-import { useWeb3Context } from "~/components/organisms/providers/Web3Provider";
+import {
+  assertMetamask,
+  useWeb3Context,
+} from "~/components/organisms/providers/Web3Provider";
 import ArticleEditor from "~/components/organisms/ArticleEditor";
 import { Button, Grid } from "@mui/material";
 import ArrowBackIosNewRoundedIcon from "@mui/icons-material/ArrowBackIosNewRounded";
@@ -31,33 +34,30 @@ const NewArticleForm = () => {
 
   const handlePost = useCallback(async () => {
     try {
-      if (isConnectedMetamask) {
-        const signatureForCreate = await web3.eth.personal.sign(
-          "Create Article",
-          account,
-          ""
-        );
-        const { id } = await postArticle({
-          title: titleInput,
-          address: account,
-          signature: signatureForCreate,
-          content,
-        });
-        const signatureForMint = await web3.eth.personal.sign(
-          "Mint NFT",
-          account,
-          ""
-        );
-        await mintArticleNft({
-          articleId: id,
-          address: account,
-          signature: signatureForMint,
-        });
-        navigate("/mypage");
-        toast.success("記事を作成しました。");
-      } else {
-        throw new Error("metamaskに接続されていません。");
-      }
+      assertMetamask(isConnectedMetamask);
+      const signatureForCreate = await web3.eth.personal.sign(
+        "Create Article",
+        account,
+        ""
+      );
+      const { id } = await postArticle({
+        title: titleInput,
+        address: account,
+        signature: signatureForCreate,
+        content,
+      });
+      const signatureForMint = await web3.eth.personal.sign(
+        "Mint NFT",
+        account,
+        ""
+      );
+      await mintArticleNft({
+        articleId: id,
+        address: account,
+        signature: signatureForMint,
+      });
+      navigate("/mypage");
+      toast.success("記事を作成しました。");
     } catch (error) {
       console.error(error);
       toast.error("記事の作成に失敗しました。");
