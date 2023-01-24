@@ -14,20 +14,31 @@ import { CONTRACT_ADDRESS } from "~/configs/blockchain";
 // json file in blockchain directory
 import Knowtfolio from "../../../../../../blockchain/artifacts/contracts/Knowtfolio.sol/Knowtfolio.json";
 
-type web3Context = {
-  web3?: Web3;
-  account?: string;
-  contract?: Contract;
-  connectMetamask?: () => Promise<void>;
-};
-const web3Context = createContext<web3Context>({});
+type web3Context =
+  | {
+      web3?: Web3;
+      account?: string;
+      contract?: Contract;
+      connectMetamask?: () => Promise<void>;
+      isConnectedMetamask: false;
+    }
+  | {
+      web3: Web3;
+      account: string;
+      contract: Contract;
+      connectMetamask: () => Promise<void>;
+      isConnectedMetamask: true;
+    };
+const web3Context = createContext<web3Context>({ isConnectedMetamask: false });
 
 type props = {
   children: React.ReactNode;
   contentOnUnconnected?: React.ReactNode;
 };
 const Web3Provider = ({ children }: props) => {
-  const [web3Obj, setWeb3Obj] = useState<web3Context>({});
+  const [web3Obj, setWeb3Obj] = useState<web3Context>({
+    isConnectedMetamask: false,
+  });
 
   const connectMetamask = useCallback(async () => {
     console.log("Welcome to MetaMask User🎉");
@@ -42,13 +53,12 @@ const Web3Provider = ({ children }: props) => {
       CONTRACT_ADDRESS
     );
 
-    setWeb3Obj((prev) => {
-      return {
-        ...prev,
-        web3,
-        account,
-        contract,
-      };
+    setWeb3Obj({
+      web3,
+      account,
+      contract,
+      connectMetamask,
+      isConnectedMetamask: true,
     });
   }, []);
 

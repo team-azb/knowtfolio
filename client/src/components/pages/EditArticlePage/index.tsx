@@ -26,7 +26,7 @@ const contentOnNotEditable = (
  */
 const EditArticlePage = () => {
   const { articleId } = useParams();
-  const { contract } = useWeb3Context();
+  const { isConnectedMetamask, contract } = useWeb3Context();
   const { userWalletAddress } = useAuthContext();
   const [ownerIdOfArticle, setOwnerIdOfArticle] = useState<null | string>(null);
 
@@ -35,7 +35,7 @@ const EditArticlePage = () => {
   }, [ownerIdOfArticle, userWalletAddress]);
 
   const content = useMemo(() => {
-    if (ownerIdOfArticle === null) {
+    if (isConnectedMetamask && ownerIdOfArticle === null) {
       return (
         <div style={{ padding: "100px 400px" }}>
           <LoadingDisplay message="編集権限を検証中" />
@@ -50,22 +50,19 @@ const EditArticlePage = () => {
     } else {
       return contentOnNotEditable;
     }
-  }, [articleId, isAuthorized, ownerIdOfArticle]);
+  }, [articleId, isAuthorized, isConnectedMetamask, ownerIdOfArticle]);
 
   useEffect(() => {
     (async () => {
-      if (contract) {
+      if (isConnectedMetamask) {
         // TODO: コントラクトではなくバックエンド経由で取得する
         const ownerIdOfArticle = await contract.methods
           .getOwnerOfArticle(articleId)
           .call();
         setOwnerIdOfArticle(ownerIdOfArticle);
-      } else {
-        // Metamaskが接続されていない場合は、空文字を入れる。編集権限は必然的にないと判定される。
-        setOwnerIdOfArticle("");
       }
     })();
-  }, [articleId, contract]);
+  }, [articleId, contract, isConnectedMetamask]);
 
   return <div>{content}</div>;
 };

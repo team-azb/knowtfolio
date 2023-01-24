@@ -24,7 +24,7 @@ const EditArticleForm = ({ articleId }: editArticleFormProps) => {
   >((value) => {
     setContent(value);
   }, []);
-  const { web3, account } = useWeb3Context();
+  const { isConnectedMetamask, web3, account } = useWeb3Context();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -44,7 +44,7 @@ const EditArticleForm = ({ articleId }: editArticleFormProps) => {
 
   const handleUpdate = useCallback(async () => {
     try {
-      if (account && web3) {
+      if (isConnectedMetamask) {
         const signature = await web3.eth.personal.sign(
           "Update Article",
           account,
@@ -66,7 +66,7 @@ const EditArticleForm = ({ articleId }: editArticleFormProps) => {
       console.error(error);
       toast.error("記事の更新に失敗しました。");
     }
-  }, [account, articleId, content, navigate, title, web3]);
+  }, [account, articleId, content, isConnectedMetamask, navigate, title, web3]);
 
   const onChangeTitleInput = useCallback<
     React.ChangeEventHandler<HTMLInputElement>

@@ -15,7 +15,7 @@ import ConnectToMetamaskButton from "~/components/organisms/ConnectToMetamaskBut
 const NewArticleForm = () => {
   const [content, setContent] = useState("");
   const [titleInput, setTitleInput] = useState("");
-  const { web3, account } = useWeb3Context();
+  const { isConnectedMetamask, web3, account } = useWeb3Context();
   const handleEditorChange = useCallback<
     (value: string, editor: TinyMCEEditor) => void
   >((value) => {
@@ -31,7 +31,7 @@ const NewArticleForm = () => {
 
   const handlePost = useCallback(async () => {
     try {
-      if (web3 && account) {
+      if (isConnectedMetamask) {
         const signatureForCreate = await web3.eth.personal.sign(
           "Create Article",
           account,
@@ -62,7 +62,7 @@ const NewArticleForm = () => {
       console.error(error);
       toast.error("記事の作成に失敗しました。");
     }
-  }, [account, content, navigate, titleInput, web3]);
+  }, [account, content, isConnectedMetamask, navigate, titleInput, web3]);
   return (
     <div
       style={{
