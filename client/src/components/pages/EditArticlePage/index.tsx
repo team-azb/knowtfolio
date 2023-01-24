@@ -3,7 +3,10 @@ import { Link, useParams } from "react-router-dom";
 import LoadingDisplay from "~/components/atoms/LoadingDisplay";
 import EditArticleForm from "~/components/organisms/forms/EditArticleForm";
 import { useAuthContext } from "~/components/organisms/providers/AuthProvider";
-import { useWeb3Context } from "~/components/organisms/providers/Web3Provider";
+import {
+  assertMetamask,
+  useWeb3Context,
+} from "~/components/organisms/providers/Web3Provider";
 
 const ContentOnEditable = ({ articleId }: { articleId: string }) => {
   return <EditArticleForm articleId={articleId} />;
@@ -54,13 +57,12 @@ const EditArticlePage = () => {
 
   useEffect(() => {
     (async () => {
-      if (isConnectedMetamask) {
-        // TODO: コントラクトではなくバックエンド経由で取得する
-        const ownerIdOfArticle = await contract.methods
-          .getOwnerOfArticle(articleId)
-          .call();
-        setOwnerIdOfArticle(ownerIdOfArticle);
-      }
+      assertMetamask(isConnectedMetamask);
+      // TODO: コントラクトではなくバックエンド経由で取得する
+      const ownerIdOfArticle = await contract.methods
+        .getOwnerOfArticle(articleId)
+        .call();
+      setOwnerIdOfArticle(ownerIdOfArticle);
     })();
   }, [articleId, contract, isConnectedMetamask]);
 

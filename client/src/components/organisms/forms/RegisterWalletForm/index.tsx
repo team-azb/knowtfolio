@@ -1,6 +1,9 @@
 import { useCallback } from "react";
 import { useAuthContext } from "~/components/organisms/providers/AuthProvider";
-import { useWeb3Context } from "~/components/organisms/providers/Web3Provider";
+import {
+  assertMetamask,
+  useWeb3Context,
+} from "~/components/organisms/providers/Web3Provider";
 import Form from "~/components/atoms/authForm/Form";
 import WalletAddressDisplay from "~/components/organisms/WalletAddressDisplay";
 import { Button, Grid } from "@mui/material";
@@ -8,6 +11,7 @@ import Spacer from "~/components/atoms/Spacer";
 import { useNavigate } from "react-router-dom";
 import { postWalletAddress } from "~/apis/lambda";
 import { noteOnWalletAddress } from "~/components/organisms/forms/SignUpForm";
+import RequireWeb3Wrapper from "~/components/organisms/RequireWeb3Wrapper";
 import { toast } from "react-toastify";
 
 /**
@@ -67,28 +71,27 @@ const RegisterWalletFormContent = () => {
   const navigate = useNavigate();
 
   const registerWalletAddress = useCallback(async () => {
-    if (isConnectedMetamask) {
-      const signature = await web3.eth.personal.sign(
-        "Register wallet address",
-        account,
-        ""
-      );
-      try {
-        await postWalletAddress({
-          userId: user.getUsername(),
-          walletAddress: account,
-          signature: signature,
-        });
-        toast.success("Wallet addressの登録に成功しました。");
-        navigate("/register-wallet", {
-          state: {
-            shouldLoadCurrentUser: true,
-          },
-        });
-      } catch (error) {
-        // TODO: toastで実装する
-        toast.error("Wallet addressの登録に失敗しました。");
-      }
+    assertMetamask(isConnectedMetamask);
+    const signature = await web3.eth.personal.sign(
+      "Register wallet address",
+      account,
+      ""
+    );
+    try {
+      await postWalletAddress({
+        userId: user.getUsername(),
+        walletAddress: account,
+        signature: signature,
+      });
+      toast.success("Wallet addressの登録に成功しました。");
+      navigate("/register-wallet", {
+        state: {
+          shouldLoadCurrentUser: true,
+        },
+      });
+    } catch (error) {
+      // TODO: toastで実装する
+      toast.error("Wallet addressの登録に失敗しました。");
     }
   }, [account, isConnectedMetamask, navigate, user, web3]);
 
@@ -118,13 +121,15 @@ const RegisterWalletFormContent = () => {
       <Grid item container justifyContent="center">
         <Grid item xs={2.5}></Grid>
         <Grid item xs={7.5}>
-          <Button
-            variant="outlined"
-            onClick={registerWalletAddress}
-            style={{ fontSize: "1.4rem" }}
-          >
-            register wallet address
-          </Button>
+          <RequireWeb3Wrapper isConnectedMetamask={isConnectedMetamask}>
+            <Button
+              variant="outlined"
+              onClick={registerWalletAddress}
+              style={{ fontSize: "1.4rem" }}
+            >
+              register wallet address
+            </Button>
+          </RequireWeb3Wrapper>
         </Grid>
         <Grid item container xs={2} direction="row-reverse">
           <Button
