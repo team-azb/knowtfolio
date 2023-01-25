@@ -3,7 +3,7 @@ import RegisterWalletForm from "~/components/organisms/forms/RegisterWalletForm"
 import HeaderLayout from "~/components/organisms/layouts/HeaderLayout";
 
 /**
- * "/register-wallet"で表示されるページコンポーネント
+ * "/settings/wallet"で表示されるページコンポーネント
  */
 const RegisterWalletPage = () => {
   return (

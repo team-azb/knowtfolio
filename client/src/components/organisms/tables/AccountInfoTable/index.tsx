@@ -88,7 +88,7 @@ const AccountInfoTable = () => {
             <Button
               variant="outlined"
               onClick={() => {
-                navigate("/register-wallet");
+                navigate("/settings/wallet");
               }}
               style={{ marginLeft: "1rem", fontSize: "1.4rem" }}
             >

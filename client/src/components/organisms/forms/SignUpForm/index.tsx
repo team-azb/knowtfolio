@@ -89,7 +89,7 @@ const SignUpForm = () => {
       try {
         await signInToCognitoWithPassword(form.username, form.password);
         toast.success("サインインしました。");
-        navigate("/register-wallet", {
+        navigate("/settings/wallet", {
           state: {
             shouldLoadCurrentUser: true,
           },
