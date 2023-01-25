@@ -21,6 +21,10 @@ func init() {
 	if err != nil {
 		panic(err.(any))
 	}
+
+	requestValidator.RegisterTagNameFunc(func(field reflect.StructField) string {
+		return field.Tag.Get("json")
+	})
 }
 
 // ValidateJSONRequest unmarshal srcJSON into the type of distStruct,
