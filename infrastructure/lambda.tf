@@ -2,8 +2,8 @@ locals {
   func_script_root_dir = "${path.module}/function_scripts"
 
   golang_functions_dependencies = setunion(
-    fileset("/", "${local.func_script_root_dir}/pkg/**.go"),
-    fileset("/", "${path.module}/../server/gateways/**.go")
+    fileset(path.module, "function_scripts/pkg/**/*.go"),
+    fileset(path.module, "../server/gateways/ethereum/**/*.go")
   )
 
   cognito_trigger_functions = {
