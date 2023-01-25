@@ -18,6 +18,7 @@ type UserAttributes = {
   email?: string;
   website?: string;
   description?: string;
+  picture?: string;
 };
 
 export type AuthContext = {
@@ -78,6 +79,7 @@ const AuthProvider = ({
         (atr) => atr.Name === "phone_number"
       )?.Value;
       const email = attributes.find((atr) => atr.Name === "email")?.Value;
+      const picture = attributes.find((atr) => atr.Name === "picture")?.Value;
       const website = attributes.find((atr) => atr.Name === "website")?.Value;
       const description = attributes.find(
         (atr) => atr.Name === "custom:description"
@@ -100,6 +102,7 @@ const AuthProvider = ({
             email,
             website,
             description,
+            picture,
           },
           userWalletAddress,
         });

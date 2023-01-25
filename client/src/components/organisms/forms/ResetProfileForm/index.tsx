@@ -8,14 +8,24 @@ import TextareaAutosize from "@mui/base/TextareaAutosize";
 import { grey } from "@mui/material/colors";
 import { useAuthContext } from "~/components/organisms/providers/AuthProvider";
 import { useNavigate } from "react-router-dom";
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { toast } from "react-toastify";
 import { CognitoUserAttribute } from "amazon-cognito-identity-js";
+import { PutObjectCommand } from "@aws-sdk/client-s3";
+import { ARTICLE_RESOURCES_S3_BUCKET } from "~/configs/s3";
+import { useS3Client } from "~/apis/s3";
 
 type profileForm = {
   email?: string;
   website?: string;
   description?: string;
+  picture?: string;
+};
+
+type imageForm = {
+  blob: Blob;
+  url: string;
+  name: string;
 };
 
 const convertToCognitoKey = (value: keyof profileForm) => {
@@ -28,7 +38,7 @@ const convertToCognitoKey = (value: keyof profileForm) => {
 const ResetProfileForm = () => {
   const {
     user,
-    attributes: { phoneNumber, email, website, description },
+    attributes: { phoneNumber, email, website, description, picture },
   } = useAuthContext();
   const [profileForm, setProfileForm] = useState<profileForm>({
     email,
@@ -36,16 +46,39 @@ const ResetProfileForm = () => {
     description,
   });
   const navigate = useNavigate();
+  const [imageForm, setImageForm] = useState<imageForm | null>(null);
+  const s3Client = useS3Client();
 
-  const handleSubmitForm = useCallback(() => {
-    const attributes = (Object.keys(profileForm) as (keyof profileForm)[]).map(
+  const handleSubmitForm = useCallback(async () => {
+    let form = { ...profileForm };
+    if (imageForm) {
+      const command = new PutObjectCommand({
+        Bucket: ARTICLE_RESOURCES_S3_BUCKET,
+        Key: `images/${imageForm.name}`,
+        Body: imageForm.blob,
+      });
+      try {
+        await s3Client.send(command);
+        const uri = encodeURI(
+          `https://knowtfolio.com/images/${imageForm.name}`
+        );
+        form = { ...form, picture: uri };
+        toast.success("プロフィール画像の更新に成功しました。");
+      } catch (error) {
+        console.error(error);
+        toast.error("プロフィール画像の更新に失敗しました。");
+      }
+    }
+
+    const attributes = (Object.keys(form) as (keyof profileForm)[]).map(
       (key) => {
         return new CognitoUserAttribute({
           Name: convertToCognitoKey(key),
-          Value: profileForm[key] || "",
+          Value: form[key] || "",
         });
       }
     );
+
     user.updateAttributes(attributes, (err) => {
       if (err) {
         console.error(err.message || JSON.stringify(err));
@@ -59,7 +92,7 @@ const ResetProfileForm = () => {
         },
       });
     });
-  }, [navigate, profileForm, user]);
+  }, [imageForm, navigate, profileForm, s3Client, user]);
 
   const handleChangeForm = useCallback<
     React.ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement>
@@ -73,6 +106,55 @@ const ResetProfileForm = () => {
     });
   }, []);
 
+  const handleSetImage = useCallback<
+    React.ChangeEventHandler<HTMLInputElement>
+  >((event) => {
+    const files = event.target.files;
+    if (files?.length) {
+      const fr = new FileReader();
+      fr.readAsDataURL(files[0]);
+      fr.addEventListener("load", () => {
+        setImageForm({
+          blob: files[0],
+          url: String(fr.result),
+          name: files[0].name,
+        });
+      });
+    }
+  }, []);
+
+  const iconImage = useMemo(() => {
+    if (imageForm) {
+      return (
+        <img
+          src={imageForm.url}
+          alt="preview image"
+          style={{
+            borderRadius: "50%",
+            width: 125,
+            height: 125,
+            padding: 12.5,
+          }}
+        />
+      );
+    } else if (picture) {
+      return (
+        <img
+          src={picture}
+          alt="preview image"
+          style={{
+            borderRadius: "50%",
+            width: 125,
+            height: 125,
+            padding: 12.5,
+          }}
+        />
+      );
+    } else {
+      return <AccountCircleIcon sx={{ fontSize: 150 }} />;
+    }
+  }, [imageForm, picture]);
+
   return (
     <Form>
       <h2>プロフィールを編集</h2>
@@ -80,8 +162,18 @@ const ResetProfileForm = () => {
       <Spacer height="3rem" />
       <Grid container direction="row" spacing={5}>
         <Grid item>
-          <Button variant="text" style={{ fontSize: 14, padding: 0 }}>
-            <AccountCircleIcon sx={{ fontSize: 150 }} />
+          <Button
+            variant="text"
+            component="label"
+            style={{ fontSize: 14, padding: 0 }}
+          >
+            {iconImage}
+            <input
+              type="file"
+              accept="image/*"
+              hidden
+              onChange={handleSetImage}
+            />
           </Button>
         </Grid>
         <Grid item flexGrow={1}>
