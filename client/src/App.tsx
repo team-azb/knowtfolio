@@ -10,7 +10,7 @@ import NewArticlePage from "~/components/pages/NewArticlePage";
 import EditArticlePage from "~/components/pages/EditArticlePage";
 import SearchPage from "~/components/pages/SearchPage";
 import Web3Provider from "~/components/organisms/providers/Web3Provider";
-import ResetWalletPage from "./components/pages/ResetWalletPage";
+import RegisterWalletPage from "./components/pages/RegisterWalletPage";
 import ArticlePage from "~/components/pages/ArticlePage";
 import ResetProfilePage from "~/components/pages/ResetProfilePage";
 import { ThemeProvider } from "@mui/material";
@@ -32,7 +32,7 @@ const App = () => {
               path="wallet"
               element={
                 <AuthProvider>
-                  <ResetWalletPage />
+                  <RegisterWalletPage />
                 </AuthProvider>
               }
             />

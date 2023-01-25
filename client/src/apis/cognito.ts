@@ -6,7 +6,6 @@ import {
 import * as AmazonCognitoIdentity from "amazon-cognito-identity-js";
 import { userPool } from "~/configs/cognito";
 import Web3 from "web3";
-import axios from "axios";
 
 export const signOutFromCognito = (cognitoUser: CognitoUser) => {
   return new Promise<void>((resolve) => {
@@ -91,7 +90,6 @@ export type SignUpForm = {
   phone: string;
   password: string;
   username: string;
-  wallet?: string;
 };
 
 export const signUpToCognito = (form: SignUpForm) => {
@@ -100,11 +98,8 @@ export const signUpToCognito = (form: SignUpForm) => {
       Name: "phone_number",
       Value: form.phone,
     }),
-    new CognitoUserAttribute({
-      Name: "custom:wallet_address",
-      Value: form.wallet || "",
-    }),
   ];
+
   return new Promise<AmazonCognitoIdentity.CognitoUser>((resolve, reject) => {
     userPool.signUp(
       form.username,

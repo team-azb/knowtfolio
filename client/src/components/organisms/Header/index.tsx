@@ -8,10 +8,7 @@ import LoadingDisplay from "~/components/atoms/LoadingDisplay";
 import WalletAddressDisplay from "~/components/organisms/WalletAddressDisplay";
 
 const AcountInfo = () => {
-  const {
-    user,
-    attributes: { walletAddress },
-  } = useAuthContext();
+  const { user, userWalletAddress } = useAuthContext();
   const navigate = useNavigate();
 
   return (
@@ -24,7 +21,7 @@ const AcountInfo = () => {
     >
       {user.getUsername()}
       <WalletAddressDisplay
-        address={walletAddress}
+        address={userWalletAddress}
         style={{ fontSize: "1rem" }}
       />
     </Button>

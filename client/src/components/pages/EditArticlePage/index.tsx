@@ -27,14 +27,12 @@ const contentOnNotEditable = (
 const EditArticlePage = () => {
   const { articleId } = useParams();
   const { contract } = useWeb3Context();
-  const {
-    attributes: { walletAddress },
-  } = useAuthContext();
+  const { userWalletAddress } = useAuthContext();
   const [ownerIdOfArticle, setOwnerIdOfArticle] = useState<null | string>(null);
 
   const isAuthorized = useMemo(() => {
-    return ownerIdOfArticle === walletAddress;
-  }, [walletAddress, ownerIdOfArticle]);
+    return ownerIdOfArticle === userWalletAddress;
+  }, [ownerIdOfArticle, userWalletAddress]);
 
   const content = useMemo(() => {
     if (ownerIdOfArticle === null) {

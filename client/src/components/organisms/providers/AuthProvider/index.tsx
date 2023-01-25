@@ -11,19 +11,20 @@ import { userPool } from "~/configs/cognito";
 import { loadAttributes, loadSession } from "~/apis/cognito";
 import { Link, useLocation } from "react-router-dom";
 import LoadingDisplay from "~/components/atoms/LoadingDisplay";
+import { fetchWalletAddress, initDynamodbClient } from "~/apis/dynamodb";
 
 type UserAttributes = {
   phoneNumber: string;
   email?: string;
   website?: string;
   description?: string;
-  walletAddress?: string;
 };
 
 export type AuthContext = {
   user: CognitoUser;
   session: CognitoUserSession;
   attributes: UserAttributes;
+  userWalletAddress?: string;
 };
 
 const authContext = createContext<AuthContext>({} as AuthContext);
@@ -81,9 +82,14 @@ const AuthProvider = ({
       const description = attributes.find(
         (atr) => atr.Name === "custom:description"
       )?.Value;
-      const walletAddress = attributes.find(
-        (atr) => atr.Name === "custom:wallet_address"
-      )?.Value;
+
+      const dynamodbClient = initDynamodbClient(
+        session.getIdToken().getJwtToken()
+      );
+      const userWalletAddress = await fetchWalletAddress(
+        dynamodbClient,
+        cognitoUser.getUsername()
+      );
 
       if (phoneNumber) {
         setAuth({
@@ -94,8 +100,8 @@ const AuthProvider = ({
             email,
             website,
             description,
-            walletAddress,
           },
+          userWalletAddress,
         });
       }
     } else {

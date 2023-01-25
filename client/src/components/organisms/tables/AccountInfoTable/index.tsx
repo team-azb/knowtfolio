@@ -9,7 +9,8 @@ import { toast } from "react-toastify";
 const AccountInfoTable = () => {
   const {
     user,
-    attributes: { phoneNumber, walletAddress, email, description },
+    attributes: { phoneNumber, email, description },
+    userWalletAddress,
   } = useAuthContext();
   const navigate = useNavigate();
 
@@ -77,20 +78,23 @@ const AccountInfoTable = () => {
       <Grid item container alignItems="center">
         <Grid xs={2}>Wallet address</Grid>
         <Grid xs={10}>
-          <WalletAddressDisplay
-            style={{ display: "inline" }}
-            address={walletAddress}
-            shouldTruncate={false}
-          />
-          <Button
-            variant="outlined"
-            onClick={() => {
-              navigate("/settings/wallet");
-            }}
-            style={{ marginLeft: "1rem", fontSize: "1.4rem" }}
-          >
-            変更/登録する
-          </Button>
+          {userWalletAddress ? (
+            <WalletAddressDisplay
+              style={{ display: "inline" }}
+              address={userWalletAddress}
+              shouldTruncate={false}
+            />
+          ) : (
+            <Button
+              variant="outlined"
+              onClick={() => {
+                navigate("/register-wallet");
+              }}
+              style={{ marginLeft: "1rem", fontSize: "1.4rem" }}
+            >
+              登録する
+            </Button>
+          )}
         </Grid>
       </Grid>
     </Grid>

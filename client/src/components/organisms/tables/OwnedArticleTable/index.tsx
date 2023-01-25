@@ -11,9 +11,7 @@ const pageSize = 12;
  * ユーザーが所有している記事を一覧表示できるテーブル
  */
 const OwnedArticleTable = () => {
-  const {
-    attributes: { walletAddress },
-  } = useAuthContext();
+  const { userWalletAddress } = useAuthContext();
   const [articles, setArticles] = useState<SearchResultEntry[]>([]);
   const [searchParams, setSearchParams] = useSearchParams();
   const [totalNumOfPage, setTotalNumOfPage] = useState(1);
@@ -26,7 +24,7 @@ const OwnedArticleTable = () => {
   useEffect(() => {
     (async () => {
       const { results, total_count } = await searchArticles({
-        owned_by: walletAddress,
+        owned_by: userWalletAddress,
         sort_by: "updated_at",
         page_num: pageNum,
         page_size: pageSize,
@@ -34,7 +32,7 @@ const OwnedArticleTable = () => {
       setArticles(results);
       setTotalNumOfPage(Math.ceil(total_count / pageSize));
     })();
-  }, [pageNum, walletAddress]);
+  }, [pageNum, userWalletAddress]);
 
   const changePage = useCallback(
     (_event: React.ChangeEvent<unknown>, page: number) => {
