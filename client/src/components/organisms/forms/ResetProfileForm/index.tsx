@@ -140,7 +140,7 @@ const ResetProfileForm = () => {
             component="label"
             style={{ fontSize: 14, padding: 0 }}
           >
-            <IconImage url={imageForm?.url || picture} />
+            <IconImage url={imageForm?.url || picture} size={180} />
             <input
               type="file"
               accept="image/*"
