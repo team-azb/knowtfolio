@@ -2,8 +2,8 @@ locals {
   func_script_root_dir = "${path.module}/function_scripts"
 
   golang_functions_dependencies = setunion(
-    fileset("/", "${local.func_script_root_dir}/pkg/**.go"),
-    fileset("/", "${path.module}/../server/gateways/**.go")
+    fileset(path.module, "function_scripts/pkg/**/*.go"),
+    fileset(path.module, "../server/gateways/ethereum/**/*.go")
   )
 
   cognito_trigger_functions = {
@@ -33,12 +33,12 @@ locals {
 resource "null_resource" "golang_functions_to_s3" {
   for_each = local.golang_functions
   triggers = {
-    code_diff = join("", [
+    code_diff = base64sha256(join("", [
       for file in setunion(
         ["${local.func_script_root_dir}/cmd/${each.key}/main.go"],
         local.golang_functions_dependencies
-      ) : filebase64(file)
-    ])
+      ) : filesha256(file)
+    ]))
   }
 
   provisioner "local-exec" {
