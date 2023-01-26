@@ -1,7 +1,6 @@
 import { Button, Grid } from "@mui/material";
 import Form from "~/components/atoms/authForm/Form";
 import Spacer from "~/components/atoms/Spacer";
-import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import Input from "~/components/atoms/authForm/Input";
 import Label from "~/components/atoms/authForm/Label";
 import TextareaAutosize from "@mui/base/TextareaAutosize";
@@ -14,6 +13,7 @@ import { CognitoUserAttribute } from "amazon-cognito-identity-js";
 import { PutObjectCommand } from "@aws-sdk/client-s3";
 import { ARTICLE_RESOURCES_S3_BUCKET } from "~/configs/s3";
 import { useS3Client } from "~/apis/s3";
+import IconImage from "~/components/atoms/IconImage";
 
 type profileForm = {
   email?: string;
@@ -128,38 +128,6 @@ const ResetProfileForm = () => {
     }
   }, []);
 
-  const iconImage = useMemo(() => {
-    if (imageForm) {
-      return (
-        <img
-          src={imageForm.url}
-          alt="preview image"
-          style={{
-            borderRadius: "50%",
-            width: 125,
-            height: 125,
-            padding: 12.5,
-          }}
-        />
-      );
-    } else if (picture) {
-      return (
-        <img
-          src={picture}
-          alt="preview image"
-          style={{
-            borderRadius: "50%",
-            width: 125,
-            height: 125,
-            padding: 12.5,
-          }}
-        />
-      );
-    } else {
-      return <AccountCircleIcon sx={{ fontSize: 150 }} />;
-    }
-  }, [imageForm, picture]);
-
   return (
     <Form>
       <h2>プロフィールを編集</h2>
@@ -172,7 +140,7 @@ const ResetProfileForm = () => {
             component="label"
             style={{ fontSize: 14, padding: 0 }}
           >
-            {iconImage}
+            <IconImage url={imageForm?.url || picture} />
             <input
               type="file"
               accept="image/*"
