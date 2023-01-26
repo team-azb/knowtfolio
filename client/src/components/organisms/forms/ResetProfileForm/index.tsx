@@ -37,6 +37,9 @@ const convertToCognitoKey = (value: keyof profileForm) => {
 
 const descriptionMaxLength = 160;
 
+/**
+ * プロフィールを編集するフォーム
+ */
 const ResetProfileForm = () => {
   const {
     user,

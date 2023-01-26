@@ -7,6 +7,9 @@ import { Button, Grid } from "@mui/material";
 import { toast } from "react-toastify";
 import IconImage from "~/components/atoms/IconImage";
 
+/**
+ * ユーザー情報を表示するテーブル
+ */
 const AccountInfoTable = () => {
   const {
     user,
