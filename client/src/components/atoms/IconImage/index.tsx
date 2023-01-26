@@ -6,6 +6,12 @@ type iconImageProps = {
   url?: string;
 };
 
+/**
+ * 丸い画像(Icon)の表示
+ * ※urlが無い場合、デフォルトのIconを表示
+ * @size 画像のサイズ(px)
+ * @url 画像のurl
+ */
 const IconImage = ({ size = 150, url }: iconImageProps) => {
   const [imgSize, imgPadding] = useMemo(() => {
     return [(size * 5) / 6, size / 12];
