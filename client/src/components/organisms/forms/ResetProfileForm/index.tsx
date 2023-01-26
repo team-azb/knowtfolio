@@ -28,11 +28,19 @@ type imageForm = {
   name: string;
 };
 
-const convertToCognitoKey = (value: keyof profileForm) => {
-  if (value === "description") {
-    return `custom:${value}`;
-  }
-  return value;
+/**
+ * profileFormをCognitoのattributeの配列に変換する
+ * @param form profileForm
+ * @returns attributeの配列
+ */
+const convertToAttributes = (form: profileForm) => {
+  return (Object.keys(form) as (keyof profileForm)[]).map((key) => {
+    const cognitoKey = key === "description" ? "custom:description" : key;
+    return new CognitoUserAttribute({
+      Name: cognitoKey,
+      Value: form[key] || "",
+    });
+  });
 };
 
 const descriptionMaxLength = 160;
@@ -78,14 +86,7 @@ const ResetProfileForm = () => {
       }
     }
 
-    const attributes = (Object.keys(form) as (keyof profileForm)[]).map(
-      (key) => {
-        return new CognitoUserAttribute({
-          Name: convertToCognitoKey(key),
-          Value: form[key] || "",
-        });
-      }
-    );
+    const attributes = convertToAttributes(form);
 
     user.updateAttributes(attributes, (err) => {
       if (err) {
