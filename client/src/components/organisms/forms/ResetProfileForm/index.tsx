@@ -35,6 +35,8 @@ const convertToCognitoKey = (value: keyof profileForm) => {
   return value;
 };
 
+const descriptionMaxLength = 160;
+
 const ResetProfileForm = () => {
   const {
     user,
@@ -45,6 +47,9 @@ const ResetProfileForm = () => {
     website,
     description,
   });
+  const descriptionLength = useMemo(() => {
+    return profileForm.description?.length || 0;
+  }, [profileForm.description?.length]);
   const navigate = useNavigate();
   const [imageForm, setImageForm] = useState<imageForm | null>(null);
   const s3Client = useS3Client();
@@ -221,6 +226,26 @@ const ResetProfileForm = () => {
                 value={profileForm.description}
                 onChange={handleChangeForm}
               />
+              <Grid item container>
+                <p style={{ color: "red" }}>
+                  {descriptionLength > descriptionMaxLength &&
+                    "自己紹介の文字数は160文字以内にしてください"}
+                </p>
+                <Grid
+                  item
+                  flexGrow={1}
+                  style={{
+                    color:
+                      descriptionLength > descriptionMaxLength
+                        ? "red"
+                        : "green",
+                  }}
+                >
+                  <Grid container direction="row-reverse">
+                    {descriptionLength}/160文字
+                  </Grid>
+                </Grid>
+              </Grid>
             </Grid>
             <Grid item container justifyContent="center" spacing={3}>
               <Grid item>
