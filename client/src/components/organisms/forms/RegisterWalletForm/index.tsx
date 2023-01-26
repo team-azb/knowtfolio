@@ -1,6 +1,9 @@
 import { useCallback } from "react";
 import { useAuthContext } from "~/components/organisms/providers/AuthProvider";
-import { useWeb3Context } from "~/components/organisms/providers/Web3Provider";
+import {
+  assertMetamask,
+  useWeb3Context,
+} from "~/components/organisms/providers/Web3Provider";
 import Form from "~/components/atoms/authForm/Form";
 import WalletAddressDisplay from "~/components/organisms/WalletAddressDisplay";
 import { Button, Grid } from "@mui/material";
@@ -8,6 +11,7 @@ import Spacer from "~/components/atoms/Spacer";
 import { useNavigate } from "react-router-dom";
 import { postWalletAddress } from "~/apis/lambda";
 import { noteOnWalletAddress } from "~/components/organisms/forms/SignUpForm";
+import RequireWeb3Wrapper from "~/components/organisms/RequireWeb3Wrapper";
 import { toast } from "react-toastify";
 
 /**
@@ -63,10 +67,11 @@ const RegisteredWalletAddressMessage = () => {
  */
 const RegisterWalletFormContent = () => {
   const { user } = useAuthContext();
-  const { account, web3 } = useWeb3Context();
+  const { isConnectedToMetamask, account, web3 } = useWeb3Context();
   const navigate = useNavigate();
 
   const registerWalletAddress = useCallback(async () => {
+    assertMetamask(isConnectedToMetamask);
     const signature = await web3.eth.personal.sign(
       "Register wallet address",
       account,
@@ -85,10 +90,9 @@ const RegisterWalletFormContent = () => {
         },
       });
     } catch (error) {
-      // TODO: toastで実装する
       toast.error("Wallet addressの登録に失敗しました。");
     }
-  }, [account, navigate, user, web3.eth.personal]);
+  }, [account, isConnectedToMetamask, navigate, user, web3]);
 
   return (
     <Grid container direction="column" spacing={3}>
@@ -116,13 +120,15 @@ const RegisterWalletFormContent = () => {
       <Grid item container justifyContent="center">
         <Grid item xs={2.5}></Grid>
         <Grid item xs={7.5}>
-          <Button
-            variant="outlined"
-            onClick={registerWalletAddress}
-            style={{ fontSize: "1.4rem" }}
-          >
-            register wallet address
-          </Button>
+          <RequireWeb3Wrapper isConnectedToMetamask={isConnectedToMetamask}>
+            <Button
+              variant="outlined"
+              onClick={registerWalletAddress}
+              style={{ fontSize: "1.4rem" }}
+            >
+              register wallet address
+            </Button>
+          </RequireWeb3Wrapper>
         </Grid>
         <Grid item container xs={2} direction="row-reverse">
           <Button

@@ -1,7 +1,10 @@
 import { Editor as TinyMCEEditor } from "tinymce";
 import { useCallback, useEffect, useState } from "react";
 import { getArticle, putArticle } from "~/apis/knowtfolio";
-import { useWeb3Context } from "~/components/organisms/providers/Web3Provider";
+import {
+  assertMetamask,
+  useWeb3Context,
+} from "~/components/organisms/providers/Web3Provider";
 import ArticleEditor from "~/components/organisms/ArticleEditor";
 import { Button, Grid } from "@mui/material";
 import ArrowBackIosNewRoundedIcon from "@mui/icons-material/ArrowBackIosNewRounded";
@@ -24,7 +27,7 @@ const EditArticleForm = ({ articleId }: editArticleFormProps) => {
   >((value) => {
     setContent(value);
   }, []);
-  const { web3, account } = useWeb3Context();
+  const { isConnectedToMetamask, web3, account } = useWeb3Context();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -44,6 +47,7 @@ const EditArticleForm = ({ articleId }: editArticleFormProps) => {
 
   const handleUpdate = useCallback(async () => {
     try {
+      assertMetamask(isConnectedToMetamask);
       const signature = await web3.eth.personal.sign(
         "Update Article",
         account,
@@ -62,7 +66,15 @@ const EditArticleForm = ({ articleId }: editArticleFormProps) => {
       console.error(error);
       toast.error("記事の更新に失敗しました。");
     }
-  }, [account, articleId, content, navigate, title, web3.eth.personal]);
+  }, [
+    account,
+    articleId,
+    content,
+    isConnectedToMetamask,
+    navigate,
+    title,
+    web3,
+  ]);
 
   const onChangeTitleInput = useCallback<
     React.ChangeEventHandler<HTMLInputElement>
