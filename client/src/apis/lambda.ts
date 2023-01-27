@@ -7,10 +7,10 @@ export type FieldError = {
   code: signUpErrorCode;
 };
 
-type signUpvalidationForm = {
+type signUpValidationForm = {
   [key in SignUpFormKey]?: string;
 };
-export const validateSignUpForm = async (form: signUpvalidationForm) => {
+export const validateSignUpForm = async (form: signUpValidationForm) => {
   const { data: errData } = await axios.post(
     "/api/validate_sign_up_form",
     form
