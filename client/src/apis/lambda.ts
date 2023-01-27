@@ -1,5 +1,5 @@
 import axios from "axios";
-import { SignUpForm, SignUpFormKey } from "./cognito";
+import { SignUpFormKey } from "./cognito";
 
 export type signUpErrorCode = "invalid_format" | "already_exists";
 export type FieldError = {
@@ -7,7 +7,10 @@ export type FieldError = {
   code: signUpErrorCode;
 };
 
-export const validateSignUpForm = async (form: SignUpForm) => {
+type signUpvalidationForm = {
+  [key in SignUpFormKey]?: string;
+};
+export const validateSignUpForm = async (form: signUpvalidationForm) => {
   const { data: errData } = await axios.post(
     "/api/validate_sign_up_form",
     form
