@@ -12,6 +12,7 @@ import SearchPage from "~/components/pages/SearchPage";
 import Web3Provider from "~/components/organisms/providers/Web3Provider";
 import RegisterWalletPage from "./components/pages/RegisterWalletPage";
 import ArticlePage from "~/components/pages/ArticlePage";
+import ResetPasswordPage from "~/components/pages/ResetPasswordPage";
 import { ThemeProvider } from "@mui/material";
 import { theme } from "~/configs/theme";
 import { ToastContainer } from "react-toastify";
@@ -31,6 +32,15 @@ const App = () => {
             element={
               <AuthProvider>
                 <RegisterWalletPage />
+              </AuthProvider>
+            }
+          />
+          {/* TODO: wallet、profile再設定と揃える */}
+          <Route
+            path="/settings/password"
+            element={
+              <AuthProvider>
+                <ResetPasswordPage />
               </AuthProvider>
             }
           />
