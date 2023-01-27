@@ -89,11 +89,15 @@ export const signInToCognitoWithWallet = async (
 export type SignUpForm = {
   phone_number: string;
   password: string;
+  confirm_password: string;
   username: string;
 };
 export type SignUpFormKey = keyof SignUpForm;
 
 export const signUpToCognito = (form: SignUpForm) => {
+  if (form.password !== form.confirm_password) {
+    throw new Error("Password does not match confirm password.");
+  }
   const attributeList = [
     new CognitoUserAttribute({
       Name: "phone_number",

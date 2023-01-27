@@ -30,6 +30,7 @@ export const MessagesOnInvalidFormError = {
   phone_number:
     "適切な電話番号ではありません。（日本国以外の電話番号は利用できません。）",
   wallet_address: "適切なwallet addressではありません。",
+  confirm_password: "パスワードが一致していません。",
 } as const;
 
 /**
@@ -64,7 +65,7 @@ const translateSignUpErrorCode = (
  */
 const createFieldMessages = async (form: SignUpForm) => {
   // 値が入力されているものについてのみメッセージ表示の対応
-  const messagesWhenValid = (
+  const initMessage = (
     Object.keys(form) as SignUpFormKey[]
   ).reduce<formFieldMessages>((obj, key) => {
     if (form[key]) {
@@ -72,6 +73,15 @@ const createFieldMessages = async (form: SignUpForm) => {
     }
     return obj;
   }, {});
+
+  // 確認用パスワードのバリデーション
+  if (form.confirm_password && form.confirm_password !== form.password) {
+    initMessage.confirm_password = (
+      <span style={{ color: "red" }}>
+        {MessagesOnInvalidFormError.confirm_password}
+      </span>
+    );
+  }
 
   // バリデーションエラーが起きているフィールドのメッセージを上書きする
   const fieldErrors = await validateSignUpForm(form);
@@ -82,7 +92,7 @@ const createFieldMessages = async (form: SignUpForm) => {
       obj[field_name] = translateSignUpErrorCode(field_name, code, value);
     }
     return obj;
-  }, messagesWhenValid);
+  }, initMessage);
 };
 
 export const noteOnWalletAddress =
@@ -92,6 +102,7 @@ const SignUpForm = () => {
   const [form, setForm] = useState<SignUpForm>({
     phone_number: "",
     password: "",
+    confirm_password: "",
     username: "",
   });
   const [fieldMessages, setFieldMessages] = useState<formFieldMessages>({});
@@ -104,6 +115,7 @@ const SignUpForm = () => {
       switch (event.target.name) {
         case "password":
         case "username":
+        case "confirm_password":
           setForm((prev) => {
             return { ...prev, [event.target.name]: event.target.value };
           });
@@ -220,6 +232,17 @@ const SignUpForm = () => {
           value={form.password}
           placeholder="Password"
           message={fieldMessages.password}
+        />
+        <Input
+          label="Confirm password"
+          disabled={hasSignedUp}
+          type="password"
+          name="confirm_password"
+          id="confirm_password"
+          onChange={onChangeForm}
+          value={form.confirm_password}
+          placeholder="Confirm password"
+          message={fieldMessages.confirm_password}
         />
         <Grid item container justifyContent="center">
           <Button
