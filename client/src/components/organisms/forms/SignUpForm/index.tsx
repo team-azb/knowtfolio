@@ -41,7 +41,7 @@ export const MessagesOnInvalidFormError = {
  * @param value フィールドの値
  * @returns エラー表示用のJSX Element
  */
-const translateSignUpErrorCode = (
+export const TranslateSignUpErrorCode = (
   field: SignUpFormKey,
   errorCode: signUpErrorCode,
   value: string
@@ -74,22 +74,13 @@ const createFieldMessages = async (form: SignUpForm) => {
     return obj;
   }, {});
 
-  // 確認用パスワードのバリデーション
-  if (form.confirm_password && form.confirm_password !== form.password) {
-    initMessage.confirm_password = (
-      <span style={{ color: "red" }}>
-        {MessagesOnInvalidFormError.confirm_password}
-      </span>
-    );
-  }
-
   // バリデーションエラーが起きているフィールドのメッセージを上書きする
   const fieldErrors = await validateSignUpForm(form);
   return fieldErrors.reduce<formFieldMessages>((obj, { field_name, code }) => {
     const value = form[field_name];
     // 値が入力されているものについてのみエラー表示の対象
     if (value) {
-      obj[field_name] = translateSignUpErrorCode(field_name, code, value);
+      obj[field_name] = TranslateSignUpErrorCode(field_name, code, value);
     }
     return obj;
   }, initMessage);

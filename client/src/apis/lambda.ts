@@ -8,14 +8,21 @@ export type FieldError = {
 };
 
 type signUpValidationForm = {
-  [key in Exclude<SignUpFormKey, "confirm_password">]?: string;
+  [key in SignUpFormKey]?: string;
 };
 export const validateSignUpForm = async (form: signUpValidationForm) => {
-  const { data: errData } = await axios.post(
+  const { confirm_password, ...reqBody } = form;
+  const { data: errData } = await axios.post<FieldError[]>(
     "/api/validate_sign_up_form",
-    form
+    reqBody
   );
-  return errData as FieldError[];
+  if (confirm_password !== reqBody.password) {
+    errData.push({
+      field_name: "confirm_password",
+      code: "invalid_format",
+    });
+  }
+  return errData;
 };
 
 type postWalletForm = {
