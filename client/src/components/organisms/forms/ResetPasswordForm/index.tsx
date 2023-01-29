@@ -2,12 +2,11 @@ import { Button, Grid } from "@mui/material";
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { validateSignUpForm } from "~/apis/lambda";
 import Form from "~/components/atoms/authForm/Form";
 import Input from "~/components/atoms/authForm/Input";
 import Spacer from "~/components/atoms/Spacer";
 import { useAuthContext } from "~/components/organisms/providers/AuthProvider";
-import { TranslateSignUpErrorCode } from "../SignUpForm";
+import { CreateFieldMessages } from "../SignUpForm";
 
 export type ResetPasswordForm = {
   old_password: string;
@@ -17,36 +16,6 @@ export type ResetPasswordForm = {
 
 type formFieldMessages = {
   [key in keyof ResetPasswordForm]?: JSX.Element;
-};
-
-/**
- * フィールドに表示するメッセージを作成するための関数
- * @param form サインアップフォーム
- */
-const createFieldMessages = async (form: ResetPasswordForm) => {
-  // 値が入力されているものについてのみメッセージ表示の対応
-  const initMessage = (
-    Object.keys(form) as (keyof ResetPasswordForm)[]
-  ).reduce<formFieldMessages>((obj, key) => {
-    if (form[key]) {
-      obj[key] = <span style={{ color: "green" }}>有効な値です。</span>;
-    }
-    return obj;
-  }, {});
-
-  // バリデーションエラーが起きているフィールドのメッセージを上書きする
-  const fieldErrors = await validateSignUpForm(form);
-  return fieldErrors.reduce<formFieldMessages>((obj, { field_name, code }) => {
-    if (field_name === "password" || field_name === "confirm_password") {
-      const value = form[field_name];
-      // 値が入力されているものについてのみエラー表示の対象
-      if (value) {
-        obj[field_name] = TranslateSignUpErrorCode(field_name, code, value);
-      }
-    }
-
-    return obj;
-  }, initMessage);
 };
 
 /**
@@ -100,7 +69,9 @@ const ResetPasswordForm = () => {
 
   useEffect(() => {
     (async () => {
-      const fieldMessages = await createFieldMessages(resetPasswordForm);
+      const fieldMessages = await CreateFieldMessages<ResetPasswordForm>(
+        resetPasswordForm
+      );
       setFieldMessages(fieldMessages);
     })();
   }, [resetPasswordForm]);

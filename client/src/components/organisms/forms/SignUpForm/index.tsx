@@ -16,6 +16,7 @@ import Spacer from "~/components/atoms/Spacer";
 import { toast } from "react-toastify";
 import { Link, useNavigate } from "react-router-dom";
 import { signUpErrorCode, validateSignUpForm } from "~/apis/lambda";
+import { ResetPasswordForm } from "../ResetPasswordForm";
 
 type formFieldMessages = {
   [key in SignUpFormKey]?: JSX.Element;
@@ -41,7 +42,7 @@ export const MessagesOnInvalidFormError = {
  * @param value フィールドの値
  * @returns エラー表示用のJSX Element
  */
-export const TranslateSignUpErrorCode = (
+const translateSignUpErrorCode = (
   field: SignUpFormKey,
   errorCode: signUpErrorCode,
   value: string
@@ -63,24 +64,45 @@ export const TranslateSignUpErrorCode = (
  * フィールドに表示するメッセージを作成するための関数
  * @param form サインアップフォーム
  */
-const createFieldMessages = async (form: SignUpForm) => {
+export const CreateFieldMessages = async <
+  T extends SignUpForm | ResetPasswordForm
+>(
+  form: T
+) => {
+  type fieldMessage = {
+    [key in keyof T]?: JSX.Element;
+  };
   // 値が入力されているものについてのみメッセージ表示の対応
-  const initMessage = (
-    Object.keys(form) as SignUpFormKey[]
-  ).reduce<formFieldMessages>((obj, key) => {
-    if (form[key]) {
-      obj[key] = <span style={{ color: "green" }}>有効な値です。</span>;
-    }
-    return obj;
-  }, {});
+  const initMessage = (Object.keys(form) as (keyof T)[]).reduce<fieldMessage>(
+    (obj, key) => {
+      if (form[key]) {
+        obj[key] = <span style={{ color: "green" }}>有効な値です。</span>;
+      }
+      return obj;
+    },
+    {}
+  );
 
   // バリデーションエラーが起きているフィールドのメッセージを上書きする
   const fieldErrors = await validateSignUpForm(form);
-  return fieldErrors.reduce<formFieldMessages>((obj, { field_name, code }) => {
-    const value = form[field_name];
-    // 値が入力されているものについてのみエラー表示の対象
-    if (value) {
-      obj[field_name] = TranslateSignUpErrorCode(field_name, code, value);
+  return fieldErrors.reduce<fieldMessage>((obj, { field_name, code }) => {
+    if ("username" in form) {
+      const value = form[field_name];
+
+      // 値が入力されているものについてのみエラー表示の対象
+      if (value) {
+        obj[field_name as keyof T] = translateSignUpErrorCode(
+          field_name,
+          code,
+          value
+        );
+      }
+    } else if (field_name === "password" || field_name === "confirm_password") {
+      const value = form[field_name];
+      // 値が入力されているものについてのみエラー表示の対象
+      if (value) {
+        obj[field_name] = translateSignUpErrorCode(field_name, code, value);
+      }
     }
     return obj;
   }, initMessage);
@@ -120,7 +142,7 @@ const SignUpForm = () => {
 
   useEffect(() => {
     (async () => {
-      const fieldMessages = await createFieldMessages(form);
+      const fieldMessages = await CreateFieldMessages<SignUpForm>(form);
       setFieldMessages(fieldMessages);
     })();
   }, [form]);
