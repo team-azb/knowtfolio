@@ -25,7 +25,7 @@ type formFieldMessages = {
 /**
  * invalid_formだった場合のエラー表示文
  */
-export const MessagesOnInvalidFormError = {
+const messagesOnInvalidFormError = {
   username: "適切なユーザーネームではありません。",
   password: "大文字・小文字・数字・記号を含む８文字以上である必要があります。",
   phone_number:
@@ -36,7 +36,7 @@ export const MessagesOnInvalidFormError = {
 
 /**
  * signUpFormのエラーコードをエラー表示用のJSX Elementに変換する
- * MessagesOnInvalidFormErrorに依存関係あり
+ * messagesOnInvalidFormErrorに依存関係あり
  * @param field 対象のフィールド
  * @param errorCode エラーコード
  * @param value フィールドの値
@@ -56,7 +56,7 @@ const translateSignUpErrorCode = (
   }
   // invalida_formだった場合のエラーメッセージ
   return (
-    <span style={{ color: "red" }}>{MessagesOnInvalidFormError[field]}</span>
+    <span style={{ color: "red" }}>{messagesOnInvalidFormError[field]}</span>
   );
 };
 
