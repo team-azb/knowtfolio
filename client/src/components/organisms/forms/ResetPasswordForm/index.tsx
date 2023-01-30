@@ -6,7 +6,7 @@ import Form from "~/components/atoms/authForm/Form";
 import Input from "~/components/atoms/authForm/Input";
 import Spacer from "~/components/atoms/Spacer";
 import { useAuthContext } from "~/components/organisms/providers/AuthProvider";
-import { CreateFieldMessages } from "../SignUpForm";
+import { CreateFieldMessages } from "~/components/organisms/forms/helper";
 
 export type ResetPasswordForm = {
   old_password: string;
