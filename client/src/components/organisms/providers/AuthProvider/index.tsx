@@ -72,28 +72,31 @@ const AuthProvider = ({
   const loadCurrentUser = useCallback(async () => {
     const cognitoUser = userPool.getCurrentUser();
     if (cognitoUser) {
-      const session = await loadSession(cognitoUser);
-      const attributes = await loadAttributes(cognitoUser);
+      try {
+        const session = await loadSession(cognitoUser);
+        const attributes = await loadAttributes(cognitoUser);
 
-      const phoneNumber = attributes.find(
-        (atr) => atr.Name === "phone_number"
-      )?.Value;
-      const email = attributes.find((atr) => atr.Name === "email")?.Value;
-      const picture = attributes.find((atr) => atr.Name === "picture")?.Value;
-      const website = attributes.find((atr) => atr.Name === "website")?.Value;
-      const description = attributes.find(
-        (atr) => atr.Name === "custom:description"
-      )?.Value;
+        const phoneNumber = attributes.find(
+          (atr) => atr.Name === "phone_number"
+        )?.Value;
+        const email = attributes.find((atr) => atr.Name === "email")?.Value;
+        const picture = attributes.find((atr) => atr.Name === "picture")?.Value;
+        const website = attributes.find((atr) => atr.Name === "website")?.Value;
+        const description = attributes.find(
+          (atr) => atr.Name === "custom:description"
+        )?.Value;
 
-      const dynamodbClient = initDynamodbClient(
-        session.getIdToken().getJwtToken()
-      );
-      const userWalletAddress = await fetchWalletAddress(
-        dynamodbClient,
-        cognitoUser.getUsername()
-      );
+        const dynamodbClient = initDynamodbClient(
+          session.getIdToken().getJwtToken()
+        );
+        const userWalletAddress = await fetchWalletAddress(
+          dynamodbClient,
+          cognitoUser.getUsername()
+        );
 
-      if (phoneNumber) {
+        if (!phoneNumber) {
+          throw new Error("Phone number is not registered.");
+        }
         setAuth({
           user: cognitoUser,
           session: session,
@@ -106,6 +109,10 @@ const AuthProvider = ({
           },
           userWalletAddress,
         });
+      } catch (error) {
+        // TODO: toastでUIを整える
+        console.error(error);
+        alert("正常にログインできませんでした。");
       }
     } else {
       setAuth(null);
