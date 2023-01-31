@@ -51,11 +51,11 @@ const translateSignUpErrorCode = (
         <b>{value}</b>はすでに登録されています。
       </span>
     );
+  } else {
+    return (
+      <span style={{ color: "red" }}>{messagesOnInvalidFormError[field]}</span>
+    );
   }
-  // invalida_formだった場合のエラーメッセージ
-  return (
-    <span style={{ color: "red" }}>{messagesOnInvalidFormError[field]}</span>
-  );
 };
 
 /**
@@ -63,26 +63,27 @@ const translateSignUpErrorCode = (
  * @param form サインアップフォーム
  */
 const createFieldMessages = async (form: SignUpForm) => {
-  // 値が入力されているものについてのみメッセージ表示の対応
-  const messagesWhenValid = (
-    Object.keys(form) as SignUpFormKey[]
-  ).reduce<formFieldMessages>((obj, key) => {
-    if (form[key]) {
-      obj[key] = <span style={{ color: "green" }}>有効な値です。</span>;
-    }
-    return obj;
-  }, {});
-
-  // バリデーションエラーが起きているフィールドのメッセージを上書きする
+  const keys = Object.keys(form) as SignUpFormKey[];
   const fieldErrors = await validateSignUpForm(form);
-  return fieldErrors.reduce<formFieldMessages>((obj, { field_name, code }) => {
-    const value = form[field_name];
-    // 値が入力されているものについてのみエラー表示の対象
-    if (value) {
-      obj[field_name] = translateSignUpErrorCode(field_name, code, value);
-    }
-    return obj;
-  }, messagesWhenValid);
+  const validFieldMessage = (
+    <span style={{ color: "green" }}>有効な値です。</span>
+  );
+
+  const messages = keys
+    .filter((key) => form[key]) //入力のない項目についてはメッセージを表示しない
+    .reduce((msgs, key) => {
+      const fieldErr = fieldErrors.find((err) => err.field_name == key);
+      msgs[key] = fieldErr
+        ? translateSignUpErrorCode(
+            fieldErr.field_name,
+            fieldErr.code,
+            form[key]
+          )
+        : validFieldMessage;
+      return msgs;
+    }, {} as formFieldMessages);
+
+  return messages;
 };
 
 export const noteOnWalletAddress =
