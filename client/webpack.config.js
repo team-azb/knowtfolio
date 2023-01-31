@@ -117,7 +117,7 @@ module.exports = [
       port: 3000,
       proxy: [
         {
-          context: "/api/signup",
+          context: "/api/validate_sign_up_form",
           changeOrigin: true,
           target: "https://knowtfolio.com",
         },

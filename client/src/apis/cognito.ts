@@ -87,16 +87,17 @@ export const signInToCognitoWithWallet = async (
 };
 
 export type SignUpForm = {
-  phone: string;
+  phone_number: string;
   password: string;
   username: string;
 };
+export type SignUpFormKey = keyof SignUpForm;
 
 export const signUpToCognito = (form: SignUpForm) => {
   const attributeList = [
     new CognitoUserAttribute({
       Name: "phone_number",
-      Value: form.phone,
+      Value: form.phone_number,
     }),
   ];
 

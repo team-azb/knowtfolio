@@ -15,6 +15,7 @@ type inputProps = React.DetailedHTMLProps<
   HTMLInputElement
 > & {
   label?: string;
+  message?: string | JSX.Element;
 };
 
 /**
@@ -29,6 +30,7 @@ const Input = ({
   placeholder,
   style,
   label,
+  message,
 }: inputProps) => {
   return (
     <Grid item container direction="column">
@@ -42,6 +44,7 @@ const Input = ({
         placeholder={placeholder}
         style={{ ...InputStyle, ...style }}
       />
+      <label htmlFor={id}>{message}</label>
     </Grid>
   );
 };
