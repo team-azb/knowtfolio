@@ -1,8 +1,4 @@
-import {
-  CognitoUser,
-  CognitoUserAttribute,
-  CognitoUserSession,
-} from "amazon-cognito-identity-js";
+import { CognitoUser, CognitoUserSession } from "amazon-cognito-identity-js";
 import React, {
   createContext,
   useCallback,
@@ -17,10 +13,18 @@ import { Link, useLocation } from "react-router-dom";
 import LoadingDisplay from "~/components/atoms/LoadingDisplay";
 import { fetchWalletAddress, initDynamodbClient } from "~/apis/dynamodb";
 
+type UserAttributes = {
+  phoneNumber: string;
+  email?: string;
+  website?: string;
+  description?: string;
+  picture?: string;
+};
+
 export type AuthContext = {
   user: CognitoUser;
   session: CognitoUserSession;
-  attributes: CognitoUserAttribute[];
+  attributes: UserAttributes;
   userWalletAddress?: string;
 };
 
@@ -72,19 +76,38 @@ const AuthProvider = ({
         const session = await loadSession(cognitoUser);
         const attributes = await loadAttributes(cognitoUser);
 
+        const phoneNumber = attributes.find(
+          (atr) => atr.Name === "phone_number"
+        )?.Value;
+        const email = attributes.find((atr) => atr.Name === "email")?.Value;
+        const picture = attributes.find((atr) => atr.Name === "picture")?.Value;
+        const website = attributes.find((atr) => atr.Name === "website")?.Value;
+        const description = attributes.find(
+          (atr) => atr.Name === "custom:description"
+        )?.Value;
+
         const dynamodbClient = initDynamodbClient(
           session.getIdToken().getJwtToken()
         );
-        const walletAddress = await fetchWalletAddress(
+        const userWalletAddress = await fetchWalletAddress(
           dynamodbClient,
           cognitoUser.getUsername()
         );
 
+        if (!phoneNumber) {
+          throw new Error("Phone number is not registered.");
+        }
         setAuth({
           user: cognitoUser,
           session: session,
-          attributes: attributes,
-          userWalletAddress: walletAddress,
+          attributes: {
+            phoneNumber,
+            email,
+            website,
+            description,
+            picture,
+          },
+          userWalletAddress,
         });
       } catch (error) {
         // TODO: toastでUIを整える

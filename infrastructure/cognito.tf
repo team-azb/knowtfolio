@@ -17,6 +17,17 @@ resource "aws_cognito_user_pool" "knowtfolio" {
     }
   }
 
+  schema {
+    name                = "description"
+    attribute_data_type = "String"
+    mutable             = true
+
+    string_attribute_constraints {
+      min_length = 0
+      max_length = 160
+    }
+  }
+
   lambda_config {
     pre_sign_up                    = aws_lambda_function.cognito_triggers["pre_sign_up"].arn
     define_auth_challenge          = aws_lambda_function.cognito_triggers["define_auth_challenge"].arn
