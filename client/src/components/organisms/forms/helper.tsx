@@ -52,37 +52,61 @@ export const CreateFieldMessages = async <
   type fieldMessage = {
     [key in keyof T]?: JSX.Element;
   };
-  // 値が入力されているものについてのみメッセージ表示の対応
-  const initMessage = (Object.keys(form) as (keyof T)[]).reduce<fieldMessage>(
-    (obj, key) => {
-      if (form[key]) {
-        obj[key] = <span style={{ color: "green" }}>有効な値です。</span>;
-      }
-      return obj;
-    },
-    {}
-  );
-  // バリデーションエラーが起きているフィールドのメッセージを上書きする
+  const keys = Object.keys(form) as (keyof T)[];
   const fieldErrors = await validateSignUpForm(form);
-  return fieldErrors.reduce<fieldMessage>((obj, { field_name, code }) => {
-    if ("username" in form) {
-      const value = form[field_name];
+  const validFieldMessage = (
+    <span style={{ color: "green" }}>有効な値です。</span>
+  );
 
-      // 値が入力されているものについてのみエラー表示の対象
-      if (value) {
-        obj[field_name as keyof T] = translateSignUpErrorCode(
-          field_name,
-          code,
-          value
-        );
-      }
-    } else if (field_name === "password" || field_name === "confirm_password") {
-      const value = form[field_name];
-      // 値が入力されているものについてのみエラー表示の対象
-      if (value) {
-        obj[field_name] = translateSignUpErrorCode(field_name, code, value);
-      }
-    }
-    return obj;
-  }, initMessage);
+  const messages = keys
+    .filter((key) => form[key]) //入力のない項目についてはメッセージを表示しない
+    .reduce((msgs, key) => {
+      const fieldErr = fieldErrors.find((err) => err.field_name == key);
+      msgs[key] = fieldErr
+        ? translateSignUpErrorCode(
+            fieldErr.field_name,
+            fieldErr.code,
+            String(form[key])
+          )
+        : validFieldMessage;
+      return msgs;
+    }, {} as fieldMessage);
+
+  return messages;
+  // type fieldMessage = {
+  //   [key in keyof T]?: JSX.Element;
+  // };
+  // // 値が入力されているものについてのみメッセージ表示の対応
+  // const initMessage = (Object.keys(form) as (keyof T)[]).reduce<fieldMessage>(
+  //   (obj, key) => {
+  //     if (form[key]) {
+  //       obj[key] = <span style={{ color: "green" }}>有効な値です。</span>;
+  //     }
+  //     return obj;
+  //   },
+  //   {}
+  // );
+  // // バリデーションエラーが起きているフィールドのメッセージを上書きする
+  // const fieldErrors = await validateSignUpForm(form);
+  // return fieldErrors.reduce<fieldMessage>((obj, { field_name, code }) => {
+  //   if ("username" in form) {
+  //     const value = form[field_name];
+
+  //     // 値が入力されているものについてのみエラー表示の対象
+  //     if (value) {
+  //       obj[field_name as keyof T] = translateSignUpErrorCode(
+  //         field_name,
+  //         code,
+  //         value
+  //       );
+  //     }
+  //   } else if (field_name === "password" || field_name === "confirm_password") {
+  //     const value = form[field_name];
+  //     // 値が入力されているものについてのみエラー表示の対象
+  //     if (value) {
+  //       obj[field_name] = translateSignUpErrorCode(field_name, code, value);
+  //     }
+  //   }
+  //   return obj;
+  // }, initMessage);
 };
