@@ -14,7 +14,7 @@ import { PutObjectCommand } from "@aws-sdk/client-s3";
 import { ARTICLE_RESOURCES_S3_BUCKET } from "~/configs/s3";
 import { useS3Client } from "~/apis/s3";
 import IconImage from "~/components/atoms/IconImage";
-import imageCompression from 'browser-image-compression';
+import imageCompression from "browser-image-compression";
 
 type profileForm = {
   email?: string;
@@ -126,8 +126,8 @@ const ResetProfileForm = () => {
         const compressedFile = await imageCompression(files[0], {
           maxSizeMB: 0.009765625, // 10kb
           useWebWorker: true,
-          maxIteration: 100
-        })
+          maxIteration: 100,
+        });
         fr.readAsDataURL(compressedFile);
         fr.addEventListener("load", () => {
           setImageForm({
@@ -138,8 +138,8 @@ const ResetProfileForm = () => {
         });
       }
     } catch (error) {
-      console.error(error)
-      toast.error("画像の読み込みに失敗しました。")
+      console.error(error);
+      toast.error("画像の読み込みに失敗しました。");
     }
   }, []);
 
