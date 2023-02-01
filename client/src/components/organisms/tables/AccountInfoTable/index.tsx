@@ -97,11 +97,11 @@ const AccountInfoTable = () => {
         </Grid>
       </Grid>
       <Grid item>
-        <h2>Wallet address</h2>
+        <h2>Wallet info</h2>
         <hr />
       </Grid>
       <Grid item container alignItems="center">
-        <Grid xs={2}>Wallet address</Grid>
+        <Grid xs={2}>Address</Grid>
         <Grid xs={10}>
           {userWalletAddress ? (
             <WalletAddressDisplay
