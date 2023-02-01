@@ -15,16 +15,18 @@ type inputProps = React.DetailedHTMLProps<
   HTMLInputElement
 > & {
   label?: string;
+  message?: string | JSX.Element;
 };
 
 /**
  * 認証用フォームのためのスタイルが適用されたInput要素
  */
-const Input = ({ id, label, style, ...props }: inputProps) => {
+const Input = ({ id, label, style, message, ...props }: inputProps) => {
   return (
     <Grid item container direction="column">
       <Label htmlFor={id}>{label}</Label>
       <input id={id} style={{ ...InputStyle, ...style }} {...props} />
+      <label htmlFor={id}>{message}</label>
     </Grid>
   );
 };
