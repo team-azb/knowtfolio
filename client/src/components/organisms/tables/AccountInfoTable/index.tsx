@@ -88,6 +88,17 @@ const AccountInfoTable = () => {
         </Grid>
         <Grid item>
           <Button
+            variant="outlined"
+            onClick={() => {
+              navigate("/settings/password");
+            }}
+            style={{ fontSize: "1.4rem" }}
+          >
+            パスワードを変更
+          </Button>
+        </Grid>
+        <Grid item>
+          <Button
             variant="contained"
             onClick={signOut}
             style={{ fontSize: "1.4rem" }}
