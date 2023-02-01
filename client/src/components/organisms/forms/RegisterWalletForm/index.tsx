@@ -84,7 +84,7 @@ const RegisterWalletFormContent = () => {
         signature: signature,
       });
       toast.success("Wallet addressの登録に成功しました。");
-      navigate("/register-wallet", {
+      navigate("/settings/wallet", {
         state: {
           shouldLoadCurrentUser: true,
         },
