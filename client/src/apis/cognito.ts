@@ -173,7 +173,7 @@ export const loadAttributes = (cognitoUser: CognitoUser) => {
   });
 };
 
-export const sendPassswordResetCode = (username: string) => {
+export const sendPassswordResetVerificationCode = (username: string) => {
   const userData = {
     Username: username,
     Pool: userPool,
@@ -191,13 +191,13 @@ export const sendPassswordResetCode = (username: string) => {
   });
 };
 
-export type ResetPasswordWithCodeForm = {
+export type ResetPasswordForm = {
   username: string;
   password: string;
   confirm_password: string;
   verification_code: string;
 };
-export const resetPasswordWithCode = (form: ResetPasswordWithCodeForm) => {
+export const resetPassword = (form: ResetPasswordForm) => {
   assertConfirmPassword(form.password, form.confirm_password);
   const userData = {
     Username: form.username,

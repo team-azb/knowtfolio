@@ -2,60 +2,40 @@ import { Button, Grid } from "@mui/material";
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import {
+  resetPassword,
+  ResetPasswordForm,
+  sendPassswordResetVerificationCode,
+} from "~/apis/cognito";
 import Form from "~/components/atoms/authForm/Form";
 import Input from "~/components/atoms/authForm/Input";
 import Spacer from "~/components/atoms/Spacer";
-import { useAuthContext } from "~/components/organisms/providers/AuthProvider";
 import { CreateFieldMessages } from "~/components/organisms/forms/helper";
-
-export type ResetPasswordForm = {
-  old_password: string;
-  password: string;
-  confirm_password: string;
-};
 
 type formFieldMessages = {
   [key in keyof ResetPasswordForm]?: JSX.Element;
 };
 
-/**
- * パスワードを再設定するためのフォーム
- */
 const ResetPasswordForm = () => {
-  const [resetPasswordForm, setResetPasswordForm] = useState<ResetPasswordForm>(
-    {
-      old_password: "",
-      password: "",
-      confirm_password: "",
-    }
-  );
+  const [form, setForm] = useState<ResetPasswordForm>({
+    username: "",
+    password: "",
+    confirm_password: "",
+    verification_code: "",
+  });
   const [fieldMessages, setFieldMessages] = useState<formFieldMessages>({});
-  const { user } = useAuthContext();
+  const [hasSentCode, setHasSentCode] = useState(false);
   const navigate = useNavigate();
-
-  const handleSubmitForm = useCallback(() => {
-    user.changePassword(
-      resetPasswordForm.old_password,
-      resetPasswordForm.password,
-      (err) => {
-        if (err) {
-          console.error(err.message);
-          toast.error("パスワードのアップデートに失敗しました。");
-          return;
-        }
-        toast.success("パスワードを更新しました。");
-      }
-    );
-  }, [resetPasswordForm.password, resetPasswordForm.old_password, user]);
 
   const handleChangeForm = useCallback<
     React.ChangeEventHandler<HTMLInputElement>
   >((event) => {
     switch (event.target.name) {
+      case "username":
       case "password":
-      case "old_password":
       case "confirm_password":
-        setResetPasswordForm((prev) => {
+      case "verification_code":
+        setForm((prev) => {
           return {
             ...prev,
             [event.target.name]: event.target.value,
@@ -69,12 +49,32 @@ const ResetPasswordForm = () => {
 
   useEffect(() => {
     (async () => {
-      const fieldMessages = await CreateFieldMessages<ResetPasswordForm>(
-        resetPasswordForm
-      );
+      const fieldMessages = await CreateFieldMessages<ResetPasswordForm>(form);
       setFieldMessages(fieldMessages);
     })();
-  }, [resetPasswordForm]);
+  }, [form]);
+
+  const handleSubmitUsername = useCallback(async () => {
+    try {
+      await sendPassswordResetVerificationCode(form.username);
+      setHasSentCode(true);
+      toast.success("認証コードを送信しました。");
+    } catch (error) {
+      console.error(error);
+      toast.error("認証コードの送信に失敗しました。");
+    }
+  }, [form.username]);
+
+  const handleSubmitPasswordResetForm = useCallback(async () => {
+    try {
+      await resetPassword(form);
+      toast.success("パスワードを再設定しました。");
+      navigate("/signin");
+    } catch (error) {
+      console.error(error);
+      toast.error("パスワードの再設定に失敗しました。");
+    }
+  }, [form, navigate]);
 
   return (
     <Form>
@@ -83,56 +83,71 @@ const ResetPasswordForm = () => {
       <Spacer height="3rem" />
       <Grid container spacing={3}>
         <Input
-          name="old_password"
-          id="old_password"
+          name="username"
+          id="username"
           onChange={handleChangeForm}
-          value={resetPasswordForm.old_password}
-          label="現在のパスワード"
-          placeholder="現在使用しているパスワードを入力"
-          type="password"
-        />
-        <Input
-          name="password"
-          id="password"
-          onChange={handleChangeForm}
-          value={resetPasswordForm.password}
-          label="新しいパスワード"
-          placeholder="新しく設定するパスワードを入力"
-          type="password"
-          message={fieldMessages.password}
-        />
-        <Input
-          name="confirm_password"
-          id="confirm_password"
-          onChange={handleChangeForm}
-          value={resetPasswordForm.confirm_password}
-          label="新しいパスワード（確認用）"
-          placeholder="新しく設定するパスワードを再度入力"
-          type="password"
-          message={fieldMessages.confirm_password}
+          value={form.username}
+          label="Username"
+          placeholder="ユーザーネームを入力"
+          type="text"
+          disabled={hasSentCode}
         />
         <Grid item container justifyContent="center" spacing={2}>
-          <Grid item>
-            <Button
-              variant="outlined"
-              onClick={handleSubmitForm}
-              style={{ fontSize: "1.4rem" }}
-            >
-              Submit
-            </Button>
-          </Grid>
-          <Grid item>
-            <Button
-              onClick={() => {
-                navigate("/mypage");
-              }}
-              variant="contained"
-              style={{ fontSize: "1.4rem" }}
-            >
-              Cancel
-            </Button>
-          </Grid>
+          <Button
+            variant="outlined"
+            disabled={hasSentCode}
+            onClick={handleSubmitUsername}
+            style={{ fontSize: "1.4rem" }}
+          >
+            確認コードを送信
+          </Button>
         </Grid>
+        {hasSentCode && (
+          <>
+            <Input
+              name="verification_code"
+              id="verification_code"
+              onChange={handleChangeForm}
+              value={form.verification_code}
+              label="確認用コード"
+              placeholder="送信した確認用コード"
+              type="text"
+              disabled={!hasSentCode}
+            />
+            <Input
+              name="password"
+              id="password"
+              onChange={handleChangeForm}
+              value={form.password}
+              label="新しいパスワード"
+              placeholder="新しく設定するパスワードを入力"
+              type="password"
+              disabled={!hasSentCode}
+              message={fieldMessages.password}
+            />
+            <Input
+              name="confirm_password"
+              id="confirm_password"
+              onChange={handleChangeForm}
+              value={form.confirm_password}
+              label="新しいパスワード（確認用）"
+              placeholder="新しく設定するパスワードを再度入力"
+              type="password"
+              disabled={!hasSentCode}
+              message={fieldMessages.confirm_password}
+            />
+            <Grid item container justifyContent="center" spacing={2}>
+              <Button
+                variant="outlined"
+                disabled={!hasSentCode}
+                onClick={handleSubmitPasswordResetForm}
+                style={{ fontSize: "1.4rem" }}
+              >
+                Submit
+              </Button>
+            </Grid>
+          </>
+        )}
       </Grid>
     </Form>
   );

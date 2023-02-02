@@ -1,5 +1,5 @@
 import { Grid } from "@mui/material";
-import ResetPasswordForm from "~/components/organisms/forms/ResetPasswordForm";
+import UpdatePasswordForm from "~/components/organisms/forms/UpdatePasswordForm";
 import HeaderLayout from "~/components/organisms/layouts/HeaderLayout";
 
 /**
@@ -9,7 +9,7 @@ const ResetPasswordPage = () => {
   return (
     <HeaderLayout>
       <Grid style={{ padding: "100px 400px" }}>
-        <ResetPasswordForm />
+        <UpdatePasswordForm />
       </Grid>
     </HeaderLayout>
   );

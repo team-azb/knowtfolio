@@ -1,11 +1,11 @@
 import HeaderLayout from "~/components/organisms/layouts/HeaderLayout";
-import ResetPasswordWithCodeForm from "~/components/organisms/forms/ResetPasswordWithCodeForm";
+import ResetPasswordForm from "~/components/organisms/forms/ResetPasswordForm";
 
 const ForgotPasswordPage = () => {
   return (
     <HeaderLayout>
       <div style={{ padding: "100px 400px" }}>
-        <ResetPasswordWithCodeForm />
+        <ResetPasswordForm />
       </div>
     </HeaderLayout>
   );
