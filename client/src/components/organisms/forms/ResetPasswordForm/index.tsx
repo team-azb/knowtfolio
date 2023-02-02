@@ -16,6 +16,9 @@ type formFieldMessages = {
   [key in keyof ResetPasswordForm]?: JSX.Element;
 };
 
+/**
+ * 検証コードを使用してパスワードを再設定するためのフォーム
+ */
 const ResetPasswordForm = () => {
   const [form, setForm] = useState<ResetPasswordForm>({
     username: "",

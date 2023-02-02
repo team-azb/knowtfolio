@@ -19,7 +19,7 @@ type formFieldMessages = {
 };
 
 /**
- * パスワードを再設定するためのフォーム
+ * 現在のパスワードを使用してパスワードを更新するためのフォーム
  */
 const UpdatePasswordForm = () => {
   const [UpdatePasswordForm, setUpdatePasswordForm] =
