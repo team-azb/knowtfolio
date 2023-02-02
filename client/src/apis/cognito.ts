@@ -168,3 +168,48 @@ export const loadAttributes = (cognitoUser: CognitoUser) => {
     });
   });
 };
+
+export const sendPassswordResetCode = (username: string) => {
+  const userData = {
+    Username: username,
+    Pool: userPool,
+  };
+  const cognitoUser = new AmazonCognitoIdentity.CognitoUser(userData);
+  return new Promise<void>((resolve, reject) => {
+    cognitoUser.forgotPassword({
+      onSuccess: () => {
+        resolve();
+      },
+      onFailure: (err) => {
+        reject(err);
+      },
+    });
+  });
+};
+
+export type ResetPasswordWithCodeForm = {
+  username: string;
+  password: string;
+  confirm_password: string;
+  verification_code: string;
+};
+export const resetPasswordWithCode = (form: ResetPasswordWithCodeForm) => {
+  if (form.password !== form.confirm_password) {
+    throw new Error("Password does not match confirm password.");
+  }
+  const userData = {
+    Username: form.username,
+    Pool: userPool,
+  };
+  const cognitoUser = new AmazonCognitoIdentity.CognitoUser(userData);
+  return new Promise<void>((resolve, reject) => {
+    cognitoUser.confirmPassword(form.verification_code, form.password, {
+      onSuccess() {
+        resolve();
+      },
+      onFailure(err) {
+        reject(err);
+      },
+    });
+  });
+};

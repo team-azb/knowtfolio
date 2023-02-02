@@ -1,4 +1,8 @@
-import { SignUpForm, SignUpFormKey } from "~/apis/cognito";
+import {
+  ResetPasswordWithCodeForm,
+  SignUpForm,
+  SignUpFormKey,
+} from "~/apis/cognito";
 import { signUpErrorCode, validateSignUpForm } from "~/apis/lambda";
 import { ResetPasswordForm } from "~/components/organisms/forms/ResetPasswordForm";
 
@@ -45,7 +49,7 @@ const translateSignUpErrorCode = (
  * @param form サインアップフォーム
  */
 export const CreateFieldMessages = async <
-  T extends SignUpForm | ResetPasswordForm
+  T extends SignUpForm | ResetPasswordForm | ResetPasswordWithCodeForm
 >(
   form: T
 ) => {
@@ -73,40 +77,4 @@ export const CreateFieldMessages = async <
     }, {} as fieldMessage);
 
   return messages;
-  // type fieldMessage = {
-  //   [key in keyof T]?: JSX.Element;
-  // };
-  // // 値が入力されているものについてのみメッセージ表示の対応
-  // const initMessage = (Object.keys(form) as (keyof T)[]).reduce<fieldMessage>(
-  //   (obj, key) => {
-  //     if (form[key]) {
-  //       obj[key] = <span style={{ color: "green" }}>有効な値です。</span>;
-  //     }
-  //     return obj;
-  //   },
-  //   {}
-  // );
-  // // バリデーションエラーが起きているフィールドのメッセージを上書きする
-  // const fieldErrors = await validateSignUpForm(form);
-  // return fieldErrors.reduce<fieldMessage>((obj, { field_name, code }) => {
-  //   if ("username" in form) {
-  //     const value = form[field_name];
-
-  //     // 値が入力されているものについてのみエラー表示の対象
-  //     if (value) {
-  //       obj[field_name as keyof T] = translateSignUpErrorCode(
-  //         field_name,
-  //         code,
-  //         value
-  //       );
-  //     }
-  //   } else if (field_name === "password" || field_name === "confirm_password") {
-  //     const value = form[field_name];
-  //     // 値が入力されているものについてのみエラー表示の対象
-  //     if (value) {
-  //       obj[field_name] = translateSignUpErrorCode(field_name, code, value);
-  //     }
-  //   }
-  //   return obj;
-  // }, initMessage);
 };

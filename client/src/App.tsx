@@ -14,6 +14,7 @@ import RegisterWalletPage from "./components/pages/RegisterWalletPage";
 import ArticlePage from "~/components/pages/ArticlePage";
 import ResetPasswordPage from "~/components/pages/ResetPasswordPage";
 import ResetProfilePage from "~/components/pages/ResetProfilePage";
+import ForgotPasswordPage from "~/components/pages/ForgotPasswordPage";
 import { ThemeProvider } from "@mui/material";
 import { theme } from "~/configs/theme";
 import { ToastContainer } from "react-toastify";
@@ -28,6 +29,7 @@ const App = () => {
           <Route path="/" element={<TopPage />} />
           <Route path="/signup" element={<SignUpPage />} />
           <Route path="/signin" element={<SignInPage />} />
+          <Route path="/forgot-password" element={<ForgotPasswordPage />} />
           <Route path="/settings">
             <Route
               path="wallet"
