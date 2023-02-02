@@ -33,11 +33,11 @@ const translateSignUpErrorCode = (
         <b>{value}</b>はすでに登録されています。
       </span>
     );
+  } else {
+    return (
+      <span style={{ color: "red" }}>{messagesOnInvalidFormError[field]}</span>
+    );
   }
-  // invalida_formだった場合のエラーメッセージ
-  return (
-    <span style={{ color: "red" }}>{messagesOnInvalidFormError[field]}</span>
-  );
 };
 
 /**
