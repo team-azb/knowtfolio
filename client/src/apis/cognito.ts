@@ -94,10 +94,14 @@ export type SignUpForm = {
 };
 export type SignUpFormKey = keyof SignUpForm;
 
-export const signUpToCognito = (form: SignUpForm) => {
-  if (form.password !== form.confirm_password) {
+const assertConfirmPassword = (password: string, confirmPassword: string) => {
+  if (password !== confirmPassword) {
     throw new Error("Password does not match confirm password.");
   }
+};
+
+export const signUpToCognito = (form: SignUpForm) => {
+  assertConfirmPassword(form.password, form.confirm_password);
   const attributeList = [
     new CognitoUserAttribute({
       Name: "phone_number",
@@ -194,9 +198,7 @@ export type ResetPasswordWithCodeForm = {
   verification_code: string;
 };
 export const resetPasswordWithCode = (form: ResetPasswordWithCodeForm) => {
-  if (form.password !== form.confirm_password) {
-    throw new Error("Password does not match confirm password.");
-  }
+  assertConfirmPassword(form.password, form.confirm_password);
   const userData = {
     Username: form.username,
     Pool: userPool,

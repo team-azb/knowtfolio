@@ -3,7 +3,7 @@ import {
   SignUpForm,
   SignUpFormKey,
 } from "~/apis/cognito";
-import { signUpErrorCode, validateSignUpForm } from "~/apis/lambda";
+import { SignUpErrorCode, validateSignUpForm } from "~/apis/lambda";
 import { ResetPasswordForm } from "~/components/organisms/forms/ResetPasswordForm";
 
 /**
@@ -28,7 +28,7 @@ const messagesOnInvalidFormError = {
  */
 const translateSignUpErrorCode = (
   field: SignUpFormKey,
-  errorCode: signUpErrorCode,
+  errorCode: SignUpErrorCode,
   value: string
 ) => {
   if (errorCode === "already_exists") {
