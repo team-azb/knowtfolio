@@ -161,7 +161,7 @@ const SignInForm = () => {
         <Grid item container direction="column" spacing={1}>
           <Grid item container justifyContent="center">
             パスワードを忘れた方は
-            <Link to="/forgot-password" style={{ color: "#000" }}>
+            <Link to="/reset-password" style={{ color: "#000" }}>
               パスワード再設定
             </Link>
             へ

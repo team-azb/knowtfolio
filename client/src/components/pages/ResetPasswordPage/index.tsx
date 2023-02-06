@@ -1,16 +1,15 @@
-import { Grid } from "@mui/material";
-import UpdatePasswordForm from "~/components/organisms/forms/UpdatePasswordForm";
 import HeaderLayout from "~/components/organisms/layouts/HeaderLayout";
+import ResetPasswordForm from "~/components/organisms/forms/ResetPasswordForm";
 
 /**
- * "settings/password"で表示されるページコンポーネント
+ * "/reset-password"で表示されるページコンポーネント
  */
 const ResetPasswordPage = () => {
   return (
     <HeaderLayout>
-      <Grid style={{ padding: "100px 400px" }}>
-        <UpdatePasswordForm />
-      </Grid>
+      <div style={{ padding: "100px 400px" }}>
+        <ResetPasswordForm />
+      </div>
     </HeaderLayout>
   );
 };
