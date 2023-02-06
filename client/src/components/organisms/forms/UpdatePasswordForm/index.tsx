@@ -11,7 +11,7 @@ import { CreateFieldMessages } from "~/components/organisms/forms/helper";
 export type UpdatePasswordForm = {
   old_password: string;
   password: string;
-  confirm_password: string;
+  password_confirmation: string;
 };
 
 type formFieldMessages = {
@@ -26,7 +26,7 @@ const UpdatePasswordForm = () => {
     useState<UpdatePasswordForm>({
       old_password: "",
       password: "",
-      confirm_password: "",
+      password_confirmation: "",
     });
   const [fieldMessages, setFieldMessages] = useState<formFieldMessages>({});
   const { user } = useAuthContext();
@@ -53,7 +53,7 @@ const UpdatePasswordForm = () => {
     switch (event.target.name) {
       case "password":
       case "old_password":
-      case "confirm_password":
+      case "password_confirmation":
         setUpdatePasswordForm((prev) => {
           return {
             ...prev,
@@ -101,14 +101,14 @@ const UpdatePasswordForm = () => {
           message={fieldMessages.password}
         />
         <Input
-          name="confirm_password"
-          id="confirm_password"
+          name="password_confirmation"
+          id="password_confirmation"
           onChange={handleChangeForm}
-          value={UpdatePasswordForm.confirm_password}
+          value={UpdatePasswordForm.password_confirmation}
           label="新しいパスワード（確認用）"
           placeholder="新しく設定するパスワードを再度入力"
           type="password"
-          message={fieldMessages.confirm_password}
+          message={fieldMessages.password_confirmation}
         />
         <Grid item container justifyContent="center" spacing={2}>
           <Grid item>

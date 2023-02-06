@@ -11,7 +11,7 @@ const messagesOnInvalidFormError = {
   phone_number:
     "適切な電話番号ではありません。（日本国以外の電話番号は利用できません。）",
   wallet_address: "適切なwallet addressではありません。",
-  confirm_password: "パスワードが一致していません。",
+  password_confirmation: "パスワードが一致していません。",
 } as const;
 
 /**

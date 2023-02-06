@@ -23,7 +23,7 @@ const ResetPasswordForm = () => {
   const [form, setForm] = useState<ResetPasswordForm>({
     username: "",
     password: "",
-    confirm_password: "",
+    password_confirmation: "",
     verification_code: "",
   });
   const [fieldMessages, setFieldMessages] = useState<formFieldMessages>({});
@@ -36,7 +36,7 @@ const ResetPasswordForm = () => {
     switch (event.target.name) {
       case "username":
       case "password":
-      case "confirm_password":
+      case "password_confirmation":
       case "verification_code":
         setForm((prev) => {
           return {
@@ -129,15 +129,15 @@ const ResetPasswordForm = () => {
               message={fieldMessages.password}
             />
             <Input
-              name="confirm_password"
-              id="confirm_password"
+              name="password_confirmation"
+              id="password_confirmation"
               onChange={handleChangeForm}
-              value={form.confirm_password}
+              value={form.password_confirmation}
               label="新しいパスワード（確認用）"
               placeholder="新しく設定するパスワードを再度入力"
               type="password"
               disabled={!hasSentCode}
-              message={fieldMessages.confirm_password}
+              message={fieldMessages.password_confirmation}
             />
             <Grid item container justifyContent="center" spacing={2}>
               <Button

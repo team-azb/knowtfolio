@@ -89,7 +89,7 @@ export const signInToCognitoWithWallet = async (
 export type SignUpForm = {
   phone_number: string;
   password: string;
-  confirm_password: string;
+  password_confirmation: string;
   username: string;
 };
 export type SignUpFormKey = keyof SignUpForm;
@@ -101,7 +101,7 @@ const assertConfirmPassword = (password: string, confirmPassword: string) => {
 };
 
 export const signUpToCognito = (form: SignUpForm) => {
-  assertConfirmPassword(form.password, form.confirm_password);
+  assertConfirmPassword(form.password, form.password_confirmation);
   const attributeList = [
     new CognitoUserAttribute({
       Name: "phone_number",
@@ -194,11 +194,11 @@ export const sendPassswordResetVerificationCode = (username: string) => {
 export type ResetPasswordForm = {
   username: string;
   password: string;
-  confirm_password: string;
+  password_confirmation: string;
   verification_code: string;
 };
 export const resetPassword = (form: ResetPasswordForm) => {
-  assertConfirmPassword(form.password, form.confirm_password);
+  assertConfirmPassword(form.password, form.password_confirmation);
   const userData = {
     Username: form.username,
     Pool: userPool,

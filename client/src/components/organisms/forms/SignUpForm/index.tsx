@@ -28,7 +28,7 @@ const SignUpForm = () => {
   const [form, setForm] = useState<SignUpForm>({
     phone_number: "",
     password: "",
-    confirm_password: "",
+    password_confirmation: "",
     username: "",
   });
   const [fieldMessages, setFieldMessages] = useState<formFieldMessages>({});
@@ -41,7 +41,7 @@ const SignUpForm = () => {
       switch (event.target.name) {
         case "password":
         case "username":
-        case "confirm_password":
+        case "password_confirmation":
           setForm((prev) => {
             return { ...prev, [event.target.name]: event.target.value };
           });
@@ -163,12 +163,12 @@ const SignUpForm = () => {
           label="Confirm password"
           disabled={hasSignedUp}
           type="password"
-          name="confirm_password"
-          id="confirm_password"
+          name="password_confirmation"
+          id="password_confirmation"
           onChange={onChangeForm}
-          value={form.confirm_password}
+          value={form.password_confirmation}
           placeholder="Confirm password"
-          message={fieldMessages.confirm_password}
+          message={fieldMessages.password_confirmation}
         />
         <Grid item container justifyContent="center">
           <Button
