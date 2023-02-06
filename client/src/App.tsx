@@ -10,9 +10,13 @@ import NewArticlePage from "~/components/pages/NewArticlePage";
 import EditArticlePage from "~/components/pages/EditArticlePage";
 import SearchPage from "~/components/pages/SearchPage";
 import Web3Provider from "~/components/organisms/providers/Web3Provider";
-import ResetWalletPage from "./components/pages/ResetWalletPage";
+import RegisterWalletPage from "./components/pages/RegisterWalletPage";
+import ArticlePage from "~/components/pages/ArticlePage";
+import ResetProfilePage from "~/components/pages/ResetProfilePage";
 import { ThemeProvider } from "@mui/material";
 import { theme } from "~/configs/theme";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import "~/global.css";
 
 const App = () => {
@@ -23,14 +27,24 @@ const App = () => {
           <Route path="/" element={<TopPage />} />
           <Route path="/signup" element={<SignUpPage />} />
           <Route path="/signin" element={<SignInPage />} />
-          <Route
-            path="/reset-wallet"
-            element={
-              <AuthProvider>
-                <ResetWalletPage />
-              </AuthProvider>
-            }
-          />
+          <Route path="/settings">
+            <Route
+              path="wallet"
+              element={
+                <AuthProvider>
+                  <RegisterWalletPage />
+                </AuthProvider>
+              }
+            />
+            <Route
+              path="profile"
+              element={
+                <AuthProvider>
+                  <ResetProfilePage />
+                </AuthProvider>
+              }
+            />
+          </Route>
           <Route
             path="/mypage"
             element={
@@ -63,10 +77,12 @@ const App = () => {
               </AuthProvider>
             }
           />
+          <Route path="/articles/:articleId" element={<ArticlePage />} />
           <Route path="/search" element={<SearchPage />} />
           <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </Web3Provider>
+      <ToastContainer style={{ top: 100 }} />
     </ThemeProvider>
   );
 };

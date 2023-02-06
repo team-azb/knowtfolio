@@ -1,8 +1,4 @@
-import {
-  CognitoUser,
-  CognitoUserAttribute,
-  CognitoUserSession,
-} from "amazon-cognito-identity-js";
+import { CognitoUser, CognitoUserSession } from "amazon-cognito-identity-js";
 import React, {
   createContext,
   useCallback,
@@ -13,13 +9,23 @@ import React, {
 } from "react";
 import { userPool } from "~/configs/cognito";
 import { loadAttributes, loadSession } from "~/apis/cognito";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import LoadingDisplay from "~/components/atoms/LoadingDisplay";
+import { fetchWalletAddress, initDynamodbClient } from "~/apis/dynamodb";
+
+type UserAttributes = {
+  phoneNumber: string;
+  email?: string;
+  website?: string;
+  description?: string;
+  picture?: string;
+};
 
 export type AuthContext = {
   user: CognitoUser;
   session: CognitoUserSession;
-  attributes: CognitoUserAttribute[];
+  attributes: UserAttributes;
+  userWalletAddress?: string;
 };
 
 const authContext = createContext<AuthContext>({} as AuthContext);
@@ -63,27 +69,64 @@ const AuthProvider = ({
   const [auth, setAuth] = useState<AuthContext | null>(null);
   const [hasLoadedSession, setHasLoadedSession] = useState(false);
 
-  const setCurrentUser = useCallback(async () => {
+  const loadCurrentUser = useCallback(async () => {
     const cognitoUser = userPool.getCurrentUser();
     if (cognitoUser) {
-      const session = await loadSession(cognitoUser);
-      const attributes = await loadAttributes(cognitoUser);
-      setAuth({
-        user: cognitoUser,
-        session: session,
-        attributes: attributes,
-      });
+      try {
+        const session = await loadSession(cognitoUser);
+        const attributes = await loadAttributes(cognitoUser);
+
+        const phoneNumber = attributes.find(
+          (atr) => atr.Name === "phone_number"
+        )?.Value;
+        const email = attributes.find((atr) => atr.Name === "email")?.Value;
+        const picture = attributes.find((atr) => atr.Name === "picture")?.Value;
+        const website = attributes.find((atr) => atr.Name === "website")?.Value;
+        const description = attributes.find(
+          (atr) => atr.Name === "custom:description"
+        )?.Value;
+
+        const dynamodbClient = initDynamodbClient(
+          session.getIdToken().getJwtToken()
+        );
+        const userWalletAddress = await fetchWalletAddress(
+          dynamodbClient,
+          cognitoUser.getUsername()
+        );
+
+        if (!phoneNumber) {
+          throw new Error("Phone number is not registered.");
+        }
+        setAuth({
+          user: cognitoUser,
+          session: session,
+          attributes: {
+            phoneNumber,
+            email,
+            website,
+            description,
+            picture,
+          },
+          userWalletAddress,
+        });
+      } catch (error) {
+        // TODO: toastでUIを整える
+        console.error(error);
+        alert("正常にログインできませんでした。");
+      }
+    } else {
+      setAuth(null);
     }
     setHasLoadedSession(true);
   }, []);
 
   useEffect(() => {
-    window.addEventListener("storage", setCurrentUser);
-    setCurrentUser();
+    window.addEventListener("storage", loadCurrentUser);
+    loadCurrentUser();
     return () => {
-      window.removeEventListener("storage", setCurrentUser);
+      window.removeEventListener("storage", loadCurrentUser);
     };
-  }, [setCurrentUser]);
+  }, [loadCurrentUser]);
 
   const content = useMemo(() => {
     if (!hasLoadedSession) {
@@ -102,6 +145,13 @@ const AuthProvider = ({
     contentOnUnauthenticated,
     hasLoadedSession,
   ]);
+
+  const location = useLocation();
+  useEffect(() => {
+    if (location.state && location.state.shouldLoadCurrentUser) {
+      loadCurrentUser();
+    }
+  }, [loadCurrentUser, location.state]);
 
   return <>{content}</>;
 };

@@ -18,19 +18,21 @@ resource "aws_cognito_user_pool" "knowtfolio" {
   }
 
   schema {
-    name                = "wallet_address"
+    name                = "description"
     attribute_data_type = "String"
     mutable             = true
+
     string_attribute_constraints {
-      min_length = 42
-      max_length = 42
+      min_length = 0
+      max_length = 160
     }
   }
 
   lambda_config {
-    define_auth_challenge          = aws_lambda_function.auth_challenge_functions["define_auth_challenge"].arn
-    create_auth_challenge          = aws_lambda_function.auth_challenge_functions["create_auth_challenge"].arn
-    verify_auth_challenge_response = aws_lambda_function.auth_challenge_functions["verify_auth_challenge_response"].arn
+    pre_sign_up                    = aws_lambda_function.cognito_triggers["pre_sign_up"].arn
+    define_auth_challenge          = aws_lambda_function.cognito_triggers["define_auth_challenge"].arn
+    create_auth_challenge          = aws_lambda_function.cognito_triggers["create_auth_challenge"].arn
+    verify_auth_challenge_response = aws_lambda_function.cognito_triggers["verify_auth_challenge_response"].arn
   }
 
   sms_configuration {
@@ -44,8 +46,14 @@ resource "aws_cognito_user_pool" "knowtfolio" {
 resource "aws_cognito_user_pool_client" "knowtfolio" {
   name = "dev-knowtfolio-client"
 
-  user_pool_id        = aws_cognito_user_pool.knowtfolio.id
-  explicit_auth_flows = ["ALLOW_USER_PASSWORD_AUTH", "ALLOW_REFRESH_TOKEN_AUTH", "ALLOW_CUSTOM_AUTH", "ALLOW_ADMIN_USER_PASSWORD_AUTH"]
+  user_pool_id = aws_cognito_user_pool.knowtfolio.id
+  explicit_auth_flows = [
+    "ALLOW_USER_PASSWORD_AUTH",
+    "ALLOW_REFRESH_TOKEN_AUTH",
+    "ALLOW_CUSTOM_AUTH",
+    "ALLOW_ADMIN_USER_PASSWORD_AUTH",
+    "ALLOW_USER_SRP_AUTH"
+  ]
 }
 
 resource "aws_cognito_identity_pool" "knowtfolio" {

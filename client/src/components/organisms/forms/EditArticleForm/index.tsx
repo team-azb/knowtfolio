@@ -1,10 +1,14 @@
 import { Editor as TinyMCEEditor } from "tinymce";
 import { useCallback, useEffect, useState } from "react";
 import { getArticle, putArticle } from "~/apis/knowtfolio";
-import { useWeb3Context } from "~/components/organisms/providers/Web3Provider";
+import {
+  assertMetamask,
+  useWeb3Context,
+} from "~/components/organisms/providers/Web3Provider";
 import ArticleEditor from "~/components/organisms/ArticleEditor";
 import { Button, Grid } from "@mui/material";
 import ArrowBackIosNewRoundedIcon from "@mui/icons-material/ArrowBackIosNewRounded";
+import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 
 type editArticleFormProps = {
@@ -23,7 +27,7 @@ const EditArticleForm = ({ articleId }: editArticleFormProps) => {
   >((value) => {
     setContent(value);
   }, []);
-  const { web3, account } = useWeb3Context();
+  const { isConnectedToMetamask, web3, account } = useWeb3Context();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -36,13 +40,14 @@ const EditArticleForm = ({ articleId }: editArticleFormProps) => {
         }
       } catch (error) {
         console.error(error);
-        alert("記事の取得に失敗しました。");
+        toast.error("記事の取得に失敗しました。");
       }
     })();
   }, [articleId]);
 
   const handleUpdate = useCallback(async () => {
     try {
+      assertMetamask(isConnectedToMetamask);
       const signature = await web3.eth.personal.sign(
         "Update Article",
         account,
@@ -55,11 +60,21 @@ const EditArticleForm = ({ articleId }: editArticleFormProps) => {
         address: account,
         signature,
       });
+      navigate("/mypage");
+      toast.success("記事が更新されました。");
     } catch (error) {
       console.error(error);
-      alert("記事の更新に失敗しました。");
+      toast.error("記事の更新に失敗しました。");
     }
-  }, [account, articleId, content, title, web3.eth.personal]);
+  }, [
+    account,
+    articleId,
+    content,
+    isConnectedToMetamask,
+    navigate,
+    title,
+    web3,
+  ]);
 
   const onChangeTitleInput = useCallback<
     React.ChangeEventHandler<HTMLInputElement>

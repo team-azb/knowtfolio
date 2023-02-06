@@ -6,17 +6,10 @@ import AuthProvider, {
 import { grey } from "@mui/material/colors";
 import LoadingDisplay from "~/components/atoms/LoadingDisplay";
 import WalletAddressDisplay from "~/components/organisms/WalletAddressDisplay";
-import { useMemo } from "react";
 
 const AcountInfo = () => {
-  const { user, attributes } = useAuthContext();
+  const { user, userWalletAddress } = useAuthContext();
   const navigate = useNavigate();
-  const walletAddress = useMemo(() => {
-    const walletAddress = attributes.find(
-      (atr) => atr.Name === "custom:wallet_address"
-    )?.Value;
-    return walletAddress || "";
-  }, [attributes]);
 
   return (
     <Button
@@ -28,7 +21,7 @@ const AcountInfo = () => {
     >
       {user.getUsername()}
       <WalletAddressDisplay
-        address={walletAddress}
+        address={userWalletAddress}
         style={{ fontSize: "1rem" }}
       />
     </Button>
@@ -40,7 +33,7 @@ const AuthButtons = () => {
 
   return (
     <>
-      <Grid xs={2}>
+      <Grid item xs={2}>
         <Button
           onClick={() => {
             navigate("/signup");
@@ -51,7 +44,7 @@ const AuthButtons = () => {
           sign up
         </Button>{" "}
       </Grid>
-      <Grid xs={2}>
+      <Grid item xs={2}>
         <Button
           onClick={() => {
             navigate("/signin");
@@ -87,7 +80,7 @@ const Header = () => {
         borderColor: grey[500],
       }}
     >
-      <Grid xs={6}>
+      <Grid item xs={6}>
         <p
           style={{
             padding: "1rem",
@@ -103,13 +96,13 @@ const Header = () => {
           Knowtfolio
         </p>
       </Grid>
-      <Grid xs={6}>
+      <Grid item xs={6}>
         <Grid container direction="row-reverse" alignItems="center">
           <AuthProvider
             contentOnUnauthenticated={<AuthButtons />}
             contentWhileLoadingSession={<LoadingAuthDisplay />}
           >
-            <Grid xs={2}>
+            <Grid item xs={2}>
               <AcountInfo />
             </Grid>
             <Grid item xs={2}>

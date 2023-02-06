@@ -1,9 +1,10 @@
 package models
 
 import (
-	"github.com/stretchr/testify/assert"
-	"strings"
+	"path/filepath"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
 )
 
 func TestToHtml(t *testing.T) {
@@ -19,22 +20,17 @@ func TestToHtml(t *testing.T) {
 		ID:       id,
 		Document: *doc,
 	}
+
+	// テスト実行時のディレクトリが本番実行とは異なるので、TemplateDirを直接上書きしてtemplateファイルのパスを指定
+	root, _ := filepath.Abs("../")
+	TemplatePath = filepath.Join(root, "/static/article_template.html")
+
 	actual, err := src.ToHTML()
 	assert.NoError(t, err)
 
-	expected := `
-			<head>
-				<meta charset="UTF-8" />
-				<title> Hello Knowtfolio! </title>
-			</head>
-			<body>
-				<a href="/articles">記事一覧</a>
-				<a href="/articles/abcdefghijk/edit">記事を編集</a>
-				<h1> Hello Knowtfolio! </h1>
-				<div> Hello HTML! </div>
-				<img src="https://i.imgur.com/Ru0JifT.jpeg" alt="basketball legend" width="410" height="213">
-				XSS
-			</body>`
-
-	assert.Equal(t, strings.Fields(expected), strings.Fields(string(actual)))
+	assert.Contains(t, string(actual), "<title>Knowtfolio</title>")
+	assert.Contains(t, string(actual), "<div> Hello HTML! </div>")
+	assert.Contains(t, string(actual), `<img src="https://i.imgur.com/Ru0JifT.jpeg" alt="basketball legend" width="410" height="213">`)
+	assert.Contains(t, string(actual), "XSS")
+	assert.NotContains(t, string(actual), `<a href="javascript:alert('XSS1')" onmouseover="alert('XSS2')"> XSS <a>`)
 }

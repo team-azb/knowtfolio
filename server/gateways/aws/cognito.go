@@ -62,6 +62,9 @@ func (c *CognitoClient) CreateUserWithPassword(userID string, password string, p
 			},
 		},
 		UserPoolId: &userPoolID,
+		ClientMetadata: map[string]string{
+			"password": password,
+		},
 	})
 	if err != nil {
 		return err

@@ -4,10 +4,10 @@ import (
 	"context"
 	"errors"
 	"fmt"
+
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/team-azb/knowtfolio/server/gateways/api/gen/articles"
-	articlesviews "github.com/team-azb/knowtfolio/server/gateways/api/gen/articles/views"
 	"github.com/team-azb/knowtfolio/server/gateways/api/gen/http/articles/server"
 	"github.com/team-azb/knowtfolio/server/gateways/aws"
 	"github.com/team-azb/knowtfolio/server/gateways/ethereum"
@@ -47,7 +47,7 @@ func (a articleService) Create(ctx context.Context, request *articles.ArticleCre
 
 	newArticle := models.NewArticle(request.Title, []byte(request.Content), userID)
 	result := a.DB.Create(newArticle)
-	return articleToResult(*newArticle), result.Error
+	return articleToResult(newArticle), result.Error
 }
 
 func (a articleService) Read(_ context.Context, request *articles.ArticleReadRequest) (res *articles.ArticleResult, err error) {
@@ -70,13 +70,13 @@ func (a articleService) Read(_ context.Context, request *articles.ArticleReadReq
 		if err != nil {
 			return nil, err
 		}
-		return articleWithOwnerInfoToResult(&target, ownerID, ownerAddr), nil
+		return articleToResult(&target, withOwnerInfo(ownerID, ownerAddr)), nil
 	} else {
 		originalAuthorAddr, err := a.DynamoDBClient.GetAddressByID(target.OriginalAuthorID)
 		if err != nil {
 			return nil, err
 		}
-		return articleWithOwnerInfoToResult(&target, target.OriginalAuthorID, originalAuthorAddr), nil
+		return articleToResult(&target, withOwnerInfo(target.OriginalAuthorID, originalAuthorAddr)), nil
 	}
 }
 
@@ -107,7 +107,7 @@ func (a articleService) Update(ctx context.Context, request *articles.ArticleUpd
 		return nil, articles.MakeNotFound(err)
 	}
 
-	return articleToResult(target), err
+	return articleToResult(&target), err
 }
 
 func (a articleService) Delete(ctx context.Context, request *articles.ArticleDeleteRequest) (res *articles.ArticleResult, err error) {
@@ -126,7 +126,7 @@ func (a articleService) Delete(ctx context.Context, request *articles.ArticleDel
 
 	result = a.DB.Delete(&target)
 
-	return articleIdToResult(request.ID), result.Error
+	return articleToResult(&target), result.Error
 }
 
 func (a articleService) JWTAuth(ctx context.Context, token string, _ *security.JWTScheme) (context.Context, error) {
@@ -164,36 +164,27 @@ func (a articleService) AuthorizeEdit(editorID string, target models.Article, re
 	}
 }
 
-func articleToResult(src models.Article) *articles.ArticleResult {
-	return &articles.ArticleResult{
+type articleResultOpt func(articles.ArticleResult) articles.ArticleResult
+
+func articleToResult(src *models.Article, opts ...articleResultOpt) *articles.ArticleResult {
+	res := articles.ArticleResult{
 		ID:      src.ID,
 		Title:   src.Document.Title,
-		Content: string(src.Document.Content),
+		Content: string(src.Document.SanitizedContent()),
 	}
+	for _, opt := range opts {
+		res = opt(res)
+	}
+	return &res
 }
 
-func articleIdToResult(src string) *articles.ArticleResult {
-	return articles.NewArticleResult(&articlesviews.ArticleResult{
-		Projected: &articlesviews.ArticleResultView{ID: &src},
-		View:      "only-id",
-	})
-}
-
-func articleWithOwnerInfoToResult(src *models.Article, ownerID string, ownerAddr *common.Address) *articles.ArticleResult {
-	contentStr := string(src.Document.Content)
-	var ownerAddrStr *string
-	if ownerAddr != nil {
-		ownerAddrStr = new(string)
-		*ownerAddrStr = ownerAddr.String()
+func withOwnerInfo(id string, addr *common.Address) articleResultOpt {
+	return func(res articles.ArticleResult) articles.ArticleResult {
+		res.OwnerID = id
+		if addr != nil {
+			addrStr := addr.String()
+			res.OwnerAddress = &addrStr
+		}
+		return res
 	}
-	return articles.NewArticleResult(&articlesviews.ArticleResult{
-		Projected: &articlesviews.ArticleResultView{
-			ID:           &src.ID,
-			Title:        &src.Document.Title,
-			Content:      &contentStr,
-			OwnerID:      &ownerID,
-			OwnerAddress: ownerAddrStr,
-		},
-		View: "with-owner-info",
-	})
 }

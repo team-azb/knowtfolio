@@ -6,17 +6,24 @@ inputs:
     required: true
   AWS_KNOWTFOLIO_ADMIN_SECRET_KEY:
     required: true
-  COGNITO_CLIENT_ID:
-    required: true
   COGNITO_USER_POOL_ID:
     required: true
+  COGNITO_CLIENT_ID:
+    required: true
+  COGNITO_IDENTITY_POOL_ID:
+    required: true
+  TINY_MCE_API_KEY:
+    required: true
+  DB_URI:
+    required: false
+    default: root:password@tcp(db:3306)/knowtfolio-db
 runs:
   using: "composite"
   steps:
     - shell: bash
       run: |
         touch server/.env
-        echo DB_URI="root:password@tcp(db:3306)/knowtfolio-db" >> server/.env
+        echo DB_URI="${{inputs.DB_URI}}" >> server/.env
         echo ADMIN_PRIVATE_KEY=${{inputs.ADMIN_WALLET_PRIVATE_KEY}} >> server/.env
         echo CONTRACT_ADDRESS=0xd08db6d8Fb163182722e0D17fa8146f26a79BB6A >> server/.env
         echo NETWORK_URI=https://polygon-mumbai.g.alchemy.com/v2/ZRG81-lcDf9T69OmxipvuoO-FMMFAOoH >> server/.env
@@ -27,3 +34,14 @@ runs:
         echo COGNITO_CLIENT_ID=${{inputs.COGNITO_CLIENT_ID}} >> server/.env
         echo COGNITO_USER_POOL_ID=${{inputs.COGNITO_USER_POOL_ID}} >> server/.env
         echo S3_BUCKET_NAME=dev-knowtfolio-nfts >> server/.env
+    - shell: bash
+      run: |
+        touch client/.env
+        echo COGNITO_USER_POOL_ID=${{inputs.COGNITO_USER_POOL_ID}} >> client/.env
+        echo COGNITO_CLIENT_ID=${{inputs.COGNITO_CLIENT_ID}} >> client/.env
+        echo COGNITO_IDENTITY_POOL_ID=${{inputs.COGNITO_IDENTITY_POOL_ID}} >> client/.env
+        echo CLIENT_S3_BUCKET=dev-knowtfolio-client >> client/.env
+        echo ARTICLE_RESOURCES_S3_BUCKET=dev-knowtfolio-article-resources >> client/.env
+        echo CLOUD_FRONT_DISTRIBUTION_ID=E1QMJWEALLWNHF >> client/.env
+        echo TINY_MCE_API_KEY=${{inputs.TINY_MCE_API_KEY}} >> client/.env
+        echo CONTRACT_ADDRESS=0xd08db6d8Fb163182722e0D17fa8146f26a79BB6A >> client/.env

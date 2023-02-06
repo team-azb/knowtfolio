@@ -3,14 +3,15 @@ package main
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
+
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/aws/aws-sdk-go-v2/aws"
 	servicelambda "github.com/aws/aws-sdk-go-v2/service/lambda"
 	"github.com/team-azb/knowtfolio/infrastructure/function_scripts/pkg/aws_utils"
 	"github.com/team-azb/knowtfolio/infrastructure/function_scripts/pkg/models"
-	"net/http"
 )
 
 type lambdaPayload struct {
@@ -47,39 +48,30 @@ func invokeValidationLambda(ctx context.Context, form models.SignUpForm) (fieldE
 	return
 }
 
-func handler(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
-	fmt.Printf("Sign Up: %+v\n", request)
+func handler(ctx context.Context, event *events.CognitoEventUserPoolsPreSignup) (*events.CognitoEventUserPoolsPreSignup, error) {
+	fmt.Printf("Pre SignUp: %+v\n", event)
 
-	var form models.SignUpForm
-	if err := json.Unmarshal([]byte(request.Body), &form); err != nil {
-		return events.APIGatewayProxyResponse{
-			StatusCode: http.StatusBadRequest,
-			Body:       err.Error(),
-		}, nil
+	password, ok := event.Request.ClientMetadata["password"]
+	if !ok {
+		return event, errors.New("clientMetadata must include `password` to validate on pre-signup phase")
+	}
+
+	form := models.SignUpForm{
+		UserName:    event.UserName,
+		Password:    password,
+		PhoneNumber: event.Request.UserAttributes["phone_number"],
 	}
 
 	fieldErrs, internalErr := invokeValidationLambda(ctx, form)
 	if internalErr != nil {
-		return events.APIGatewayProxyResponse{}, internalErr
+		return event, internalErr
 	}
 	if len(fieldErrs) > 0 {
 		fieldErrsJson, _ := json.Marshal(fieldErrs)
-		return events.APIGatewayProxyResponse{
-			StatusCode: http.StatusBadRequest,
-			Body:       string(fieldErrsJson),
-		}, nil
+		return event, fmt.Errorf("format error(s) found for signup form: %+v", string(fieldErrsJson))
 	}
 
-	_, err := aws_utils.CognitoClient.SignUp(ctx, form.ToCognitoInput())
-	if err != nil {
-		return events.APIGatewayProxyResponse{}, err
-	}
-
-	return events.APIGatewayProxyResponse{
-		StatusCode:      http.StatusOK,
-		IsBase64Encoded: false,
-		Body:            "OK",
-	}, nil
+	return event, nil
 }
 
 func main() {

@@ -2,17 +2,23 @@ import { Editor as TinyMCEEditor } from "tinymce";
 import { useCallback, useState } from "react";
 import { mintArticleNft, postArticle } from "~/apis/knowtfolio";
 import { useNavigate } from "react-router-dom";
-import { useWeb3Context } from "~/components/organisms/providers/Web3Provider";
+import {
+  assertMetamask,
+  useWeb3Context,
+} from "~/components/organisms/providers/Web3Provider";
 import ArticleEditor from "~/components/organisms/ArticleEditor";
 import { Button, Grid } from "@mui/material";
 import ArrowBackIosNewRoundedIcon from "@mui/icons-material/ArrowBackIosNewRounded";
+import { toast } from "react-toastify";
+import RequireWeb3Wrapper from "~/components/organisms/RequireWeb3Wrapper";
+
 /**
  * 記事の新規作成用のフォーム
  */
 const NewArticleForm = () => {
   const [content, setContent] = useState("");
   const [titleInput, setTitleInput] = useState("");
-  const { web3, account } = useWeb3Context();
+  const { isConnectedToMetamask, web3, account } = useWeb3Context();
   const handleEditorChange = useCallback<
     (value: string, editor: TinyMCEEditor) => void
   >((value) => {
@@ -28,6 +34,7 @@ const NewArticleForm = () => {
 
   const handlePost = useCallback(async () => {
     try {
+      assertMetamask(isConnectedToMetamask);
       const signatureForCreate = await web3.eth.personal.sign(
         "Create Article",
         account,
@@ -49,12 +56,13 @@ const NewArticleForm = () => {
         address: account,
         signature: signatureForMint,
       });
-      navigate(`/articles/${id}/edit`);
+      navigate("/mypage");
+      toast.success("記事を作成しました。");
     } catch (error) {
       console.error(error);
-      alert("記事の作成に失敗しました。");
+      toast.error("記事の作成に失敗しました。");
     }
-  }, [account, content, navigate, titleInput, web3.eth.personal]);
+  }, [account, content, isConnectedToMetamask, navigate, titleInput, web3]);
   return (
     <div
       style={{
@@ -88,13 +96,15 @@ const NewArticleForm = () => {
           </Grid>
         </Grid>
         <Grid item xs={9} container direction="row-reverse">
-          <Button
-            variant="contained"
-            onClick={handlePost}
-            style={{ fontSize: "1.4rem" }}
-          >
-            create article
-          </Button>
+          <RequireWeb3Wrapper isConnectedToMetamask={isConnectedToMetamask}>
+            <Button
+              variant="contained"
+              onClick={handlePost}
+              style={{ fontSize: "1.4rem" }}
+            >
+              create article
+            </Button>
+          </RequireWeb3Wrapper>
         </Grid>
       </Grid>
       <Grid flexGrow={1}>

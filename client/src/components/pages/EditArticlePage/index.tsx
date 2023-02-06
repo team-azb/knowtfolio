@@ -3,7 +3,10 @@ import { Link, useParams } from "react-router-dom";
 import LoadingDisplay from "~/components/atoms/LoadingDisplay";
 import EditArticleForm from "~/components/organisms/forms/EditArticleForm";
 import { useAuthContext } from "~/components/organisms/providers/AuthProvider";
-import { useWeb3Context } from "~/components/organisms/providers/Web3Provider";
+import {
+  assertMetamask,
+  useWeb3Context,
+} from "~/components/organisms/providers/Web3Provider";
 
 const ContentOnEditable = ({ articleId }: { articleId: string }) => {
   return <EditArticleForm articleId={articleId} />;
@@ -26,23 +29,16 @@ const contentOnNotEditable = (
  */
 const EditArticlePage = () => {
   const { articleId } = useParams();
-  const { contract } = useWeb3Context();
-  const { attributes } = useAuthContext();
+  const { isConnectedToMetamask, contract } = useWeb3Context();
+  const { userWalletAddress } = useAuthContext();
   const [ownerIdOfArticle, setOwnerIdOfArticle] = useState<null | string>(null);
 
-  const walletAddress = useMemo(() => {
-    const walletAddress = attributes.find(
-      (atr) => atr.Name === "custom:wallet_address"
-    )?.Value;
-    return walletAddress || "";
-  }, [attributes]);
-
   const isAuthorized = useMemo(() => {
-    return ownerIdOfArticle === walletAddress;
-  }, [walletAddress, ownerIdOfArticle]);
+    return ownerIdOfArticle === userWalletAddress;
+  }, [ownerIdOfArticle, userWalletAddress]);
 
   const content = useMemo(() => {
-    if (ownerIdOfArticle === null) {
+    if (isConnectedToMetamask && ownerIdOfArticle === null) {
       return (
         <div style={{ padding: "100px 400px" }}>
           <LoadingDisplay message="編集権限を検証中" />
@@ -57,16 +53,18 @@ const EditArticlePage = () => {
     } else {
       return contentOnNotEditable;
     }
-  }, [articleId, isAuthorized, ownerIdOfArticle]);
+  }, [articleId, isAuthorized, isConnectedToMetamask, ownerIdOfArticle]);
 
   useEffect(() => {
     (async () => {
+      assertMetamask(isConnectedToMetamask);
+      // TODO: コントラクトではなくバックエンド経由で取得する
       const ownerIdOfArticle = await contract.methods
         .getOwnerOfArticle(articleId)
         .call();
       setOwnerIdOfArticle(ownerIdOfArticle);
     })();
-  }, [articleId, contract.methods]);
+  }, [articleId, contract, isConnectedToMetamask]);
 
   return <div>{content}</div>;
 };
