@@ -89,11 +89,19 @@ export const signInToCognitoWithWallet = async (
 export type SignUpForm = {
   phone_number: string;
   password: string;
+  password_confirmation: string;
   username: string;
 };
 export type SignUpFormKey = keyof SignUpForm;
 
+const assertConfirmPassword = (password: string, confirmPassword: string) => {
+  if (password !== confirmPassword) {
+    throw new Error("Password does not match confirm password.");
+  }
+};
+
 export const signUpToCognito = (form: SignUpForm) => {
+  assertConfirmPassword(form.password, form.password_confirmation);
   const attributeList = [
     new CognitoUserAttribute({
       Name: "phone_number",
@@ -161,6 +169,49 @@ export const loadAttributes = (cognitoUser: CognitoUser) => {
         resolve(result);
       }
       reject("no attributes");
+    });
+  });
+};
+
+export const sendPassswordResetVerificationCode = (username: string) => {
+  const userData = {
+    Username: username,
+    Pool: userPool,
+  };
+  const cognitoUser = new AmazonCognitoIdentity.CognitoUser(userData);
+  return new Promise<void>((resolve, reject) => {
+    cognitoUser.forgotPassword({
+      onSuccess: () => {
+        resolve();
+      },
+      onFailure: (err) => {
+        reject(err);
+      },
+    });
+  });
+};
+
+export type ResetPasswordForm = {
+  username: string;
+  password: string;
+  password_confirmation: string;
+  verification_code: string;
+};
+export const resetPassword = (form: ResetPasswordForm) => {
+  assertConfirmPassword(form.password, form.password_confirmation);
+  const userData = {
+    Username: form.username,
+    Pool: userPool,
+  };
+  const cognitoUser = new AmazonCognitoIdentity.CognitoUser(userData);
+  return new Promise<void>((resolve, reject) => {
+    cognitoUser.confirmPassword(form.verification_code, form.password, {
+      onSuccess() {
+        resolve();
+      },
+      onFailure(err) {
+        reject(err);
+      },
     });
   });
 };

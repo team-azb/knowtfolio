@@ -1,18 +1,28 @@
 import axios from "axios";
-import { SignUpForm, SignUpFormKey } from "./cognito";
+import { SignUpFormKey } from "./cognito";
 
-export type signUpErrorCode = "invalid_format" | "already_exists";
-export type FieldError = {
-  field_name: SignUpFormKey;
-  code: signUpErrorCode;
+export type SignUpErrorCode = "invalid_format" | "already_exists";
+type FieldError = {
+  field_name: keyof signUpValidationForm;
+  code: SignUpErrorCode;
 };
 
-export const validateSignUpForm = async (form: SignUpForm) => {
-  const { data: errData } = await axios.post(
+type signUpValidationForm = {
+  [key in SignUpFormKey]?: string;
+};
+export const validateSignUpForm = async (form: signUpValidationForm) => {
+  const { password_confirmation, ...reqBody } = form;
+  const { data: errData } = await axios.post<FieldError[]>(
     "/api/validate_sign_up_form",
-    form
+    reqBody
   );
-  return errData as FieldError[];
+  if (password_confirmation !== reqBody.password) {
+    errData.push({
+      field_name: "password_confirmation",
+      code: "invalid_format",
+    });
+  }
+  return errData;
 };
 
 type postWalletForm = {
