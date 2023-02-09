@@ -15,75 +15,10 @@ import Form from "~/components/atoms/authForm/Form";
 import Spacer from "~/components/atoms/Spacer";
 import { toast } from "react-toastify";
 import { Link, useNavigate } from "react-router-dom";
-import { signUpErrorCode, validateSignUpForm } from "~/apis/lambda";
+import { CreateFieldMessages } from "~/components/organisms/forms/helper";
 
 type formFieldMessages = {
   [key in SignUpFormKey]?: JSX.Element;
-};
-
-/**
- * invalid_formだった場合のエラー表示文
- */
-const messagesOnInvalidFormError = {
-  username: "適切なユーザーネームではありません。",
-  password: "大文字・小文字・数字・記号を含む８文字以上である必要があります。",
-  phone_number:
-    "適切な電話番号ではありません。（日本国以外の電話番号は利用できません。）",
-  wallet_address: "適切なwallet addressではありません。",
-} as const;
-
-/**
- * signUpFormのエラーコードをエラー表示用のJSX Elementに変換する
- * messagesOnInvalidFormErrorに依存関係あり
- * @param field 対象のフィールド
- * @param errorCode エラーコード
- * @param value フィールドの値
- * @returns エラー表示用のJSX Element
- */
-const translateSignUpErrorCode = (
-  field: SignUpFormKey,
-  errorCode: signUpErrorCode,
-  value: string
-) => {
-  if (errorCode === "already_exists") {
-    return (
-      <span style={{ color: "red" }}>
-        <b>{value}</b>はすでに登録されています。
-      </span>
-    );
-  } else {
-    return (
-      <span style={{ color: "red" }}>{messagesOnInvalidFormError[field]}</span>
-    );
-  }
-};
-
-/**
- * フィールドに表示するメッセージを作成するための関数
- * @param form サインアップフォーム
- */
-const createFieldMessages = async (form: SignUpForm) => {
-  const keys = Object.keys(form) as SignUpFormKey[];
-  const fieldErrors = await validateSignUpForm(form);
-  const validFieldMessage = (
-    <span style={{ color: "green" }}>有効な値です。</span>
-  );
-
-  const messages = keys
-    .filter((key) => form[key]) //入力のない項目についてはメッセージを表示しない
-    .reduce((msgs, key) => {
-      const fieldErr = fieldErrors.find((err) => err.field_name == key);
-      msgs[key] = fieldErr
-        ? translateSignUpErrorCode(
-            fieldErr.field_name,
-            fieldErr.code,
-            form[key]
-          )
-        : validFieldMessage;
-      return msgs;
-    }, {} as formFieldMessages);
-
-  return messages;
 };
 
 export const noteOnWalletAddress =
@@ -93,6 +28,7 @@ const SignUpForm = () => {
   const [form, setForm] = useState<SignUpForm>({
     phone_number: "",
     password: "",
+    password_confirmation: "",
     username: "",
   });
   const [fieldMessages, setFieldMessages] = useState<formFieldMessages>({});
@@ -105,6 +41,7 @@ const SignUpForm = () => {
       switch (event.target.name) {
         case "password":
         case "username":
+        case "password_confirmation":
           setForm((prev) => {
             return { ...prev, [event.target.name]: event.target.value };
           });
@@ -118,7 +55,7 @@ const SignUpForm = () => {
 
   useEffect(() => {
     (async () => {
-      const fieldMessages = await createFieldMessages(form);
+      const fieldMessages = await CreateFieldMessages<SignUpForm>(form);
       setFieldMessages(fieldMessages);
     })();
   }, [form]);
@@ -221,6 +158,17 @@ const SignUpForm = () => {
           value={form.password}
           placeholder="Password"
           message={fieldMessages.password}
+        />
+        <Input
+          label="Confirm password"
+          disabled={hasSignedUp}
+          type="password"
+          name="password_confirmation"
+          id="password_confirmation"
+          onChange={onChangeForm}
+          value={form.password_confirmation}
+          placeholder="Confirm password"
+          message={fieldMessages.password_confirmation}
         />
         <Grid item container justifyContent="center">
           <Button

@@ -12,7 +12,9 @@ import SearchPage from "~/components/pages/SearchPage";
 import Web3Provider from "~/components/organisms/providers/Web3Provider";
 import RegisterWalletPage from "./components/pages/RegisterWalletPage";
 import ArticlePage from "~/components/pages/ArticlePage";
+import UpdatePasswordPage from "~/components/pages/UpdatePasswordPage";
 import ResetProfilePage from "~/components/pages/ResetProfilePage";
+import ResetPasswordPage from "~/components/pages/ResetPasswordPage";
 import { ThemeProvider } from "@mui/material";
 import { theme } from "~/configs/theme";
 import { ToastContainer } from "react-toastify";
@@ -27,6 +29,7 @@ const App = () => {
           <Route path="/" element={<TopPage />} />
           <Route path="/signup" element={<SignUpPage />} />
           <Route path="/signin" element={<SignInPage />} />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="/settings">
             <Route
               path="wallet"
@@ -41,6 +44,14 @@ const App = () => {
               element={
                 <AuthProvider>
                   <ResetProfilePage />
+                </AuthProvider>
+              }
+            />
+            <Route
+              path="password"
+              element={
+                <AuthProvider>
+                  <UpdatePasswordPage />
                 </AuthProvider>
               }
             />
