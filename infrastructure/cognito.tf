@@ -47,6 +47,13 @@ resource "aws_cognito_user_pool_client" "knowtfolio" {
   name = "dev-knowtfolio-client"
 
   user_pool_id = aws_cognito_user_pool.knowtfolio.id
+  explicit_auth_flows = [
+    "ALLOW_USER_PASSWORD_AUTH",
+    "ALLOW_REFRESH_TOKEN_AUTH",
+    "ALLOW_CUSTOM_AUTH",
+    "ALLOW_ADMIN_USER_PASSWORD_AUTH",
+    "ALLOW_USER_SRP_AUTH"
+  ]
 }
 
 resource "aws_cognito_identity_pool" "knowtfolio" {

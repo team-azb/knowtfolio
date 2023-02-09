@@ -7,27 +7,32 @@ import (
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/team-azb/knowtfolio/server/config"
 	"github.com/team-azb/knowtfolio/server/gateways/api/gen/articles"
 	"github.com/team-azb/knowtfolio/server/gateways/api/gen/http/articles/server"
+	"github.com/team-azb/knowtfolio/server/gateways/aws"
 	"github.com/team-azb/knowtfolio/server/gateways/ethereum"
 	"github.com/team-azb/knowtfolio/server/models"
 	goahttp "goa.design/goa/v3/http"
+	"goa.design/goa/v3/security"
 	"gorm.io/gorm"
 )
 
 type articleService struct {
-	DB       *gorm.DB
-	Contract *ethereum.ContractClient
+	DB             *gorm.DB
+	Contract       *ethereum.ContractClient
+	CognitoClient  *aws.CognitoClient
+	DynamoDBClient *aws.DynamoDBClient
 }
 
-func NewArticlesService(db *gorm.DB, contract *ethereum.ContractClient, handler HttpHandler) *server.Server {
+const UserIDCtxKey = "userID"
+
+func NewArticlesService(db *gorm.DB, contract *ethereum.ContractClient, cognitoClient *aws.CognitoClient, dynamodbClient *aws.DynamoDBClient, handler HttpHandler) *server.Server {
 	err := db.Migrator().AutoMigrate(models.Article{}, models.Document{})
 	if err != nil {
 		panic(err.(any))
 	}
 
-	endpoints := articles.NewEndpoints(articleService{DB: db, Contract: contract})
+	endpoints := articles.NewEndpoints(articleService{DB: db, Contract: contract, CognitoClient: cognitoClient, DynamoDBClient: dynamodbClient})
 	return server.New(
 		endpoints,
 		handler,
@@ -37,13 +42,10 @@ func NewArticlesService(db *gorm.DB, contract *ethereum.ContractClient, handler 
 		nil)
 }
 
-func (a articleService) Create(_ context.Context, request *articles.ArticleCreateRequest) (res *articles.ArticleResult, err error) {
-	err = ethereum.VerifySignature(request.Address, request.Signature, config.SignData["CreateArticle"])
-	if err != nil {
-		return nil, articles.MakeUnauthenticated(err)
-	}
+func (a articleService) Create(ctx context.Context, request *articles.ArticleCreateRequest) (res *articles.ArticleResult, err error) {
+	userID := ctx.Value(UserIDCtxKey).(string)
 
-	newArticle := models.NewArticle(request.Title, []byte(request.Content), request.Address)
+	newArticle := models.NewArticle(request.Title, []byte(request.Content), userID)
 	result := a.DB.Create(newArticle)
 	return articleToResult(newArticle), result.Error
 }
@@ -58,19 +60,28 @@ func (a articleService) Read(_ context.Context, request *articles.ArticleReadReq
 		return nil, result.Error
 	}
 
-	owner, err := a.Contract.GetOwnerAddressOf(target)
+	ownerAddr, err := a.Contract.GetOwnerAddressOf(target)
 	if err != nil {
 		return nil, err
 	}
 
-	return articleToResult(&target, ownerAddress(owner)), nil
+	if ownerAddr != nil {
+		ownerID, err := a.DynamoDBClient.GetIDByAddress(*ownerAddr)
+		if err != nil {
+			return nil, err
+		}
+		return articleToResult(&target, withOwnerInfo(ownerID, ownerAddr)), nil
+	} else {
+		originalAuthorAddr, err := a.DynamoDBClient.GetAddressByID(target.OriginalAuthorID)
+		if err != nil {
+			return nil, err
+		}
+		return articleToResult(&target, withOwnerInfo(target.OriginalAuthorID, originalAuthorAddr)), nil
+	}
 }
 
-func (a articleService) Update(_ context.Context, request *articles.ArticleUpdateRequest) (res *articles.ArticleResult, err error) {
-	err = ethereum.VerifySignature(request.Address, request.Signature, config.SignData["UpdateArticle"])
-	if err != nil {
-		return nil, articles.MakeUnauthenticated(err)
-	}
+func (a articleService) Update(ctx context.Context, request *articles.ArticleUpdateRequest) (res *articles.ArticleResult, err error) {
+	userID := ctx.Value(UserIDCtxKey).(string)
 
 	target := models.Article{ID: request.ID}
 
@@ -80,7 +91,7 @@ func (a articleService) Update(_ context.Context, request *articles.ArticleUpdat
 			return result.Error
 		}
 
-		err = a.AuthorizeEdit(request.Address, target, true)
+		err = a.AuthorizeEdit(userID, target, true)
 		if err != nil {
 			return err
 		}
@@ -99,11 +110,8 @@ func (a articleService) Update(_ context.Context, request *articles.ArticleUpdat
 	return articleToResult(&target), err
 }
 
-func (a articleService) Delete(_ context.Context, request *articles.ArticleDeleteRequest) (res *articles.ArticleResult, err error) {
-	err = ethereum.VerifySignature(request.Address, request.Signature, config.SignData["DeleteArticle"])
-	if err != nil {
-		return nil, articles.MakeUnauthenticated(err)
-	}
+func (a articleService) Delete(ctx context.Context, request *articles.ArticleDeleteRequest) (res *articles.ArticleResult, err error) {
+	userID := ctx.Value(UserIDCtxKey).(string)
 
 	target := models.Article{ID: request.ID}
 	result := a.DB.First(&target)
@@ -111,7 +119,7 @@ func (a articleService) Delete(_ context.Context, request *articles.ArticleDelet
 		return nil, articles.MakeNotFound(result.Error)
 	}
 
-	err = a.AuthorizeEdit(request.Address, target, false)
+	err = a.AuthorizeEdit(userID, target, false)
 	if err != nil {
 		return nil, err
 	}
@@ -121,22 +129,37 @@ func (a articleService) Delete(_ context.Context, request *articles.ArticleDelet
 	return articleToResult(&target), result.Error
 }
 
-func (a articleService) AuthorizeEdit(editorAddr string, target models.Article, requireNFT bool) error {
+func (a articleService) JWTAuth(ctx context.Context, token string, _ *security.JWTScheme) (context.Context, error) {
+	userID, err := a.CognitoClient.VerifyCognitoToken(token)
+	if err != nil {
+		err = articles.MakeUnauthenticated(err)
+	}
+	return context.WithValue(ctx, UserIDCtxKey, userID), err
+}
+
+func (a articleService) AuthorizeEdit(editorID string, target models.Article, requireNFT bool) error {
 	isAuthorized := false
+
 	if target.IsTokenized {
-		owner, err := a.Contract.GetOwnerOfArticle(&bind.CallOpts{}, target.ID)
+		ownerAddr, err := a.Contract.GetOwnerOfArticle(&bind.CallOpts{}, target.ID)
 		if err != nil {
 			return err
 		}
-		isAuthorized = editorAddr == owner.String()
+		ownerID, err := a.DynamoDBClient.GetIDByAddress(ownerAddr)
+		if err != nil {
+			return err
+		}
+		isAuthorized = editorID == ownerID
 	} else if !requireNFT {
-		isAuthorized = editorAddr == target.OriginalAuthorAddress
+		isAuthorized = editorID == target.OriginalAuthorID
 	}
 
 	if isAuthorized {
 		return nil
 	} else {
-		msg := fmt.Sprintf("Address %v does not have the right to do the specified operation on article %v.", editorAddr, target.ID)
+		msg := fmt.Sprintf(
+			"User %v does not have the right to execute the specified operation on article %v.",
+			editorID, target.ID)
 		return articles.MakeUnauthorized(errors.New(msg))
 	}
 }
@@ -155,10 +178,12 @@ func articleToResult(src *models.Article, opts ...articleResultOpt) *articles.Ar
 	return &res
 }
 
-func ownerAddress(addr *common.Address) articleResultOpt {
+func withOwnerInfo(id string, addr *common.Address) articleResultOpt {
 	return func(res articles.ArticleResult) articles.ArticleResult {
+		res.OwnerID = id
 		if addr != nil {
-			res.OwnerAddress = addr.String()
+			addrStr := addr.String()
+			res.OwnerAddress = &addrStr
 		}
 		return res
 	}
