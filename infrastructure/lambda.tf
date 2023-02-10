@@ -23,7 +23,7 @@ locals {
     }
     get_user = {
       allow_methods     = ["GET"]
-      api_resource_path = "users"
+      api_resource_path = "users/*"
     }
   }
 

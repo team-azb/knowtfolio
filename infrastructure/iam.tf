@@ -93,6 +93,12 @@ resource "aws_iam_role_policy" "basic_lambda" {
   })
 }
 
+resource "aws_iam_role_policy" "get_user-lambda" {
+  name   = "get-user-lambda"
+  role   = aws_iam_role.lambda["get_user"].name
+  policy = data.aws_iam_policy_document.get_cognito_user_as_admin_policy.json
+}
+
 resource "aws_iam_role_policy" "pre_sign_up_lambda" {
   name = "pre-sign-up-lambda"
   role = aws_iam_role.lambda["pre_sign_up"].name
@@ -109,6 +115,17 @@ data "aws_iam_policy_document" "update_wallet_table_policy" {
     ]
     resources = [
       aws_dynamodb_table.user_to_wallet.arn
+    ]
+  }
+}
+
+data "aws_iam_policy_document" "get_cognito_user_as_admin_policy" {
+  statement {
+    actions = [
+      "cognito-idp:AdminGetUser"
+    ]
+    resources = [
+      "*"
     ]
   }
 }
