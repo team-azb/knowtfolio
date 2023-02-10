@@ -20,9 +20,7 @@ paths:
                         schema:
                             $ref: '#/components/schemas/CreateRequestBody'
                         example:
-                            address: '''0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'''
                             content: <h1> Hello World! </h1>
-                            signature: Odit et voluptates quis nulla pariatur optio.
                             title: My Awesome Title
             responses:
                 "200":
@@ -30,7 +28,7 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/CreateResponseBody'
+                                $ref: '#/components/schemas/CreateResponseBody2'
                             example:
                                 content: <h1> Hello World! </h1>
                                 id: exampleId01
@@ -47,6 +45,8 @@ paths:
                         application/vnd.goa.error+json:
                             schema:
                                 $ref: '#/components/schemas/Error'
+            security:
+                - cognito_id_token_header_Authorization: []
     /api/articles/{id}:
         delete:
             tags:
@@ -67,22 +67,13 @@ paths:
                     minLength: 11
                     maxLength: 11
                   example: exampleId01
-            requestBody:
-                required: true
-                content:
-                    application/json:
-                        schema:
-                            $ref: '#/components/schemas/DeleteRequestBody'
-                        example:
-                            address: '''0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'''
-                            signature: Et in explicabo quia tenetur.
             responses:
                 "200":
                     description: OK response.
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/DeleteResponseBodyOnlyID'
+                                $ref: '#/components/schemas/DeleteResponseBodyOnlyID2'
                             example:
                                 id: exampleId01
                 "401":
@@ -103,6 +94,8 @@ paths:
                         application/vnd.goa.error+json:
                             schema:
                                 $ref: '#/components/schemas/Error'
+            security:
+                - cognito_id_token_header_Authorization: []
         get:
             tags:
                 - articles
@@ -128,11 +121,12 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/ReadResponseBodyWithOwnerAddress'
+                                $ref: '#/components/schemas/ReadResponseBodyWithOwnerInfo'
                             example:
                                 content: <h1> Hello World! </h1>
                                 id: exampleId01
                                 owner_address: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 '
+                                owner_id: exampleId01
                                 title: My Awesome Title
                 "404":
                     description: 'not_found: IDに対応するリソースが見つからなかった場合'
@@ -166,9 +160,7 @@ paths:
                         schema:
                             $ref: '#/components/schemas/UpdateRequestBody'
                         example:
-                            address: '''0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'''
                             content: <h1> Hello World! </h1>
-                            signature: Aliquid atque.
                             title: My Awesome Title
             responses:
                 "200":
@@ -176,7 +168,7 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/CreateResponseBody'
+                                $ref: '#/components/schemas/CreateResponseBody2'
                             example:
                                 content: <h1> Hello World! </h1>
                                 id: exampleId01
@@ -199,6 +191,8 @@ paths:
                         application/vnd.goa.error+json:
                             schema:
                                 $ref: '#/components/schemas/Error'
+            security:
+                - cognito_id_token_header_Authorization: []
     /api/health:
         get:
             tags:
@@ -246,10 +240,10 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/DeleteRequestBody'
+                            $ref: '#/components/schemas/CreateForArticleRequestBody'
                         example:
                             address: '''0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'''
-                            signature: Velit nam quis facilis.
+                            signature: Ipsam veritatis praesentium repellendus est esse assumenda.
             responses:
                 "200":
                     description: OK response.
@@ -258,8 +252,8 @@ paths:
                             schema:
                                 $ref: '#/components/schemas/CreateNftForArticleResult'
                             example:
-                                cost: 2272994791495004502
-                                hash: A velit et et dolorem sed pariatur.
+                                cost: 829421888521491104
+                                hash: Veritatis et.
                 "401":
                     description: 'unauthenticated: 認証に失敗した場合'
                     content:
@@ -284,7 +278,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/CreateRequestBody2'
+                            $ref: '#/components/schemas/CreateRequestBody'
                         example:
                             content: <h1> Hello World! </h1>
                             title: My Awesome Title
@@ -294,7 +288,7 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/CreateResponseBody2'
+                                $ref: '#/components/schemas/CreateResponseBody'
                             example:
                                 content: <h1> Hello World! </h1>
                                 id: exampleId01
@@ -331,7 +325,7 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/DeleteResponseBodyOnlyID2'
+                                $ref: '#/components/schemas/DeleteResponseBodyOnlyID'
                             example:
                                 id: exampleId01
                 "404":
@@ -365,7 +359,7 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/CreateResponseBody2'
+                                $ref: '#/components/schemas/CreateResponseBody'
                             example:
                                 content: <h1> Hello World! </h1>
                                 id: exampleId01
@@ -400,7 +394,7 @@ paths:
                 content:
                     application/json:
                         schema:
-                            $ref: '#/components/schemas/UpdateRequestBody2'
+                            $ref: '#/components/schemas/UpdateRequestBody'
                         example:
                             content: <h1> Hello World! </h1>
                             title: My Awesome Title
@@ -410,7 +404,7 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/CreateResponseBody2'
+                                $ref: '#/components/schemas/CreateResponseBody'
                             example:
                                 content: <h1> Hello World! </h1>
                                 id: exampleId01
@@ -636,14 +630,16 @@ paths:
                   example: Golang+NFT
                 - name: owned_by
                   in: query
-                  description: 記事の所有者。指定がない場合、全ての所有者の記事を検索する。
+                  description: 記事の所有者のUserID。指定がない場合、全ての所有者の記事を検索する。
                   allowEmptyValue: true
                   schema:
                     type: string
-                    description: 記事の所有者。指定がない場合、全ての所有者の記事を検索する。
-                    example: '''0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'''
-                    pattern: ^0x[a-fA-F0-9]{40}$
-                  example: '''0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'''
+                    description: 記事の所有者のUserID。指定がない場合、全ての所有者の記事を検索する。
+                    example: exampleId01
+                    pattern: ^[A-Za-z0-9_-]+$
+                    minLength: 1
+                    maxLength: 40
+                  example: exampleId01
                 - name: sort_by
                   in: query
                   description: 記事をソートするkey
@@ -652,7 +648,7 @@ paths:
                     type: string
                     description: 記事をソートするkey
                     default: created_at
-                    example: created_at
+                    example: updated_at
                     enum:
                         - created_at
                         - updated_at
@@ -665,9 +661,9 @@ paths:
                     type: integer
                     description: 取得したい位置のページ番号（1-indexed）
                     default: 1
-                    example: 13692916563268264376
+                    example: 5023432583872562117
                     minimum: 1
-                  example: 17930849223655672614
+                  example: 9266367122726675364
                 - name: page_size
                   in: query
                   description: 1ページあたりのコンテンツ数
@@ -676,10 +672,10 @@ paths:
                     type: integer
                     description: 1ページあたりのコンテンツ数
                     default: 10
-                    example: 66
+                    example: 40
                     minimum: 1
                     maximum: 100
-                  example: 39
+                  example: 69
             responses:
                 "200":
                     description: OK response.
@@ -691,11 +687,17 @@ paths:
                                 results:
                                     - id: exampleId01
                                       owner_address: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 '
+                                      owner_id: exampleId01
                                       title: My Awesome Title
                                     - id: exampleId01
                                       owner_address: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 '
+                                      owner_id: exampleId01
                                       title: My Awesome Title
-                                total_count: 9017659154547287277
+                                    - id: exampleId01
+                                      owner_address: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 '
+                                      owner_id: exampleId01
+                                      title: My Awesome Title
+                                total_count: 18225424149782934695
     /articles/{id}:
         get:
             tags:
@@ -775,25 +777,7 @@ components:
                 - answer_id
                 - question_id
                 - content
-        CreateNftForArticleResult:
-            type: object
-            properties:
-                cost:
-                    type: integer
-                    description: トークン発行にかかったコスト
-                    example: 2494340203643141981
-                    format: int64
-                hash:
-                    type: string
-                    description: トランザクションのハッシュ
-                    example: Dolores sapiente sit sed eos ut.
-            example:
-                cost: 1166416950581093652
-                hash: Voluptatem corrupti et non ea.
-            required:
-                - hash
-                - cost
-        CreateRequestBody:
+        CreateForArticleRequestBody:
             type: object
             properties:
                 address:
@@ -801,29 +785,35 @@ components:
                     description: ウォレットのアドレス
                     example: '''0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'''
                     pattern: ^0x[a-fA-F0-9]{40}$
-                content:
-                    type: string
-                    description: 本文のHTML
-                    example: <h1> Hello World! </h1>
                 signature:
                     type: string
                     description: '`address`のアカウントが行った署名'
-                    example: Nihil odio voluptas voluptatibus.
-                title:
-                    type: string
-                    example: My Awesome Title
-            description: 作成したい記事の情報
+                    example: Distinctio consectetur doloremque.
             example:
                 address: '''0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'''
-                content: <h1> Hello World! </h1>
-                signature: Esse excepturi rerum et odit qui.
-                title: My Awesome Title
+                signature: Dolor sapiente laboriosam veniam eos eos.
             required:
-                - title
-                - content
                 - address
                 - signature
-        CreateRequestBody2:
+        CreateNftForArticleResult:
+            type: object
+            properties:
+                cost:
+                    type: integer
+                    description: トークン発行にかかったコスト
+                    example: 4471315468130594924
+                    format: int64
+                hash:
+                    type: string
+                    description: トランザクションのハッシュ
+                    example: Et esse molestiae illum temporibus mollitia voluptatem.
+            example:
+                cost: 5255393866423437156
+                hash: Nesciunt alias nulla fuga nihil.
+            required:
+                - hash
+                - cost
+        CreateRequestBody:
             type: object
             properties:
                 content:
@@ -849,7 +839,7 @@ components:
                     example: <h1> Hello World! </h1>
                 id:
                     type: string
-                    description: 記事のID
+                    description: 質問のID
                     example: exampleId01
                     pattern: ^[A-Za-z0-9_-]+$
                     minLength: 11
@@ -875,7 +865,7 @@ components:
                     example: <h1> Hello World! </h1>
                 id:
                     type: string
-                    description: 質問のID
+                    description: 記事のID
                     example: exampleId01
                     pattern: ^[A-Za-z0-9_-]+$
                     minLength: 11
@@ -907,30 +897,12 @@ components:
                 answer_id: exampleId01
             required:
                 - answer_id
-        DeleteRequestBody:
-            type: object
-            properties:
-                address:
-                    type: string
-                    description: ウォレットのアドレス
-                    example: '''0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'''
-                    pattern: ^0x[a-fA-F0-9]{40}$
-                signature:
-                    type: string
-                    description: '`address`のアカウントが行った署名'
-                    example: Molestias vel ad nisi corporis.
-            example:
-                address: '''0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'''
-                signature: Explicabo vitae exercitationem beatae dignissimos eveniet.
-            required:
-                - address
-                - signature
         DeleteResponseBodyOnlyID:
             type: object
             properties:
                 id:
                     type: string
-                    description: 記事のID
+                    description: 質問のID
                     example: exampleId01
                     pattern: ^[A-Za-z0-9_-]+$
                     minLength: 11
@@ -945,7 +917,7 @@ components:
             properties:
                 id:
                     type: string
-                    description: 質問のID
+                    description: 記事のID
                     example: exampleId01
                     pattern: ^[A-Za-z0-9_-]+$
                     minLength: 11
@@ -961,7 +933,7 @@ components:
                 fault:
                     type: boolean
                     description: Is the error a server-side fault?
-                    example: true
+                    example: false
                 id:
                     type: string
                     description: ID is a unique identifier for this particular occurrence of the problem.
@@ -977,11 +949,11 @@ components:
                 temporary:
                     type: boolean
                     description: Is the error temporary?
-                    example: true
+                    example: false
                 timeout:
                     type: boolean
                     description: Is the error a timeout?
-                    example: true
+                    example: false
             example:
                 id: 3F1FKVRR
                 message: Value of ID must be an integer
@@ -993,7 +965,7 @@ components:
                 - temporary
                 - timeout
                 - fault
-        ReadResponseBodyWithOwnerAddress:
+        ReadResponseBodyWithOwnerInfo:
             type: object
             properties:
                 content:
@@ -1012,20 +984,28 @@ components:
                     description: 所有者のウォレットのアドレス
                     example: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 '
                     pattern: ^0x[a-fA-F0-9]{40}$
+                owner_id:
+                    type: string
+                    description: 所有者のUserID
+                    example: exampleId01
+                    pattern: ^[A-Za-z0-9_-]+$
+                    minLength: 1
+                    maxLength: 40
                 title:
                     type: string
                     example: My Awesome Title
-            description: ReadResponseBody result type (with-owner-address view)
+            description: ReadResponseBody result type (with-owner-info view)
             example:
                 content: <h1> Hello World! </h1>
                 id: exampleId01
                 owner_address: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 '
+                owner_id: exampleId01
                 title: My Awesome Title
             required:
                 - id
                 - title
                 - content
-                - owner_address
+                - owner_id
         SearchResultEntry:
             type: object
             properties:
@@ -1041,17 +1021,25 @@ components:
                     description: 所有者のウォレットのアドレス
                     example: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 '
                     pattern: ^0x[a-fA-F0-9]{40}$
+                owner_id:
+                    type: string
+                    description: 所有者のUserID
+                    example: exampleId01
+                    pattern: ^[A-Za-z0-9_-]+$
+                    minLength: 1
+                    maxLength: 40
                 title:
                     type: string
                     example: My Awesome Title
             example:
                 id: exampleId01
                 owner_address: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 '
+                owner_id: exampleId01
                 title: My Awesome Title
             required:
                 - id
                 - title
-                - owner_address
+                - owner_id
         Searchresult:
             type: object
             properties:
@@ -1063,60 +1051,39 @@ components:
                     example:
                         - id: exampleId01
                           owner_address: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 '
+                          owner_id: exampleId01
                           title: My Awesome Title
                         - id: exampleId01
                           owner_address: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 '
+                          owner_id: exampleId01
+                          title: My Awesome Title
+                        - id: exampleId01
+                          owner_address: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 '
+                          owner_id: exampleId01
                           title: My Awesome Title
                 total_count:
                     type: integer
                     description: 指定したページを含めたすべての検索結果の件数
-                    example: 3226081117937415917
+                    example: 5613503003369806042
             example:
                 results:
                     - id: exampleId01
                       owner_address: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 '
+                      owner_id: exampleId01
                       title: My Awesome Title
                     - id: exampleId01
                       owner_address: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 '
+                      owner_id: exampleId01
                       title: My Awesome Title
                     - id: exampleId01
                       owner_address: '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 '
+                      owner_id: exampleId01
                       title: My Awesome Title
-                total_count: 14655710181252209422
+                total_count: 12784667946624386665
             required:
                 - results
                 - total_count
         UpdateRequestBody:
-            type: object
-            properties:
-                address:
-                    type: string
-                    description: ウォレットのアドレス
-                    example: '''0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'''
-                    pattern: ^0x[a-fA-F0-9]{40}$
-                content:
-                    type: string
-                    description: 本文のHTML
-                    example: <h1> Hello World! </h1>
-                signature:
-                    type: string
-                    description: '`address`のアカウントが行った署名'
-                    example: Omnis enim quis consequuntur rerum.
-                title:
-                    type: string
-                    example: My Awesome Title
-            description: |-
-                記事の更新内容
-                リクエストに含まれるフィールドだけ更新される。
-            example:
-                address: '''0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266'''
-                content: <h1> Hello World! </h1>
-                signature: Consequuntur ratione consectetur neque quae exercitationem.
-                title: My Awesome Title
-            required:
-                - address
-                - signature
-        UpdateRequestBody2:
             type: object
             properties:
                 content:
@@ -1132,9 +1099,12 @@ components:
             example:
                 content: <h1> Hello World! </h1>
                 title: My Awesome Title
+    securitySchemes:
+        cognito_id_token_header_Authorization:
+            type: http
+            description: Cognitoで生成されたIDトークンのJWT
+            scheme: bearer
 tags:
-    - name: articles
-      description: 記事サービス
     - name: articles-html
       description: SEO対策で、記事の表示だけ直接HTMLで返すためのサービス
     - name: healthcheck
@@ -1145,3 +1115,5 @@ tags:
       description: 質問サービス
     - name: search
       description: 検索サービス
+    - name: articles
+      description: 記事サービス

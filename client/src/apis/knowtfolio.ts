@@ -1,10 +1,9 @@
 import axios from "axios";
 
 export type postArticleForm = {
-  address: string;
   content: string;
-  signature: string;
   title: string;
+  token: string;
 };
 
 type postArticleResponse = {
@@ -13,12 +12,18 @@ type postArticleResponse = {
   title: string;
 };
 export const postArticle = async (form: postArticleForm) => {
-  const { data } = await axios.post<postArticleResponse>("/api/articles", {
-    address: form.address,
-    content: form.content,
-    signature: form.signature,
-    title: form.title,
-  });
+  const { data } = await axios.post<postArticleResponse>(
+    "/api/articles",
+    {
+      content: form.content,
+      title: form.title,
+    },
+    {
+      headers: {
+        Authorization: `Bearer ${form.token}`,
+      },
+    }
+  );
   return data;
 };
 
@@ -26,12 +31,18 @@ export type updateArticleForm = {
   articleId: string;
 } & postArticleForm;
 export const putArticle = async (form: updateArticleForm) => {
-  await axios.put(`/api/articles/${form.articleId}`, {
-    address: form.address,
-    content: form.content,
-    signature: form.signature,
-    title: form.title,
-  });
+  await axios.put(
+    `/api/articles/${form.articleId}`,
+    {
+      content: form.content,
+      title: form.title,
+    },
+    {
+      headers: {
+        Authorization: `Bearer ${form.token}`,
+      },
+    }
+  );
 };
 
 type getArticleResponse = {

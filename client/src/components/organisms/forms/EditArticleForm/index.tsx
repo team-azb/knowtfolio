@@ -10,6 +10,7 @@ import { Button, Grid } from "@mui/material";
 import ArrowBackIosNewRoundedIcon from "@mui/icons-material/ArrowBackIosNewRounded";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import { useAuthContext } from "~/components/organisms/providers/AuthProvider";
 
 type editArticleFormProps = {
   articleId: string;
@@ -27,6 +28,7 @@ const EditArticleForm = ({ articleId }: editArticleFormProps) => {
   >((value) => {
     setContent(value);
   }, []);
+  const { session } = useAuthContext();
   const { isConnectedToMetamask, web3, account } = useWeb3Context();
   const navigate = useNavigate();
 
@@ -48,17 +50,12 @@ const EditArticleForm = ({ articleId }: editArticleFormProps) => {
   const handleUpdate = useCallback(async () => {
     try {
       assertMetamask(isConnectedToMetamask);
-      const signature = await web3.eth.personal.sign(
-        "Update Article",
-        account,
-        ""
-      );
+      const idToken = session.getIdToken().getJwtToken();
       await putArticle({
         articleId: articleId || "",
         title,
         content,
-        address: account,
-        signature,
+        token: idToken,
       });
       navigate("/mypage");
       toast.success("記事が更新されました。");

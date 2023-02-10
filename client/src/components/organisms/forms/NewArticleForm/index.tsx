@@ -11,6 +11,7 @@ import { Button, Grid } from "@mui/material";
 import ArrowBackIosNewRoundedIcon from "@mui/icons-material/ArrowBackIosNewRounded";
 import { toast } from "react-toastify";
 import RequireWeb3Wrapper from "~/components/organisms/RequireWeb3Wrapper";
+import { useAuthContext } from "~/components/organisms/providers/AuthProvider";
 
 /**
  * 記事の新規作成用のフォーム
@@ -18,6 +19,7 @@ import RequireWeb3Wrapper from "~/components/organisms/RequireWeb3Wrapper";
 const NewArticleForm = () => {
   const [content, setContent] = useState("");
   const [titleInput, setTitleInput] = useState("");
+  const { session } = useAuthContext();
   const { isConnectedToMetamask, web3, account } = useWeb3Context();
   const handleEditorChange = useCallback<
     (value: string, editor: TinyMCEEditor) => void
@@ -34,23 +36,20 @@ const NewArticleForm = () => {
 
   const handlePost = useCallback(async () => {
     try {
-      assertMetamask(isConnectedToMetamask);
-      const signatureForCreate = await web3.eth.personal.sign(
-        "Create Article",
-        account,
-        ""
-      );
+      const idToken = session.getIdToken().getJwtToken();
       const { id } = await postArticle({
         title: titleInput,
-        address: account,
-        signature: signatureForCreate,
         content,
+        token: idToken,
       });
+
+      assertMetamask(isConnectedToMetamask);
       const signatureForMint = await web3.eth.personal.sign(
         "Mint NFT",
         account,
         ""
       );
+      // TODO: Make this optional
       await mintArticleNft({
         articleId: id,
         address: account,
