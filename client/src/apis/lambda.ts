@@ -37,3 +37,15 @@ export const postWalletAddress = async (form: postWalletForm) => {
     signature: form.signature,
   });
 };
+
+export type PublicUserInfo = {
+  username: string;
+  picture: string;
+  website: string;
+  biography: string;
+  wallet_address: string;
+};
+export const getUser = async (userId: string) => {
+  const { data } = await axios.get<PublicUserInfo>(`/api/users/${userId}`);
+  return data;
+};
