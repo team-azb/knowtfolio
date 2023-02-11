@@ -55,7 +55,7 @@ const SignInForm = () => {
       event.preventDefault();
       try {
         await signInToCognitoWithPassword(form.username, form.password);
-        navigate("/mypage", {
+        navigate(`/users/${form.username}`, {
           state: {
             shouldLoadCurrentUser: true,
           },
@@ -77,7 +77,7 @@ const SignInForm = () => {
       try {
         assertMetamask(isConnectedToMetamask);
         await signInToCognitoWithWallet(form.username, web3, account);
-        navigate("/mypage", {
+        navigate(`/users/${form.username}`, {
           state: {
             shouldLoadCurrentUser: true,
           },

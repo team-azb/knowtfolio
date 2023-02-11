@@ -28,7 +28,7 @@ const EditArticleForm = ({ articleId }: editArticleFormProps) => {
   >((value) => {
     setContent(value);
   }, []);
-  const { session } = useAuthContext();
+  const { user, session } = useAuthContext();
   const { isConnectedToMetamask, web3, account } = useWeb3Context();
   const navigate = useNavigate();
 
@@ -57,7 +57,7 @@ const EditArticleForm = ({ articleId }: editArticleFormProps) => {
         content,
         token: idToken,
       });
-      navigate("/mypage");
+      navigate(`/users/${user.getUsername()}`);
       toast.success("記事が更新されました。");
     } catch (error) {
       console.error(error);
