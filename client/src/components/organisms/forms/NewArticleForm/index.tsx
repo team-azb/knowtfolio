@@ -61,7 +61,15 @@ const NewArticleForm = () => {
       console.error(error);
       toast.error("記事の作成に失敗しました。");
     }
-  }, [account, content, isConnectedToMetamask, navigate, titleInput, web3]);
+  }, [
+    account,
+    content,
+    isConnectedToMetamask,
+    navigate,
+    session,
+    titleInput,
+    web3,
+  ]);
   return (
     <div
       style={{

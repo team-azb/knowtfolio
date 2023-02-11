@@ -29,7 +29,7 @@ const EditArticleForm = ({ articleId }: editArticleFormProps) => {
     setContent(value);
   }, []);
   const { session } = useAuthContext();
-  const { isConnectedToMetamask, web3, account } = useWeb3Context();
+  const { isConnectedToMetamask } = useWeb3Context();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -63,15 +63,7 @@ const EditArticleForm = ({ articleId }: editArticleFormProps) => {
       console.error(error);
       toast.error("記事の更新に失敗しました。");
     }
-  }, [
-    account,
-    articleId,
-    content,
-    isConnectedToMetamask,
-    navigate,
-    title,
-    web3,
-  ]);
+  }, [articleId, content, isConnectedToMetamask, navigate, session, title]);
 
   const onChangeTitleInput = useCallback<
     React.ChangeEventHandler<HTMLInputElement>
