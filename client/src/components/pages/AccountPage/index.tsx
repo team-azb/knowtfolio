@@ -10,6 +10,9 @@ import MyAccountInfoTable from "~/components/organisms/tables/MyAccountInfoTable
 import MyOwnedArticlesTable from "~/components/organisms/tables/MyOwnedArticlesTable";
 import OwnedArticlesTable from "~/components/organisms/tables/OwnedArticlesTable";
 
+/**
+ * 自分のアカウントページ、編集が可能
+ */
 const MyAccountPage = () => {
   return (
     <HeaderLayout>
@@ -23,14 +26,17 @@ const MyAccountPage = () => {
   );
 };
 
+/**
+ * 他人のアカウントページ、公開情報の閲覧のみ
+ */
 const OtherAccountPage = () => {
-  const { userId } = useParams();
+  const { userId = "" } = useParams();
   return (
     <HeaderLayout>
       <div style={{ padding: "100px 400px" }}>
         <Grid container direction="column" spacing={3}>
-          <AccountInfoTable userId={userId || ""} />
-          <OwnedArticlesTable userId={userId || ""} />
+          <AccountInfoTable userId={userId} />
+          <OwnedArticlesTable userId={userId} />
         </Grid>
       </div>
     </HeaderLayout>
@@ -38,9 +44,9 @@ const OtherAccountPage = () => {
 };
 
 /**
- * "/users/:userId"のページコンポーネント
+ * 認証情報によってアカウントページの内容を切り替えるコンポーネント
  */
-const AccountPageContent = () => {
+const ConditionalAccountPageContent = () => {
   const { userId } = useParams();
   const { user } = useAuthContext();
   const isMypage = useMemo(() => {
@@ -49,10 +55,13 @@ const AccountPageContent = () => {
   return <>{isMypage && userId ? <MyAccountPage /> : <OtherAccountPage />}</>;
 };
 
+/**
+ * "/users/:userId"のページコンポーネント
+ */
 const AccountPage = () => {
   return (
     <AuthProvider contentOnUnauthenticated={<OtherAccountPage />}>
-      <AccountPageContent />
+      <ConditionalAccountPageContent />
     </AuthProvider>
   );
 };
