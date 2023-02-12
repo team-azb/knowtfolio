@@ -7,10 +7,10 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/team-azb/knowtfolio/server/config"
 	"github.com/team-azb/knowtfolio/server/gateways/aws"
+	"github.com/team-azb/knowtfolio/server/gateways/database"
 	"github.com/team-azb/knowtfolio/server/gateways/ethereum"
 	"github.com/team-azb/knowtfolio/server/models"
 	"go.uber.org/multierr"
-	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"os"
 	"strings"
@@ -49,7 +49,7 @@ func initTestDB(t *testing.T) (db *gorm.DB) {
 		t.Skip("Tests using DB are skipped.")
 	}
 	// Connect to DB.
-	setupDB, err := gorm.Open(mysql.Open(config.DatabaseURI))
+	setupDB, err := database.NewConnection()
 	fatalfIfError(t, err, "DB Connection failed")
 
 	// Create temporary database dedicated to this test call.
@@ -67,7 +67,7 @@ func initTestDB(t *testing.T) (db *gorm.DB) {
 	t.Logf("[%v] Created temporary DB %v!", t.Name(), dbName)
 
 	// Connect to the temporary database.
-	db, err = gorm.Open(mysql.Open(fmt.Sprintf("root:password@tcp(db:3306)/%v?parseTime=true", dbName)), &gorm.Config{FullSaveAssociations: true})
+	db, err = database.NewConnection(database.WithDBName(dbName))
 	fatalfIfError(t, err, "Connection to Created DB %v failed", dbName)
 
 	err = db.AutoMigrate(models.Article{}, models.Document{})
