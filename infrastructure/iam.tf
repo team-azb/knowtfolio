@@ -125,7 +125,7 @@ data "aws_iam_policy_document" "get_cognito_user_as_admin_policy" {
       "cognito-idp:AdminGetUser"
     ]
     resources = [
-      "*"
+      aws_cognito_user_pool.knowtfolio.arn
     ]
   }
 }
