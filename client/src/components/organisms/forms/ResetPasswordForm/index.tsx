@@ -52,8 +52,8 @@ const ResetPasswordForm = () => {
 
   useEffect(() => {
     (async () => {
-      const fieldMessages = await CreateFieldMessages<ResetPasswordForm>(form);
-      setFieldMessages(fieldMessages);
+      const { messages } = await CreateFieldMessages<ResetPasswordForm>(form);
+      setFieldMessages(messages);
     })();
   }, [form]);
 

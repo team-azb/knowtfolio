@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import {
   signUpToCognito,
   SignUpForm,
@@ -32,9 +32,17 @@ const SignUpForm = () => {
     username: "",
   });
   const [fieldMessages, setFieldMessages] = useState<formFieldMessages>({});
+  const [isFormValid, setIsFormValid] = useState(false);
   const [hasSignedUp, setHasSignedUp] = useState(false);
   const [code, setCode] = useState("");
   const navigate = useNavigate();
+
+  const canSubmitForm = useMemo(() => {
+    const isAllFieldsFilled = Object.values(form).every(
+      (value) => value.length > 0
+    );
+    return isFormValid && isAllFieldsFilled;
+  }, [form, isFormValid]);
 
   const onChangeForm = useCallback<React.ChangeEventHandler<HTMLInputElement>>(
     (event) => {
@@ -55,8 +63,11 @@ const SignUpForm = () => {
 
   useEffect(() => {
     (async () => {
-      const fieldMessages = await CreateFieldMessages<SignUpForm>(form);
-      setFieldMessages(fieldMessages);
+      const { messages, isFormValid } = await CreateFieldMessages<SignUpForm>(
+        form
+      );
+      setIsFormValid(isFormValid);
+      setFieldMessages(messages);
     })();
   }, [form]);
 
@@ -173,7 +184,7 @@ const SignUpForm = () => {
         <Grid item container justifyContent="center">
           <Button
             variant="outlined"
-            disabled={hasSignedUp}
+            disabled={!canSubmitForm || hasSignedUp}
             onClick={submitForm}
             style={{ fontSize: "1.4rem" }}
           >

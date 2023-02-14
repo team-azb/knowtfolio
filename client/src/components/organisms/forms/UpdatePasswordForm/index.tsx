@@ -68,10 +68,10 @@ const UpdatePasswordForm = () => {
 
   useEffect(() => {
     (async () => {
-      const fieldMessages = await CreateFieldMessages<UpdatePasswordForm>(
+      const { messages } = await CreateFieldMessages<UpdatePasswordForm>(
         UpdatePasswordForm
       );
-      setFieldMessages(fieldMessages);
+      setFieldMessages(messages);
     })();
   }, [UpdatePasswordForm]);
 
