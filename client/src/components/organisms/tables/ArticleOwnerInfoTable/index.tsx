@@ -36,7 +36,7 @@ const ArticleOwnerInfoTable = ({ ownerId }: articleOwnerInfoTableProps) => {
   const navigate = useNavigate();
 
   return (
-    <Grid container direction="column" spacing={3} style={{}}>
+    <Grid container direction="column" spacing={2}>
       <Grid item container>
         <Grid
           item
@@ -67,6 +67,7 @@ const ArticleOwnerInfoTable = ({ ownerId }: articleOwnerInfoTableProps) => {
           <Grid item>
             {userInfo.website && (
               <LinkIcon
+                fontSize="large"
                 onClick={() => {
                   window.open(userInfo.website);
                 }}
