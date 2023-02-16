@@ -66,7 +66,7 @@ const RegisteredWalletAddressMessage = () => {
  * walletを登録するフォームの本体
  */
 const RegisterWalletFormContent = () => {
-  const { user } = useAuthContext();
+  const { user, session } = useAuthContext();
   const { isConnectedToMetamask, account, web3 } = useWeb3Context();
   const navigate = useNavigate();
 
@@ -82,6 +82,7 @@ const RegisterWalletFormContent = () => {
         userId: user.getUsername(),
         walletAddress: account,
         signature: signature,
+        token: session.getIdToken().getJwtToken(),
       });
       toast.success("Wallet addressの登録に成功しました。");
       navigate("/settings/wallet", {
@@ -92,7 +93,7 @@ const RegisterWalletFormContent = () => {
     } catch (error) {
       toast.error("Wallet addressの登録に失敗しました。");
     }
-  }, [account, isConnectedToMetamask, navigate, user, web3]);
+  }, [account, isConnectedToMetamask, navigate, user, web3, session]);
 
   return (
     <Grid container direction="column" spacing={3}>

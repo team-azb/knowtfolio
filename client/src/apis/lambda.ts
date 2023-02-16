@@ -29,11 +29,20 @@ type postWalletForm = {
   userId: string;
   walletAddress: string;
   signature: string;
+  token: string;
 };
 export const postWalletAddress = async (form: postWalletForm) => {
-  await axios.post("/api/wallet_address", {
-    user_id: form.userId,
-    wallet_address: form.walletAddress,
-    signature: form.signature,
-  });
+  await axios.post(
+    "/api/wallet_address",
+    {
+      user_id: form.userId,
+      wallet_address: form.walletAddress,
+      signature: form.signature,
+    },
+    {
+      headers: {
+        Authorization: `Bearer ${form.token}`,
+      },
+    }
+  );
 };
