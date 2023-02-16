@@ -5,25 +5,19 @@ import (
 	awscfg "github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/ethereum/go-ethereum/ethclient"
-	"github.com/joho/godotenv"
 	"github.com/team-azb/knowtfolio/server/config"
 	"github.com/team-azb/knowtfolio/server/gateways/aws"
+	"github.com/team-azb/knowtfolio/server/gateways/database"
 	"github.com/team-azb/knowtfolio/server/gateways/ethereum"
 	"github.com/team-azb/knowtfolio/server/services"
-	"gorm.io/driver/mysql"
-	"gorm.io/gorm"
 	"net/http"
 )
 
 func main() {
 	logger := services.NewLogger("main", true)
 
-	// Load .env
-	err := godotenv.Load()
-	logger.Err(err)
-
 	// Connect to DB
-	db, err := gorm.Open(mysql.Open(config.DatabaseURI), &gorm.Config{FullSaveAssociations: true})
+	db, err := database.NewConnection()
 	if err != nil {
 		logger.Fatal().Msgf("Failed to connect with DB: %v", err)
 	}
