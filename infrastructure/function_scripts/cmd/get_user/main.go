@@ -57,11 +57,11 @@ func handler(ctx context.Context, request events.LambdaFunctionURLRequest) (even
 
 	address := res.Item["wallet_address"].(*dynamodbTypes.AttributeValueMemberS).Value
 
-	userInfo := &models.PublicUserInfo{
+	userInfo := &models.UserInfo{
 		UserName:      *user.Username,
 		Biography:     biography,
-		Website:       website,
-		Picture:       picture,
+		WebsiteUrl:    website,
+		IconUrl:       picture,
 		WalletAddress: address,
 	}
 

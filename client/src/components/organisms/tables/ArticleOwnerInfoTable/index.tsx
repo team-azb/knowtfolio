@@ -1,7 +1,7 @@
 import { Grid } from "@mui/material";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import { getUser, PublicUserInfo } from "~/apis/lambda";
+import { getUser, UserInfo } from "~/apis/lambda";
 import IconImage from "~/components/atoms/IconImage";
 import WalletAddressDisplay from "../../WalletAddressDisplay";
 import LinkIcon from "@mui/icons-material/Link";
@@ -16,10 +16,10 @@ type articleOwnerInfoTableProps = {
  * @ownerId オーナーのuserId
  */
 const ArticleOwnerInfoTable = ({ ownerId }: articleOwnerInfoTableProps) => {
-  const [userInfo, setUserInfo] = useState<PublicUserInfo>({
+  const [userInfo, setUserInfo] = useState<UserInfo>({
     username: "",
-    picture: "",
-    website: "",
+    icon_url: "",
+    website_url: "",
     biography: "",
     wallet_address: "",
   });
@@ -46,7 +46,7 @@ const ArticleOwnerInfoTable = ({ ownerId }: articleOwnerInfoTableProps) => {
           }}
           style={{ cursor: "pointer" }}
         >
-          <IconImage size={60} url={userInfo.picture} />
+          <IconImage size={60} url={userInfo.icon_url} />
         </Grid>
         <Grid
           item
@@ -65,11 +65,11 @@ const ArticleOwnerInfoTable = ({ ownerId }: articleOwnerInfoTableProps) => {
             )}
           </Grid>
           <Grid item>
-            {userInfo.website && (
+            {userInfo.website_url && (
               <LinkIcon
                 fontSize="large"
                 onClick={() => {
-                  window.open(userInfo.website);
+                  window.open(userInfo.website_url);
                 }}
                 style={{ cursor: "pointer" }}
               />

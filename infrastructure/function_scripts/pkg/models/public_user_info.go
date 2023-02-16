@@ -1,9 +1,9 @@
 package models
 
-type PublicUserInfo struct {
+type UserInfo struct {
 	UserName      string `json:"username"`
-	Website       string `json:"website"`
-	Picture       string `json:"picture"`
+	WebsiteUrl    string `json:"website_url"`
+	IconUrl       string `json:"icon_url"`
 	Biography     string `json:"biography"`
 	WalletAddress string `json:"wallet_address"`
 }

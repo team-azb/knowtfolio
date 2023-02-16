@@ -38,14 +38,14 @@ export const postWalletAddress = async (form: postWalletForm) => {
   });
 };
 
-export type PublicUserInfo = {
+export type UserInfo = {
   username: string;
-  picture: string;
-  website: string;
+  icon_url: string;
+  website_url: string;
   biography: string;
   wallet_address: string;
 };
 export const getUser = async (userId: string) => {
-  const { data } = await axios.get<PublicUserInfo>(`/api/users/${userId}`);
+  const { data } = await axios.get<UserInfo>(`/api/users/${userId}`);
   return data;
 };

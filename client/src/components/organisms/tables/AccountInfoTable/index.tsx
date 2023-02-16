@@ -1,7 +1,7 @@
 import { Grid } from "@mui/material";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import { getUser, PublicUserInfo } from "~/apis/lambda";
+import { getUser, UserInfo } from "~/apis/lambda";
 import IconImage from "~/components/atoms/IconImage";
 import WalletAddressDisplay from "../../WalletAddressDisplay";
 
@@ -13,10 +13,10 @@ type accountInfoTableProps = {
  * ユーザー情報を表示するテーブル
  */
 const AccountInfoTable = ({ userId }: accountInfoTableProps) => {
-  const [userInfo, setUserInfo] = useState<PublicUserInfo>({
+  const [userInfo, setUserInfo] = useState<UserInfo>({
     username: "",
-    picture: "",
-    website: "",
+    icon_url: "",
+    website_url: "",
     biography: "",
     wallet_address: "",
   });
@@ -39,7 +39,7 @@ const AccountInfoTable = ({ userId }: accountInfoTableProps) => {
       </Grid>
       <Grid item container spacing={5}>
         <Grid item>
-          <IconImage url={userInfo.picture} />
+          <IconImage url={userInfo.icon_url} />
         </Grid>
         <Grid item flexGrow={1}>
           <Grid container direction="column" spacing={2}>
@@ -50,9 +50,9 @@ const AccountInfoTable = ({ userId }: accountInfoTableProps) => {
             <Grid item container>
               <Grid xs={2}>Website</Grid>
               <Grid xs={10}>
-                {userInfo.website ? (
-                  <a href={userInfo.website} style={{ color: "#000" }}>
-                    {userInfo.website}
+                {userInfo.website_url ? (
+                  <a href={userInfo.website_url} style={{ color: "#000" }}>
+                    {userInfo.website_url}
                   </a>
                 ) : (
                   "-"
