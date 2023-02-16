@@ -14,6 +14,23 @@ resource "aws_iam_user_policy" "knowtfolio_nft_io" {
   })
 }
 
+data "aws_iam_policy_document" "read_dev_ssm_params" {
+  statement {
+    actions = [
+      "ssm:GetParameter"
+    ]
+    resources = [
+      "arn:aws:ssm:*:*:parameter/dev/*"
+    ]
+  }
+}
+
+resource "aws_iam_user_policy" "backend_read_dev_ssm_params" {
+  name   = "backend-ssm"
+  user   = aws_iam_user.knowtfolio_admin.name
+  policy = data.aws_iam_policy_document.read_dev_ssm_params.json
+}
+
 data "aws_iam_policy_document" "backend_test" {
   statement {
     actions = [

@@ -1,13 +1,13 @@
 resource "aws_db_instance" "knowtfolio_db" {
   identifier             = "knowtfolio-db"
-  db_name                = "knowtfolio_db"
+  db_name                = aws_ssm_parameter.db_name.value
   allocated_storage      = 20 # 無料枠は20GBまでなので、初期値もこれに合わせる
   max_allocated_storage  = 100
   engine                 = "mysql"
   engine_version         = "8.0"
   instance_class         = "db.t2.micro"
-  username               = "admin"
-  password               = "password"
+  username               = aws_ssm_parameter.db_user.value
+  password               = aws_ssm_parameter.db_password.value
   vpc_security_group_ids = [aws_security_group.knowtfolio_db.id]
   db_subnet_group_name   = aws_db_subnet_group.knowtfolio_db.name
   skip_final_snapshot    = true
