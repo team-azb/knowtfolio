@@ -17,8 +17,8 @@ var (
 
 // cognito
 var (
-	CognitoUserPoolId = os.Getenv("USER_POOL_ID")
-	CognitoClientId   = os.Getenv("CLIENT_ID")
+	CognitoUserPoolId = os.Getenv("COGNITO_USER_POOL_ID")
+	CognitoClientId   = os.Getenv("COGNITO_CLIENT_ID")
 	CognitoClient     = cognitoidentityprovider.New(cognitoidentityprovider.Options{
 		Credentials: DefaultConfig.Credentials,
 		Region:      Region,

@@ -110,8 +110,8 @@ resource "aws_lambda_function" "auth_endpoints" {
 
   environment {
     variables = {
-      USER_POOL_ID = aws_cognito_user_pool.knowtfolio.id
-      CLIENT_ID    = aws_cognito_user_pool_client.knowtfolio.id
+      COGNITO_USER_POOL_ID = aws_cognito_user_pool.knowtfolio.id
+      COGNITO_CLIENT_ID    = aws_cognito_user_pool_client.knowtfolio.id
     }
   }
 }
