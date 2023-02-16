@@ -65,7 +65,13 @@ func handler(ctx context.Context, request events.LambdaFunctionURLRequest) (even
 		WalletAddress: address,
 	}
 
-	jsonBody, _ := json.Marshal(userInfo)
+	jsonBody, err := json.Marshal(userInfo)
+	if err != nil {
+		return events.LambdaFunctionURLResponse{
+			StatusCode: http.StatusInternalServerError,
+			Body:       err.Error(),
+		}, nil
+	}
 
 	return events.LambdaFunctionURLResponse{
 		StatusCode: http.StatusOK,
