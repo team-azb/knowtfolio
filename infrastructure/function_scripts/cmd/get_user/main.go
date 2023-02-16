@@ -54,7 +54,7 @@ func handler(ctx context.Context, request events.LambdaFunctionURLRequest) (even
 		ProjectionExpression: aws.String("wallet_address"),
 		ConsistentRead:       aws.Bool(true),
 	})
-	// `wallet_address` should exist after passing the `define` phase.
+
 	address := res.Item["wallet_address"].(*dynamodbTypes.AttributeValueMemberS).Value
 
 	userInfo := &models.PublicUserInfo{
