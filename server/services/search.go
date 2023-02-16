@@ -44,15 +44,19 @@ func (s searchService) SearchForArticles(_ context.Context, request *search.Sear
 			return nil, err
 		}
 
-		ownedArticleIDs, err := s.Contract.GetArticleIdsOwnedBy(&bind.CallOpts{}, *ownedByAddr)
-		for i, url := range ownedArticleIDs {
-			// TODO: Do this part on the contract side.
-			ownedArticleIDs[i] = strings.TrimPrefix(url, "https://knowtfolio.com/nfts/")
+		var ownedArticleIDs []string
+		if ownedByAddr != nil {
+			ownedArticleIDs, err = s.Contract.GetArticleIdsOwnedBy(&bind.CallOpts{}, *ownedByAddr)
+			if err != nil {
+				return nil, err
+			}
+
+			for i, url := range ownedArticleIDs {
+				// TODO: Do this part on the contract side.
+				ownedArticleIDs[i] = strings.TrimPrefix(url, "https://knowtfolio.com/nfts/")
+			}
 		}
 
-		if err != nil {
-			return nil, err
-		}
 		ownedByCond := s.DB.
 			// Articles that has been tokenized and whose token is owned by the user.
 			Where(`articles.id IN ?`, ownedArticleIDs).
