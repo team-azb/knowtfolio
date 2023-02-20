@@ -65,7 +65,7 @@ func (s searchService) SearchForArticles(_ context.Context, request *search.Sear
 		baseQuery = baseQuery.Where(ownedByCond)
 	}
 	if request.Keywords != nil {
-		keywords := strings.Split(*request.Keywords, " ")
+		keywords := strings.Fields(*request.Keywords)
 		for _, keyword := range keywords {
 			baseQuery = baseQuery.Where(`raw_text LIKE ?`, fmt.Sprintf("%%%s%%", keyword))
 		}
