@@ -65,11 +65,10 @@ func (s searchService) SearchForArticles(_ context.Context, request *search.Sear
 		baseQuery = baseQuery.Where(ownedByCond)
 	}
 	if request.Keywords != nil {
-		keywords := strings.Split(*request.Keywords, "+")
-		for i := range keywords {
-			keywords[i] = fmt.Sprintf(`"%v"`, keywords[i])
+		keywords := strings.Split(*request.Keywords, " ")
+		for _, keyword := range keywords {
+			baseQuery = baseQuery.Where(`raw_text LIKE ?`, fmt.Sprintf("%%%s%%", keyword))
 		}
-		baseQuery = baseQuery.Where(`MATCH(title, raw_text) against(? IN BOOLEAN MODE)`, strings.Join(keywords, " "))
 	}
 
 	// NOTE: Need to call `Session` here to make baseQuery sharable.

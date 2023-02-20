@@ -32,6 +32,14 @@ func TestSetContentIfPresent(t *testing.T) {
 	assert.Equal(t, newContent, string(actual.Content), "Content should be set by SetContentIfPresent.")
 }
 
+func TestReloadRawText(t *testing.T) {
+	actual := Document{Title: "Hello Knowtfolio!", Content: []byte("<div> Hello HTML! </div>")}
+	actual.reloadRawText()
+	expectedRawText := "Hello Knowtfolio!\n Hello HTML! "
+
+	assert.Equal(t, expectedRawText, actual.RawText)
+}
+
 func TestSanitizedContent(t *testing.T) {
 	rawContent := `
 		<div> Hello HTML! </div>

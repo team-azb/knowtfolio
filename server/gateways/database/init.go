@@ -51,6 +51,12 @@ func NewConnection(opts ...ConnectionOption) (*gorm.DB, error) {
 	}
 
 	db, err := gorm.Open(gormmysql.Open(cfg.FormatDSN()), &gorm.Config{FullSaveAssociations: true})
+
+	// Output SQL on local execution.
+	if err != nil && config.EnvName == "local" {
+		db = db.Debug()
+	}
+
 	return db, err
 }
 
