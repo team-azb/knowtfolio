@@ -2,11 +2,12 @@ package aws_utils
 
 import (
 	"context"
+	"os"
+
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/service/cognitoidentityprovider"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	"github.com/aws/aws-sdk-go-v2/service/lambda"
-	"os"
 )
 
 // common
@@ -32,6 +33,10 @@ var (
 		Region:      Region,
 	})
 	DynamoDBClient = dynamodb.New(dynamodb.Options{
+		Credentials: DefaultConfig.Credentials,
+		Region:      Region,
+	})
+	CognitoIdentityProviderClient = cognitoidentityprovider.New(cognitoidentityprovider.Options{
 		Credentials: DefaultConfig.Credentials,
 		Region:      Region,
 	})

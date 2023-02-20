@@ -12,17 +12,20 @@ const ContentOnEditable = ({ articleId }: { articleId: string }) => {
   return <EditArticleForm articleId={articleId} />;
 };
 
-const contentOnNotEditable = (
-  <div style={{ padding: "100px 400px" }}>
-    <h2>サインイン中のアカウントに記事の編集権限がありません</h2>
-    <p>
-      <Link to="/mypage" style={{ color: "#000" }}>
-        マイページ
-      </Link>
-      にて編集可能な記事をご確認ください
-    </p>
-  </div>
-);
+const ContentOnNotEditable = () => {
+  const { user } = useAuthContext();
+  return (
+    <div style={{ padding: "100px 400px" }}>
+      <h2>サインイン中のアカウントに記事の編集権限がありません</h2>
+      <p>
+        <Link to={`/users/${user.getUsername()}`} style={{ color: "#000" }}>
+          マイページ
+        </Link>
+        にて編集可能な記事をご確認ください
+      </p>
+    </div>
+  );
+};
 
 /**
  * "/articles/:ariticleId/edit"で表示されるページコンポーネント
@@ -51,7 +54,7 @@ const EditArticlePage = () => {
         </div>
       );
     } else {
-      return contentOnNotEditable;
+      return <ContentOnNotEditable />;
     }
   }, [articleId, isAuthorized, isConnectedToMetamask, ownerIdOfArticle]);
 

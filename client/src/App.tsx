@@ -56,14 +56,9 @@ const App = () => {
               }
             />
           </Route>
-          <Route
-            path="/mypage"
-            element={
-              <AuthProvider>
-                <AccountPage />
-              </AuthProvider>
-            }
-          />
+          <Route path="/users">
+            <Route path=":userId" element={<AccountPage />} />
+          </Route>
           <Route
             path="/upload-image"
             element={

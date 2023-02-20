@@ -10,7 +10,7 @@ const pageSize = 12;
 /**
  * ユーザーが所有している記事を一覧表示できるテーブル
  */
-const OwnedArticleTable = () => {
+const OwnedArticlesTable = () => {
   const { user } = useAuthContext();
   const [articles, setArticles] = useState<SearchResultEntry[]>([]);
   const [searchParams, setSearchParams] = useSearchParams();
@@ -72,4 +72,4 @@ const OwnedArticleTable = () => {
   );
 };
 
-export default OwnedArticleTable;
+export default OwnedArticlesTable;

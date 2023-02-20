@@ -244,7 +244,7 @@ const ResetProfileForm = () => {
                 <Button
                   variant="contained"
                   style={{ fontSize: "1.4rem" }}
-                  onClick={() => navigate("/mypage")}
+                  onClick={() => navigate(`/users/${user.getUsername()}`)}
                 >
                   cancel
                 </Button>
