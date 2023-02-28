@@ -51,6 +51,7 @@ resource "null_resource" "golang_functions_to_s3" {
     # We also need to upload the hash of the zip file to fill aws_lambda_function.source_code_hash.
     # Ref: https://dev.classmethod.jp/articles/deploy-golang-lambda-function-with-terraform
     command = <<EOT
+      set -e
       go build -o ./bin/${each.key} ./cmd/${each.key}
 
       zip -j ./archive/${each.key}.zip ./bin/${each.key}
