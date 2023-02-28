@@ -8,7 +8,7 @@ resource "aws_cognito_user_pool" "knowtfolio" {
     allow_admin_create_user_only = false
   }
   schema {
-    name                = "phone_number"
+    name                = "email"
     attribute_data_type = "String"
     required            = true
     string_attribute_constraints {
@@ -40,7 +40,7 @@ resource "aws_cognito_user_pool" "knowtfolio" {
     external_id    = random_id.external_id.id
   }
 
-  auto_verified_attributes = ["phone_number"]
+  auto_verified_attributes = ["email"]
 }
 
 resource "aws_cognito_user_pool_client" "knowtfolio" {
