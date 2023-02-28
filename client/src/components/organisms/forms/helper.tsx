@@ -8,8 +8,7 @@ import { UpdatePasswordForm } from "~/components/organisms/forms/UpdatePasswordF
 const messagesOnInvalidFormError = {
   username: "適切なユーザーネームではありません。",
   password: "大文字・小文字・数字・記号を含む８文字以上である必要があります。",
-  phone_number:
-    "適切な電話番号ではありません。（日本国以外の電話番号は利用できません。）",
+  email: "適切なEmailアドレスではありません。",
   wallet_address: "適切なwallet addressではありません。",
   password_confirmation: "パスワードが一致していません。",
 } as const;

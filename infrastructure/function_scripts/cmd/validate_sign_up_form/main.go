@@ -63,7 +63,7 @@ func handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 	if err != nil {
 		return events.APIGatewayProxyResponse{}, err
 	}
-	err = checkDuplicateValueForField(ctx, "phone_number", form.PhoneNumber, &fieldErrs)
+	err = checkDuplicateValueForField(ctx, "email", form.Email, &fieldErrs)
 	if err != nil {
 		return events.APIGatewayProxyResponse{}, err
 	}
