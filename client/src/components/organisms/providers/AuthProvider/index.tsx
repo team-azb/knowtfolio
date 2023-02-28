@@ -91,7 +91,7 @@ const AuthProvider = ({
         );
 
         if (!email) {
-          throw new Error("Phone number is not registered.");
+          throw new Error("Email is not registered.");
         }
         setAuth({
           user: cognitoUser,

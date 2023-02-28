@@ -49,7 +49,7 @@ const MyAccountInfoTable = () => {
             </Grid>
             <Grid item container>
               <Grid xs={2}>Email</Grid>
-              <Grid xs={10}>{email || "-"}</Grid>
+              <Grid xs={10}>{email}</Grid>
             </Grid>
             <Grid item container>
               <Grid xs={2}>Website</Grid>
