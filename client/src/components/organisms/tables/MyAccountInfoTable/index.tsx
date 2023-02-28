@@ -13,7 +13,7 @@ import IconImage from "~/components/atoms/IconImage";
 const MyAccountInfoTable = () => {
   const {
     user,
-    attributes: { phoneNumber, email, website, description, picture },
+    attributes: { email, website, description, picture },
     userWalletAddress,
   } = useAuthContext();
   const navigate = useNavigate();
@@ -46,10 +46,6 @@ const MyAccountInfoTable = () => {
             <Grid item container>
               <Grid xs={2}>Username</Grid>
               <Grid xs={10}>{user.getUsername()}</Grid>
-            </Grid>
-            <Grid item container>
-              <Grid xs={2}>Phone number</Grid>
-              <Grid xs={10}>{phoneNumber}</Grid>
             </Grid>
             <Grid item container>
               <Grid xs={2}>Email</Grid>

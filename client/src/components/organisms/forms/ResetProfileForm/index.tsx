@@ -17,7 +17,6 @@ import IconImage from "~/components/atoms/IconImage";
 import imageCompression from "browser-image-compression";
 
 type profileForm = {
-  email?: string;
   website?: string;
   description?: string;
   picture?: string;
@@ -52,10 +51,9 @@ const descriptionMaxLength = 160;
 const ResetProfileForm = () => {
   const {
     user,
-    attributes: { phoneNumber, email, website, description, picture },
+    attributes: { email, website, description, picture },
   } = useAuthContext();
   const [profileForm, setProfileForm] = useState<profileForm>({
-    email,
     website,
     description,
   });
@@ -171,18 +169,9 @@ const ResetProfileForm = () => {
               <Grid item>{user.getUsername()}</Grid>
             </Grid>
             <Grid item container direction="column">
-              <Label>Phone number</Label>
-              <Grid item>{phoneNumber}</Grid>
+              <Label>Email</Label>
+              <Grid item>{email}</Grid>
             </Grid>
-            <Input
-              name="email"
-              id="email"
-              label="Email"
-              type="text"
-              placeholder="メールアドレスを入力"
-              value={profileForm.email}
-              onChange={handleChangeForm}
-            />
             <Input
               name="website"
               id="website"
