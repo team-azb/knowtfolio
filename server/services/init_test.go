@@ -3,6 +3,11 @@ package services
 import (
 	"context"
 	"fmt"
+	"os"
+	"strings"
+	"sync"
+	"testing"
+
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/team-azb/knowtfolio/server/config"
@@ -12,25 +17,21 @@ import (
 	"github.com/team-azb/knowtfolio/server/models"
 	"go.uber.org/multierr"
 	"gorm.io/gorm"
-	"os"
-	"strings"
-	"sync"
-	"testing"
 )
 
 var (
 	adminAddr = "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC"
 	testUsers = []testUser{
 		{
-			ID:          "test-user0",
-			Password:    "Password#0",
-			PhoneNumber: "+81120345678",
-			Address:     "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+			ID:       "test-user0",
+			Password: "Password#0",
+			Email:    "user0@example.com",
+			Address:  "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
 		}, {
-			ID:          "test-user1",
-			Password:    "Password#1",
-			PhoneNumber: "+81120987654",
-			Address:     "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
+			ID:       "test-user1",
+			Password: "Password#1",
+			Email:    "user1@sample.com",
+			Address:  "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
 		},
 	}
 	transactionLock = map[string]*sync.Mutex{testUsers[0].Address: {}, testUsers[1].Address: {}, adminAddr: {}}
@@ -115,11 +116,11 @@ func initTestContractClient(t *testing.T) *ethereum.ContractClient {
 }
 
 type testUser struct {
-	ID          string
-	Password    string
-	PhoneNumber string
-	Address     string
-	IDToken     string
+	ID       string
+	Password string
+	Email    string
+	Address  string
+	IDToken  string
 }
 
 func (u *testUser) GetUserIDContext() context.Context {
@@ -127,7 +128,7 @@ func (u *testUser) GetUserIDContext() context.Context {
 }
 
 func (u *testUser) registerToAWS() error {
-	err := cognitoClient.CreateUserWithPassword(u.ID, u.Password, u.PhoneNumber)
+	err := cognitoClient.CreateUserWithPassword(u.ID, u.Password, u.Email)
 	if err != nil {
 		return err
 	}
