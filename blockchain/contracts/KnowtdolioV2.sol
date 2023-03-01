@@ -7,9 +7,7 @@ import "@openzeppelin/contracts-upgradeable/utils/CountersUpgradeable.sol";
 import "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import "./Knowtfolio.sol";
 
-contract KnowtfolioV2 is
-    Knowtfolio
-{
+contract KnowtfolioV2 is Knowtfolio {
     /**
      * @dev Get token id of the NFT of `articleId`
      */
