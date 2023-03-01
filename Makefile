@@ -67,12 +67,15 @@ $(ARTICLE_PAGE_TEMPLATE): $(CLIENT_SRCS) $(CLIENT_NODE_MODULES_DIR)
 server/build/server: $(GOA_GEN_DIR) $(GO_ETH_BINDING_PATH)
 	docker-compose run server go build -o build/server
 
-.PHONY: app client server goa test-sv checkfmt-sv go-eth-binding \
+.PHONY: app hardhat-bash client server goa test-sv checkfmt-sv go-eth-binding \
 	init-tf fmt-tf checkfmt-tf plan-tf apply-tf clean
 
 app: $(CLIENT_DIST_DIR) goa go-eth-binding $(ARTICLE_PAGE_TEMPLATE)
 	docker-compose up --build client server
 
+### BlockChain ###
+hardhat-bash:
+	docker-compose run hardhat bash
 
 ### Client ###
 
