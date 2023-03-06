@@ -3,6 +3,7 @@ locals {
 
   golang_functions_dependencies = setunion(
     fileset(path.module, "function_scripts/pkg/**/*.go"),
+    fileset(path.module, "../server/gateways/aws/**/*.go"),
     fileset(path.module, "../server/gateways/ethereum/**/*.go")
   )
 

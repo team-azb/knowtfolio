@@ -4,16 +4,14 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/team-azb/knowtfolio/server/gateways/aws"
 	"net/http"
 	"path"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
-	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/cognitoidentityprovider"
 	"github.com/aws/aws-sdk-go-v2/service/cognitoidentityprovider/types"
-	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
-	dynamodbTypes "github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
 	"github.com/team-azb/knowtfolio/infrastructure/function_scripts/pkg/aws_utils"
 	"github.com/team-azb/knowtfolio/infrastructure/function_scripts/pkg/models"
 )
@@ -46,23 +44,15 @@ func handler(ctx context.Context, request events.LambdaFunctionURLRequest) (even
 	website := searchAttribute(user.UserAttributes, "website")
 	picture := searchAttribute(user.UserAttributes, "picture")
 
-	res, _ := aws_utils.DynamoDBClient.GetItem(ctx, &dynamodb.GetItemInput{
-		TableName: &aws_utils.DynamoDBUserTableName,
-		Key: map[string]dynamodbTypes.AttributeValue{
-			"user_id": &dynamodbTypes.AttributeValueMemberS{Value: username},
-		},
-		ProjectionExpression: aws.String("wallet_address"),
-		ConsistentRead:       aws.Bool(true),
-	})
-
-	address := res.Item["wallet_address"].(*dynamodbTypes.AttributeValueMemberS).Value
+	dynamoDB := aws.NewDynamoDBClient()
+	address, err := dynamoDB.GetAddressByID(username)
 
 	userInfo := &models.UserInfo{
 		UserName:      *user.Username,
 		Biography:     biography,
 		WebsiteUrl:    website,
 		IconUrl:       picture,
-		WalletAddress: address,
+		WalletAddress: address.String(),
 	}
 
 	jsonBody, err := json.Marshal(userInfo)

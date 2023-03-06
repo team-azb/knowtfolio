@@ -9,13 +9,23 @@ require (
 	github.com/aws/aws-sdk-go-v2 v1.17.4
 	github.com/aws/aws-sdk-go-v2/config v1.15.14
 	github.com/aws/aws-sdk-go-v2/service/cognitoidentityprovider v1.21.3
-	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.17.8
 	github.com/aws/aws-sdk-go-v2/service/lambda v1.24.8
 	github.com/go-playground/validator/v10 v10.11.1
 	github.com/team-azb/knowtfolio/server v0.0.0-00010101000000-000000000000
 )
 
-require golang.org/x/sync v0.0.0-20220722155255-886fb9371eb4 // indirect
+require (
+	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.17.8 // indirect
+	github.com/aws/aws-sdk-go-v2/service/ssm v1.35.2 // indirect
+	github.com/goccy/go-json v0.9.11 // indirect
+	github.com/lestrrat-go/blackmagic v1.0.1 // indirect
+	github.com/lestrrat-go/httpcc v1.0.1 // indirect
+	github.com/lestrrat-go/httprc v1.0.4 // indirect
+	github.com/lestrrat-go/iter v1.0.2 // indirect
+	github.com/lestrrat-go/jwx/v2 v2.0.8 // indirect
+	github.com/lestrrat-go/option v1.0.0 // indirect
+	golang.org/x/sync v0.0.0-20220722155255-886fb9371eb4 // indirect
+)
 
 require (
 	github.com/StackExchange/wmi v0.0.0-20180116203802-5d049714c4a6 // indirect
