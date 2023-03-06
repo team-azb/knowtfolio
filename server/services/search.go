@@ -2,7 +2,9 @@ package services
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"github.com/aws/smithy-go"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/team-azb/knowtfolio/server/gateways/api/gen/http/search/server"
@@ -41,7 +43,12 @@ func (s searchService) SearchForArticles(_ context.Context, request *search.Sear
 	if request.OwnedBy != nil {
 		ownedByAddr, err = s.DynamoDBClient.GetAddressByID(*request.OwnedBy)
 		if err != nil {
-			return nil, err
+			var apiErr smithy.APIError
+			if errors.As(err, &apiErr) && apiErr.ErrorCode() == aws.ItemNotFoundCode {
+				ownedByAddr = nil
+			} else {
+				return nil, err
+			}
 		}
 
 		var ownedArticleIDs []string
