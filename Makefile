@@ -99,7 +99,7 @@ server: goa go-eth-binding $(ARTICLE_PAGE_TEMPLATE)
 	docker-compose up --build server
 
 test: goa go-eth-binding $(ARTICLE_PAGE_TEMPLATE)
-	docker-compose up --build test
+	docker-compose up --build --abort-on-container-exit test
 
 checkfmt-sv: $(SERVER_SRCS)
 	docker-compose run server test -z $$(gofmt -e -l .)
