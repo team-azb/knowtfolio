@@ -40,9 +40,10 @@ export const fetchWalletAddress = async (
   userId: string
 ) => {
   const params: GetItemCommandInput = {
-    TableName: "user_to_wallet",
+    TableName: "knowtfolio",
     Key: {
-      user_id: { S: userId },
+      type: { S: "user_id_to_wallet_address" },
+      key: { S: userId },
     },
   };
   const command = new GetItemCommand(params);
