@@ -7,7 +7,6 @@ GOA_DIR = server/gateways/api
 GOA_DESIGN_DIR = $(GOA_DIR)/design
 GOA_GEN_DIR = $(GOA_DIR)/gen
 GOA_DOCKER_FILE = server/goa.Dockerfile
-CLIENT_SRCS = $(wildcard $(CLIENT_SRC_DIR)/*.tsx)
 ARTICLE_PAGE_TEMPLATE = server/static/article_template.html
 
 GO_ETH_BINDING_PATH = server/gateways/ethereum/binding.go
@@ -32,9 +31,6 @@ $(CLIENT_NODE_MODULES_DIR): ./client/package.json ./client/Dockerfile $(CONTRACT
 	docker-compose run client npm install
 	# To avoid this target from running repeatedly when the `node_modules` dir is not updated by the command above.
 	touch $(CLIENT_NODE_MODULES_DIR)
-
-$(CLIENT_DIST_DIR): ./client/webpack.config.js $(CLIENT_NODE_MODULES_DIR) $(CLIENT_SRC_DIR)
-	docker-compose run client npm run build
 
 $(GOA_GEN_DIR): $(GOA_DESIGN_DIR) $(GOA_DOCKER_FILE) ./server/go.mod
 	docker-compose up --build goa
@@ -64,7 +60,7 @@ $(CONTRACT_BIN_FILE): $(CONTRACT_JSON_FILE)
 	docker-compose run hardhat \
     	/bin/bash -c "cat $(CONTRACT_JSON_FILE) | jq -r '.bytecode' > $(CONTRACT_BIN_FILE)"
 
-$(ARTICLE_PAGE_TEMPLATE): $(CLIENT_SRCS) $(CLIENT_NODE_MODULES_DIR)
+$(ARTICLE_PAGE_TEMPLATE): ./client/webpack.config.js $(CLIENT_SRC_DIR) $(CLIENT_NODE_MODULES_DIR)
 	docker-compose run --no-deps client npm run build
 	docker-compose run --no-deps client node dist/insertPageContent.js
 	mv -f $(CLIENT_DIST_DIR)/article_template.html $(ARTICLE_PAGE_TEMPLATE)
@@ -76,22 +72,22 @@ server/build/server: $(GOA_GEN_DIR) $(GO_ETH_BINDING_PATH)
 .PHONY: app client server goa test-sv checkfmt-sv go-eth-binding \
 	init-tf fmt-tf checkfmt-tf plan-tf apply-tf clean
 
-app: $(CLIENT_DIST_DIR) goa go-eth-binding $(ARTICLE_PAGE_TEMPLATE)
+app: goa go-eth-binding $(CLIENT_NODE_MODULES_DIR) $(ARTICLE_PAGE_TEMPLATE)
 	docker-compose up --build client server
 
 
 ### Client ###
 
-client: $(CLIENT_DIST_DIR)
+client: $(CLIENT_NODE_MODULES_DIR)
 	docker-compose up --build client
 
-fmt-cl: $(CLIENT_NODE_MODULES_DIR) $(CLIENT_SRC_DIR)
+fmt-cl: $(CLIENT_NODE_MODULES_DIR)
 	docker-compose run client npm run format
 
-checkfmt-cl: $(CLIENT_NODE_MODULES_DIR) $(CLIENT_SRC_DIR)
+checkfmt-cl: $(CLIENT_NODE_MODULES_DIR)
 	docker-compose run client npx prettier --check 'src/**/*.ts' 'src/**/*.tsx' 'src/**/*.html' 'src/**/*.css' 'webpack.*.js'
 
-lint-cl: $(CLIENT_NODE_MODULES_DIR) $(CLIENT_SRC_DIR)
+lint-cl: $(CLIENT_NODE_MODULES_DIR)
 	docker-compose run client npm run lint
 
 
