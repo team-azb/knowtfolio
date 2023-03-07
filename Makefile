@@ -118,7 +118,7 @@ checkfmt-tf:
 plan-tf:
 	docker-compose run terraform plan
 
-apply-tf:
+apply-tf: go-eth-binding
 	docker-compose run terraform apply
 
 clean:
