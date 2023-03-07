@@ -30,6 +30,8 @@ HOST_GID = $(shell id -g ${USER})
 $(CLIENT_NODE_MODULES_DIR): ./client/package.json ./client/Dockerfile $(CONTRACT_JSON_FILE)
 	docker-compose build client
 	docker-compose run client npm install
+	# To avoid this target from running repeatedly when the `node_modules` dir is not updated by the command above.
+	touch $(CLIENT_NODE_MODULES_DIR)
 
 $(CLIENT_DIST_DIR): ./client/webpack.config.js $(CLIENT_NODE_MODULES_DIR) $(CLIENT_SRC_DIR)
 	docker-compose run client npm run build
@@ -44,9 +46,13 @@ $(GO_ETH_BINDING_PATH): $(CONTRACT_ABI_FILE) $(CONTRACT_BIN_FILE)
 $(BLOCKCHAIN_NODE_MODULES_DIR): ./blockchain/package.json ./blockchain/Dockerfile
 	docker-compose build hardhat
 	docker-compose run hardhat npm --prefix ./blockchain install
+	# To avoid this target from running repeatedly when the `node_modules` dir is not updated by the command above.
+	touch $(BLOCKCHAIN_NODE_MODULES_DIR)
 
 $(CONTRACT_JSON_FILE): $(CONTRACT_SOL_FILE) $(BLOCKCHAIN_NODE_MODULES_DIR)
 	docker-compose run hardhat npm --prefix ./blockchain run build
+	# To avoid this target from running repeatedly when the json is not updated by the command above.
+	touch $(CONTRACT_JSON_FILE)
 
 # Extract abi field from `$(CONTRACT_JSON_FILE)`.
 $(CONTRACT_ABI_FILE): $(CONTRACT_JSON_FILE)
