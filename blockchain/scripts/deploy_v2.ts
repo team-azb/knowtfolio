@@ -6,7 +6,6 @@
 import { ethers, upgrades } from "hardhat";
 import "@openzeppelin/hardhat-upgrades";
 import { assert } from "console";
-// import Knowtfolio from "../artifacts/contracts/Knowtfolio.sol/Knowtfolio.json";
 
 const proxyAddress = process.env.CONTRACT_ADDRESS;
 
