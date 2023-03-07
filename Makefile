@@ -7,7 +7,7 @@ GOA_DIR = server/gateways/api
 GOA_DESIGN_DIR = $(GOA_DIR)/design
 GOA_GEN_DIR = $(GOA_DIR)/gen
 GOA_DOCKER_FILE = server/goa.Dockerfile
-CLIENT_SRCS = $(wildcard $(CLIENT_SRC_DIR)/*.tsx)
+CLIENT_SRCS = $(shell find $(CLIENT_SRC_DIR) -type f)
 ARTICLE_PAGE_TEMPLATE = server/static/article_template.html
 
 GO_ETH_BINDING_PATH = server/gateways/ethereum/binding.go
