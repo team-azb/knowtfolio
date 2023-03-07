@@ -12,7 +12,7 @@ import { AbiItem } from "web3-utils";
 import { Contract } from "web3-eth-contract";
 import { CONTRACT_ADDRESS } from "~/configs/blockchain";
 // json file in blockchain directory
-import Knowtfolio from "../../../../../../blockchain/artifacts/contracts/Knowtfolio.sol/Knowtfolio.json";
+import Knowtfolio from "../../../../../../blockchain/artifacts/contracts/KnowtfolioV2.sol/KnowtfolioV2.json";
 
 type web3Context =
   | {
