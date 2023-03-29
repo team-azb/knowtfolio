@@ -73,6 +73,8 @@ jobs:
           echo [knowtfolio] >> infrastructure/.aws/credentials
           echo aws_access_key_id = ${{secrets.AWS_TERRAFORM_USER_ACCESS_KEY}} >> infrastructure/.aws/credentials
           echo aws_secret_access_key = ${{secrets.AWS_TERRAFORM_USER_SECRET_KEY}} >> infrastructure/.aws/credentials
+      - name: generate-eth-binding
+        run: make go-eth-binding
       - name: init-terraform
         run: make init-tf
       - name: terraform-apply
