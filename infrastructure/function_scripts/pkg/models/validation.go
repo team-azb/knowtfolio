@@ -2,6 +2,10 @@ package models
 
 import (
 	"encoding/json"
+	"errors"
+	"fmt"
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/team-azb/knowtfolio/server/gateways/aws"
 	"reflect"
 	"regexp"
 
@@ -57,9 +61,18 @@ func validateCognitoPassword(fl validator.FieldLevel) bool {
 		isLengthInRange
 }
 
-var signData = map[reflect.Type]string{
-	reflect.TypeOf(SignUpForm{}):               "Sign up with wallet address",
-	reflect.TypeOf(PostWalletAddressRequest{}): "Register wallet address",
+var currentUserID *string
+
+var dynamoDB = aws.NewDynamoDBClient()
+
+func getNonceOfCurrentUser() (*common.Hash, error) {
+	if currentUserID == nil {
+		msg := "pkg/models.currentUserID is not set!"
+		fmt.Println(msg)
+		return nil, errors.New(msg)
+	} else {
+		return dynamoDB.GetAndReplaceNonceByID(*currentUserID)
+	}
 }
 
 // validateEthSignature checks if the field value is a valid signature by the address specified in fl.Param().
@@ -72,7 +85,22 @@ func validateEthSignature(fl validator.FieldLevel) bool {
 	}
 	addr := addrVal.String()
 
-	err := ethereum.VerifySignature(addr, sign, signData[fl.Parent().Type()])
+	var signData string
+	var nonce *common.Hash
+	var err error
+	switch fl.Parent().Type() {
+	case reflect.TypeOf(PostWalletAddressRequest{}):
+		// Nonce is not generated when the user doesn't have an address registered.
+		signData = "Register wallet address"
+	case reflect.TypeOf(SignUpForm{}):
+		signData = "Sign up with wallet address"
+		nonce, err = getNonceOfCurrentUser()
+	}
+	if err != nil {
+		return false
+	}
+
+	err = ethereum.VerifySignature(addr, sign, signData, nonce)
 
 	return err == nil
 }
