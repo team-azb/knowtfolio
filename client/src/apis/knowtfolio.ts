@@ -94,3 +94,7 @@ export const searchArticles = async (queryParams: searchQuery = {}) => {
   });
   return data;
 };
+
+export const generateSignData = (message: string, nonce: string) => {
+  return `${message}\n(nonce: ${nonce})`;
+};

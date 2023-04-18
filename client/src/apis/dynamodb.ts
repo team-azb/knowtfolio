@@ -48,5 +48,33 @@ export const fetchWalletAddress = async (
   };
   const command = new GetItemCommand(params);
   const resp = await client.send(command);
-  return resp.Item?.wallet_address.S;
+  return resp.Item?.wallet_address?.S;
+};
+
+/**
+ * userIdからnonceを取得する
+ * @param client dynamodbクライアント
+ * @param userId ユーザーid
+ * @returns nonce
+ */
+export const fetchNonce = async (client: DynamoDBClient, userId: string) => {
+  const params: GetItemCommandInput = {
+    TableName: "knowtfolio",
+    Key: {
+      type: { S: "user_id_to_nonce" },
+      key: { S: userId },
+    },
+  };
+  const command = new GetItemCommand(params);
+  const resp = await client.send(command);
+  const value = resp.Item?.value?.S;
+  if (value) {
+    return value;
+  } else {
+    JSON.stringify(params);
+    console.log(
+      `value not found ${JSON.stringify(params)} ${JSON.stringify(resp)}`
+    );
+    return "";
+  }
 };
