@@ -28,7 +28,7 @@ const EditArticleForm = ({ articleId }: editArticleFormProps) => {
   >((value) => {
     setContent(value);
   }, []);
-  const { session } = useAuthContext();
+  const { user, session } = useAuthContext();
   const { isConnectedToMetamask } = useWeb3Context();
   const navigate = useNavigate();
 
@@ -58,13 +58,21 @@ const EditArticleForm = ({ articleId }: editArticleFormProps) => {
         },
         session
       );
-      navigate("/mypage");
+      navigate(`/users/${user.getUsername()}`);
       toast.success("記事が更新されました。");
     } catch (error) {
       console.error(error);
       toast.error("記事の更新に失敗しました。");
     }
-  }, [articleId, content, isConnectedToMetamask, navigate, session, title]);
+  }, [
+    articleId,
+    content,
+    isConnectedToMetamask,
+    navigate,
+    session,
+    title,
+    user,
+  ]);
 
   const onChangeTitleInput = useCallback<
     React.ChangeEventHandler<HTMLInputElement>

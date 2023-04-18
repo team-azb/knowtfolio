@@ -12,9 +12,6 @@ const TopPage = () => {
           <Link to={"/signup"}>サインアップ</Link>
         </li>
         <li>
-          <Link to={"/mypage"}>マイページ</Link>
-        </li>
-        <li>
           <Link to={"/articles/new"}>記事作成</Link>
         </li>
         <li>

@@ -80,7 +80,7 @@ func TestSearchForArticles(t *testing.T) {
 	t.Run("WithKeywords", func(t *testing.T) {
 		service := prepareSearchService(t)
 
-		keywords := "reliable+efficient"
+		keywords := "reliable efficient"
 		result, err := service.SearchForArticles(context.Background(), &search.SearchRequest{
 			Keywords: &keywords,
 		})

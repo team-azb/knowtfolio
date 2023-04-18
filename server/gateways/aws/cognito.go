@@ -4,12 +4,13 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"os"
+
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/cognitoidentityprovider"
 	"github.com/aws/aws-sdk-go-v2/service/cognitoidentityprovider/types"
 	"github.com/lestrrat-go/jwx/v2/jwk"
 	"github.com/lestrrat-go/jwx/v2/jwt"
-	"os"
 )
 
 var (
@@ -52,13 +53,13 @@ func (c *CognitoClient) VerifyCognitoToken(idTokenStr string) (userId string, er
 	return
 }
 
-func (c *CognitoClient) CreateUserWithPassword(userID string, password string, phoneNumber string) error {
+func (c *CognitoClient) CreateUserWithPassword(userID string, password string, email string) error {
 	_, err := c.AdminCreateUser(context.Background(), &cognitoidentityprovider.AdminCreateUserInput{
 		Username: &userID,
 		UserAttributes: []types.AttributeType{
 			{
-				Name:  aws.String("phone_number"),
-				Value: &phoneNumber,
+				Name:  aws.String("email"),
+				Value: &email,
 			},
 		},
 		UserPoolId: &userPoolID,

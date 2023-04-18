@@ -8,9 +8,9 @@ import (
 )
 
 type SignUpForm struct {
-	UserName    string `json:"username" validate:"required"`
-	Password    string `json:"password" validate:"required,cognito_password"`
-	PhoneNumber string `json:"phone_number" validate:"required,e164"`
+	UserName string `json:"username" validate:"required"`
+	Password string `json:"password" validate:"required,cognito_password"`
+	Email    string `json:"email" validate:"required,email"`
 }
 
 func (f *SignUpForm) ToCognitoInput() *cognitoidentityprovider.SignUpInput {
@@ -19,8 +19,8 @@ func (f *SignUpForm) ToCognitoInput() *cognitoidentityprovider.SignUpInput {
 		Password: &f.Password,
 		UserAttributes: []types.AttributeType{
 			{
-				Name:  aws.String("phone_number"),
-				Value: aws.String(f.PhoneNumber),
+				Name:  aws.String("email"),
+				Value: aws.String(f.Email),
 			},
 		},
 		ClientId: &aws_utils.CognitoClientId,

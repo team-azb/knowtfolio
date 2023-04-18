@@ -66,6 +66,8 @@ services:
       CONTRACT_ADDRESS: will-be-set-in-the-program
       NETWORK_URI: ws://hardhat:8545
       CHAIN_ID: 31337
+      # Set env to local to avoid modification on AWS RDS.
+      ENV: local
     volumes:
       - type: bind
         source: ./server

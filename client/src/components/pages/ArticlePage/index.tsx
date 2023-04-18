@@ -3,6 +3,8 @@ import { useParams } from "react-router-dom";
 import { getArticle } from "~/apis/knowtfolio";
 import HeaderLayout from "~/components/organisms/layouts/HeaderLayout";
 import Spacer from "~/components/atoms/Spacer";
+import { Grid } from "@mui/material";
+import ArticleOwnerInfoTable from "~/components/organisms/tables/ArticleOwnerInfoTable";
 
 /**
  * サーバサイドレンダリングされる可能性のある変数の初期値を取得する
@@ -28,6 +30,7 @@ function ArticlePage() {
   const [content, setContent] = useState(
     initServerSideRenderableValue("content")
   );
+  const [ownerId, setOwnerId] = useState("");
 
   useEffect(() => {
     (async () => {
@@ -35,22 +38,33 @@ function ArticlePage() {
         const article = await getArticle(articleId);
         setTitle(article.title);
         setContent(article.content);
+        setOwnerId(article.owner_id);
       }
     })();
   }, [articleId]);
 
   return (
     <HeaderLayout>
-      <div style={{ padding: "100px 400px" }}>
+      <div style={{ padding: "100px 200px" }}>
         <h1 id="title">{title}</h1>
         <hr />
         <Spacer height={10} />
-        <div
-          dangerouslySetInnerHTML={{
-            __html: content,
-          }}
-          id="content"
-        />
+        <Grid container spacing={5}>
+          <Grid item xs={9}>
+            <div
+              dangerouslySetInnerHTML={{
+                __html: content,
+              }}
+              id="content"
+            />
+          </Grid>
+          {ownerId && (
+            <Grid item xs={3}>
+              <ArticleOwnerInfoTable ownerId={ownerId} />
+              <hr />
+            </Grid>
+          )}
+        </Grid>
       </div>
     </HeaderLayout>
   );

@@ -6,11 +6,8 @@ import {
   signInToCognitoWithPassword,
   SignUpFormKey,
 } from "~/apis/cognito";
-import PhoneInput from "react-phone-number-input/input";
-import { E164Number } from "libphonenumber-js/types";
 import { Button, Grid } from "@mui/material";
-import Input, { InputStyle } from "~/components/atoms/authForm/Input";
-import Label from "~/components/atoms/authForm/Label";
+import Input from "~/components/atoms/authForm/Input";
 import Form from "~/components/atoms/authForm/Form";
 import Spacer from "~/components/atoms/Spacer";
 import { toast } from "react-toastify";
@@ -26,7 +23,7 @@ export const noteOnWalletAddress =
 
 const SignUpForm = () => {
   const [form, setForm] = useState<SignUpForm>({
-    phone_number: "",
+    email: "",
     password: "",
     password_confirmation: "",
     username: "",
@@ -41,6 +38,7 @@ const SignUpForm = () => {
       switch (event.target.name) {
         case "password":
         case "username":
+        case "email":
         case "password_confirmation":
           setForm((prev) => {
             return { ...prev, [event.target.name]: event.target.value };
@@ -60,22 +58,13 @@ const SignUpForm = () => {
     })();
   }, [form]);
 
-  const onChangePhoneNumberInput = useCallback((value: E164Number) => {
-    setForm((prev) => {
-      return {
-        ...prev,
-        phone_number: value,
-      };
-    });
-  }, []);
-
   const submitForm = useCallback<React.MouseEventHandler<HTMLButtonElement>>(
     async (event) => {
       event.preventDefault();
       try {
         await signUpToCognito(form);
         setHasSignedUp(true);
-        toast.success("登録した電話番号にコードを送信しました。");
+        toast.success("登録したEmailにコードを送信しました。");
       } catch (error) {
         // TODO: Display user friendly error.
         toast.error(`sign up failed: ${error}`);
@@ -132,22 +121,17 @@ const SignUpForm = () => {
           placeholder="Name used as display name"
           message={fieldMessages.username}
         />
-        <Grid item container direction="column">
-          <Label htmlFor="phone_number">Phone number</Label>
-          <PhoneInput
-            onChange={onChangePhoneNumberInput}
-            country="JP"
-            id="phone_number"
-            name="phone_number"
-            disabled={hasSignedUp}
-            value={form.phone_number}
-            style={InputStyle}
-            placeholder="Phone number"
-          />
-          <label htmlFor="phone_number" style={{ color: "red" }}>
-            {fieldMessages.phone_number}
-          </label>
-        </Grid>
+        <Input
+          label="Email"
+          disabled={hasSignedUp}
+          type="email"
+          name="email"
+          id="email"
+          onChange={onChangeForm}
+          value={form.email}
+          placeholder="Email"
+          message={fieldMessages.email}
+        />
         <Input
           label="Password"
           disabled={hasSignedUp}

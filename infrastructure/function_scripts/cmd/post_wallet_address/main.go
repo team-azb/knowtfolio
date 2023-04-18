@@ -6,13 +6,10 @@ import (
 	"fmt"
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
-	"github.com/aws/aws-sdk-go-v2/aws"
-	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
-	"github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
 	"github.com/aws/smithy-go"
-	"github.com/team-azb/knowtfolio/infrastructure/function_scripts/pkg/aws_utils"
 	"github.com/team-azb/knowtfolio/infrastructure/function_scripts/pkg/models"
 	awsutil "github.com/team-azb/knowtfolio/server/gateways/aws"
+	"github.com/team-azb/knowtfolio/server/gateways/aws"
 	"net/http"
 	"strings"
 )
@@ -56,23 +53,23 @@ func handler(ctx context.Context, request events.APIGatewayProxyRequest) (events
 		}, nil
 	}
 
-	_, err = aws_utils.DynamoDBClient.PutItem(ctx, &dynamodb.PutItemInput{
-		Item: map[string]types.AttributeValue{
-			"user_id":        &types.AttributeValueMemberS{Value: req.UserID},
-			"wallet_address": &types.AttributeValueMemberS{Value: req.WalletAddress},
-		},
-		TableName: &aws_utils.DynamoDBUserTableName,
-		ConditionExpression: aws.String(
-			"attribute_not_exists(user_id) AND attribute_not_exists(wallet_address)"),
-	})
-
+	dynamoDB := aws.NewDynamoDBClient()
+	err = dynamoDB.PutUserWallet(req.UserID, req.WalletAddress)
 	if err != nil {
 		var apiErr smithy.APIError
-		if errors.As(err, &apiErr) && apiErr.ErrorCode() == "ConditionalCheckFailedException" {
-			return events.APIGatewayProxyResponse{
-				StatusCode: http.StatusBadRequest,
-				Body:       apiErr.ErrorMessage(),
-			}, nil
+		if errors.As(err, &apiErr) {
+			switch apiErr.ErrorCode() {
+			case aws.UserAlreadyHasWalletAddressCode:
+				return events.APIGatewayProxyResponse{
+					StatusCode: http.StatusBadRequest,
+					Body:       "user already has a wallet address registered",
+				}, nil
+			case aws.WalletAddressAlreadyUsedCode:
+				return events.APIGatewayProxyResponse{
+					StatusCode: http.StatusBadRequest,
+					Body:       "wallet address is already used",
+				}, nil
+			}
 		}
 		return events.APIGatewayProxyResponse{}, err
 	}

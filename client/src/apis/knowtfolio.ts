@@ -52,6 +52,8 @@ type getArticleResponse = {
   id: string;
   content: string;
   title: string;
+  owner_address?: string;
+  owner_id: string;
 };
 export const getArticle = async (articleId: string) => {
   const { data } = await axios.get<getArticleResponse>(

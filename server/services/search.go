@@ -2,7 +2,9 @@ package services
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"github.com/aws/smithy-go"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/team-azb/knowtfolio/server/gateways/api/gen/http/search/server"
@@ -41,18 +43,27 @@ func (s searchService) SearchForArticles(_ context.Context, request *search.Sear
 	if request.OwnedBy != nil {
 		ownedByAddr, err = s.DynamoDBClient.GetAddressByID(*request.OwnedBy)
 		if err != nil {
-			return nil, err
+			var apiErr smithy.APIError
+			if errors.As(err, &apiErr) && apiErr.ErrorCode() == aws.ItemNotFoundCode {
+				ownedByAddr = nil
+			} else {
+				return nil, err
+			}
 		}
 
-		ownedArticleIDs, err := s.Contract.GetArticleIdsOwnedBy(&bind.CallOpts{}, *ownedByAddr)
-		for i, url := range ownedArticleIDs {
-			// TODO: Do this part on the contract side.
-			ownedArticleIDs[i] = strings.TrimPrefix(url, "https://knowtfolio.com/nfts/")
+		var ownedArticleIDs []string
+		if ownedByAddr != nil {
+			ownedArticleIDs, err = s.Contract.GetArticleIdsOwnedBy(&bind.CallOpts{}, *ownedByAddr)
+			if err != nil {
+				return nil, err
+			}
+
+			for i, url := range ownedArticleIDs {
+				// TODO: Do this part on the contract side.
+				ownedArticleIDs[i] = strings.TrimPrefix(url, "https://knowtfolio.com/nfts/")
+			}
 		}
 
-		if err != nil {
-			return nil, err
-		}
 		ownedByCond := s.DB.
 			// Articles that has been tokenized and whose token is owned by the user.
 			Where(`articles.id IN ?`, ownedArticleIDs).
@@ -61,11 +72,10 @@ func (s searchService) SearchForArticles(_ context.Context, request *search.Sear
 		baseQuery = baseQuery.Where(ownedByCond)
 	}
 	if request.Keywords != nil {
-		keywords := strings.Split(*request.Keywords, "+")
-		for i := range keywords {
-			keywords[i] = fmt.Sprintf(`"%v"`, keywords[i])
+		keywords := strings.Split(*request.Keywords, " ")
+		for _, keyword := range keywords {
+			baseQuery = baseQuery.Where(`raw_text LIKE ?`, fmt.Sprintf("%%%s%%", keyword))
 		}
-		baseQuery = baseQuery.Where(`MATCH(title, raw_text) against(? IN BOOLEAN MODE)`, strings.Join(keywords, " "))
 	}
 
 	// NOTE: Need to call `Session` here to make baseQuery sharable.

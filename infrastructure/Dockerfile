@@ -1,7 +1,7 @@
 FROM --platform=linux/amd64 hashicorp/terraform:1.2.8
 
 # Install Golang to compile lambda codes.
-RUN apk add --no-cache git make musl-dev zip openssl aws-cli
+RUN apk add --no-cache git make musl-dev zip openssl aws-cli bash
 RUN wget https://dl.google.com/go/go1.18.3.linux-amd64.tar.gz
 RUN tar -C /usr/local -xzf go1.18.3.linux-amd64.tar.gz
 ENV PATH="/usr/local/go/bin:${PATH}"
