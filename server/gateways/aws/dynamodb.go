@@ -50,6 +50,15 @@ func (c *DynamoDBClient) GetAddressByID(userID string) (*common.Address, error) 
 	return &addr, nil
 }
 
+func (c *DynamoDBClient) GetNonceByID(userID string) (*common.Hash, error) {
+	addrStr, err := c.getValue(userIDToNonceType, userID)
+	if err != nil {
+		return nil, err
+	}
+	nonce := common.HexToHash(addrStr)
+	return &nonce, nil
+}
+
 // GetAndReplaceNonceByID gets the current nonce and then replace it with a newly generated one.
 // This can be done by a single PutItem call with ReturnValues set to ALL_OLD.
 func (c *DynamoDBClient) GetAndReplaceNonceByID(userID string) (*common.Hash, error) {
