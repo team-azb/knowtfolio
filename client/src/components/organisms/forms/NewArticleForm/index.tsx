@@ -36,12 +36,10 @@ const NewArticleForm = () => {
 
   const handlePost = useCallback(async () => {
     try {
-      const idToken = session.getIdToken().getJwtToken();
       const { id } = await postArticle({
         title: titleInput,
         content,
-        token: idToken,
-      });
+      }, session);
 
       assertMetamask(isConnectedToMetamask);
       const signatureForMint = await web3.eth.personal.sign(

@@ -82,8 +82,7 @@ const RegisterWalletFormContent = () => {
         userId: user.getUsername(),
         walletAddress: account,
         signature: signature,
-        token: session.getIdToken().getJwtToken(),
-      });
+      }, session);
       toast.success("Wallet addressの登録に成功しました。");
       navigate("/settings/wallet", {
         state: {

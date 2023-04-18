@@ -50,13 +50,11 @@ const EditArticleForm = ({ articleId }: editArticleFormProps) => {
   const handleUpdate = useCallback(async () => {
     try {
       assertMetamask(isConnectedToMetamask);
-      const idToken = session.getIdToken().getJwtToken();
       await putArticle({
         articleId: articleId || "",
         title,
         content,
-        token: idToken,
-      });
+      }, session);
       navigate("/mypage");
       toast.success("記事が更新されました。");
     } catch (error) {
