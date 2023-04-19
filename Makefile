@@ -33,6 +33,10 @@ $(CLIENT_NODE_MODULES_DIR): ./client/package.json ./client/Dockerfile $(CONTRACT
 	# To avoid this target from running repeatedly when the `node_modules` dir is not updated by the command above.
 	touch $(CLIENT_NODE_MODULES_DIR)
 
+# This target is used by the `client test` gha workflow.
+$(CLIENT_DIST_DIR): ./client/webpack.config.js $(CLIENT_NODE_MODULES_DIR) $(CLIENT_SRC_DIR)
+	docker-compose run client npm run build
+
 $(GOA_GEN_DIR): $(GOA_DESIGN_DIR) $(GOA_DOCKER_FILE) ./server/go.mod
 	docker compose up --build goa
 	cp -f $(GOA_GEN_DIR)/http/openapi3.yaml ./server
