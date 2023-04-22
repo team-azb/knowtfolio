@@ -85,4 +85,12 @@ contract Knowtfolio is
         }
         return articleIds;
     }
+
+    /**
+     * @dev Get token id of the NFT of `articleId`
+     */
+    function getTokenId(string memory articleId) public view returns (uint256) {
+        uint256 _tokenId = tokenIdOf[articleId];
+        return _tokenId;
+    }
 }
