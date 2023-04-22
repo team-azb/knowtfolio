@@ -9,6 +9,9 @@ import { assert } from "console";
 
 const proxyAddress = process.env.CONTRACT_ADDRESS;
 
+/**
+ * Version2にアップグレードする場合のデプロイ用スクリプト
+ */
 async function main() {
   if (!proxyAddress) {
     assert("Could not read CONTRACT_ADDRESS...");
