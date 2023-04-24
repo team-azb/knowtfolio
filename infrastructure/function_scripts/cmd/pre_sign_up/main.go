@@ -57,9 +57,9 @@ func handler(ctx context.Context, event *events.CognitoEventUserPoolsPreSignup) 
 	}
 
 	form := models.SignUpForm{
-		UserName:    event.UserName,
-		Password:    password,
-		PhoneNumber: event.Request.UserAttributes["phone_number"],
+		UserName: event.UserName,
+		Password: password,
+		Email:    event.Request.UserAttributes["email"],
 	}
 
 	fieldErrs, internalErr := invokeValidationLambda(ctx, form)

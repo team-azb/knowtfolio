@@ -3,6 +3,7 @@ locals {
 
   golang_functions_dependencies = setunion(
     fileset(path.module, "function_scripts/pkg/**/*.go"),
+    fileset(path.module, "../server/gateways/aws/**/*.go"),
     fileset(path.module, "../server/gateways/ethereum/**/*.go")
   )
 
@@ -20,6 +21,10 @@ locals {
     post_wallet_address = {
       allow_methods     = ["POST"]
       api_resource_path = "wallet_address"
+    }
+    get_user = {
+      allow_methods     = ["GET"]
+      api_resource_path = "users/*"
     }
   }
 
@@ -56,6 +61,7 @@ resource "null_resource" "golang_functions_to_s3" {
       aws s3 cp ./archive/${each.key}.zip.base64sha256 s3://${aws_s3_bucket.lambda_artifacts.bucket} --profile=knowtfolio --content-type "text/plain"
     EOT
 
+    interpreter = ["/bin/bash", "-ce"]
     working_dir = local.func_script_root_dir
     environment = {
       GOARCH = "amd64"

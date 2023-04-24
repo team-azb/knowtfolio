@@ -19,7 +19,7 @@ import { useAuthContext } from "~/components/organisms/providers/AuthProvider";
 const NewArticleForm = () => {
   const [content, setContent] = useState("");
   const [titleInput, setTitleInput] = useState("");
-  const { session } = useAuthContext();
+  const { user, session } = useAuthContext();
   const { isConnectedToMetamask, web3, account } = useWeb3Context();
   const handleEditorChange = useCallback<
     (value: string, editor: TinyMCEEditor) => void
@@ -55,7 +55,7 @@ const NewArticleForm = () => {
         address: account,
         signature: signatureForMint,
       });
-      navigate("/mypage");
+      navigate(`/users/${user.getUsername()}`);
       toast.success("記事を作成しました。");
     } catch (error) {
       console.error(error);
@@ -68,6 +68,7 @@ const NewArticleForm = () => {
     navigate,
     session,
     titleInput,
+    user,
     web3,
   ]);
   return (

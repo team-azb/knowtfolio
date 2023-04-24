@@ -127,6 +127,11 @@ module.exports = [
           target: "https://knowtfolio.com",
         },
         {
+          context: "/api/users",
+          changeOrigin: true,
+          target: "https://knowtfolio.com",
+        },
+        {
           context: (path) => {
             if (path.includes("/api")) {
               return true;

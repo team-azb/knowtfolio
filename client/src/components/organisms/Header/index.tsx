@@ -14,7 +14,7 @@ const AcountInfo = () => {
   return (
     <Button
       onClick={() => {
-        navigate("/mypage");
+        navigate(`/users/${user.getUsername()}`);
       }}
       variant="outlined"
       style={{ fontSize: "1.4rem", flexDirection: "column" }}

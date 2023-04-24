@@ -50,7 +50,7 @@ const RegisteredWalletAddressMessage = () => {
       <Grid item container xs={2} direction="row-reverse">
         <Button
           onClick={() => {
-            navigate("/mypage");
+            navigate(`/users/${user.getUsername()}`);
           }}
           variant="contained"
           style={{ fontSize: "1.4rem" }}
@@ -133,7 +133,7 @@ const RegisterWalletFormContent = () => {
         <Grid item container xs={2} direction="row-reverse">
           <Button
             onClick={() => {
-              navigate("/mypage");
+              navigate(`/users/${user.getUsername()}`);
             }}
             variant="contained"
             style={{ fontSize: "1.4rem" }}

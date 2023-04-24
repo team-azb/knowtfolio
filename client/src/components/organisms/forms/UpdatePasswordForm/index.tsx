@@ -123,7 +123,7 @@ const UpdatePasswordForm = () => {
           <Grid item>
             <Button
               onClick={() => {
-                navigate("/mypage");
+                navigate(`/users/${user.getUsername()}`);
               }}
               variant="contained"
               style={{ fontSize: "1.4rem" }}

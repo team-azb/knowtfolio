@@ -14,8 +14,7 @@ import LoadingDisplay from "~/components/atoms/LoadingDisplay";
 import { fetchWalletAddress, initDynamodbClient } from "~/apis/dynamodb";
 
 type UserAttributes = {
-  phoneNumber: string;
-  email?: string;
+  email: string;
   website?: string;
   description?: string;
   picture?: string;
@@ -76,9 +75,6 @@ const AuthProvider = ({
         const session = await loadSession(cognitoUser);
         const attributes = await loadAttributes(cognitoUser);
 
-        const phoneNumber = attributes.find(
-          (atr) => atr.Name === "phone_number"
-        )?.Value;
         const email = attributes.find((atr) => atr.Name === "email")?.Value;
         const picture = attributes.find((atr) => atr.Name === "picture")?.Value;
         const website = attributes.find((atr) => atr.Name === "website")?.Value;
@@ -94,14 +90,13 @@ const AuthProvider = ({
           cognitoUser.getUsername()
         );
 
-        if (!phoneNumber) {
-          throw new Error("Phone number is not registered.");
+        if (!email) {
+          throw new Error("Email is not registered.");
         }
         setAuth({
           user: cognitoUser,
           session: session,
           attributes: {
-            phoneNumber,
             email,
             website,
             description,

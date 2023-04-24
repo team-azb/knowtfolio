@@ -2,17 +2,32 @@ package aws
 
 import (
 	"context"
+	"crypto/rand"
 	"errors"
 	"fmt"
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
+	"github.com/aws/smithy-go"
 	"github.com/ethereum/go-ethereum/common"
 )
 
+const tableName = "knowtfolio"
+
+type KeyValueType string
+
 const (
-	userTableName        = "user_to_wallet"
-	addressToIDIndexName = "wallet_address-index"
+	userIDToWalletAddressType KeyValueType = "user_id_to_wallet_address"
+	userIDToNonceType         KeyValueType = "user_id_to_nonce"
+	walletAddressToUserIDType KeyValueType = "wallet_address_to_user_id"
+)
+
+const (
+	ItemNotFoundCode                = "ItemNotFound"
+	ValueFieldNotFoundCode          = "ValueFieldNotFound"
+	UserAlreadyHasWalletAddressCode = "UserAlreadyHaveWalletAddress"
+	WalletAddressAlreadyUsedCode    = "WalletAddressAlreadyUsed"
+	NonceGenerationFailedCode       = "NonceGenerationFailed"
 )
 
 type DynamoDBClient struct {
@@ -27,66 +42,177 @@ func NewDynamoDBClient() *DynamoDBClient {
 }
 
 func (c *DynamoDBClient) GetAddressByID(userID string) (*common.Address, error) {
-	res, err := c.GetItem(context.Background(), &dynamodb.GetItemInput{
-		TableName: aws.String(userTableName),
-		Key: map[string]types.AttributeValue{
-			"user_id": &types.AttributeValueMemberS{Value: userID},
-		},
-		ProjectionExpression: aws.String("wallet_address"),
-		ConsistentRead:       aws.Bool(true),
-	})
+	addrStr, err := c.getValue(userIDToWalletAddressType, userID)
 	if err != nil {
 		return nil, err
 	}
+	addr := common.HexToAddress(addrStr)
+	return &addr, nil
+}
 
-	if item, ok := res.Item["wallet_address"]; ok {
-		addr := common.HexToAddress(item.(*types.AttributeValueMemberS).Value)
-		return &addr, nil
-	} else {
-		// user_id not found or the user doesn't have a wallet_address
-		return nil, nil
-	}
+func (c *DynamoDBClient) GetNonceByID(userID string) (string, error) {
+	return c.getValue(userIDToNonceType, userID)
 }
 
 func (c *DynamoDBClient) GetIDByAddress(walletAddress common.Address) (string, error) {
-	res, err := c.Query(context.Background(), &dynamodb.QueryInput{
-		TableName:              aws.String(userTableName),
-		IndexName:              aws.String(addressToIDIndexName),
-		KeyConditionExpression: aws.String("wallet_address = :wallet_address_value"),
-		ExpressionAttributeValues: map[string]types.AttributeValue{
-			":wallet_address_value": &types.AttributeValueMemberS{Value: walletAddress.String()},
-		},
-		Limit:                aws.Int32(1),
-		ProjectionExpression: aws.String("user_id"),
-	})
+	return c.getValue(walletAddressToUserIDType, walletAddress.String())
+}
+
+func (c *DynamoDBClient) GenerateAndPutNonce(userID string) error {
+	nonce, err := generateNonce()
 	if err != nil {
-		return "", err
-	}
-	if res.Count == 0 {
-		return "", errors.New(fmt.Sprintf("wallet address %s not found", walletAddress))
+		return err
 	}
 
-	id := res.Items[0]["user_id"].(*types.AttributeValueMemberS).Value
-	return id, nil
+	_, err = c.PutItem(context.Background(), &dynamodb.PutItemInput{
+		TableName: aws.String(tableName),
+		Item: map[string]types.AttributeValue{
+			"type":  &types.AttributeValueMemberS{Value: string(userIDToNonceType)},
+			"key":   &types.AttributeValueMemberS{Value: userID},
+			"value": &types.AttributeValueMemberS{Value: nonce},
+		},
+	})
+	return err
 }
 
 func (c *DynamoDBClient) PutUserWallet(userID string, walletAddress string) error {
-	_, err := c.PutItem(context.Background(), &dynamodb.PutItemInput{
-		Item: map[string]types.AttributeValue{
-			"user_id":        &types.AttributeValueMemberS{Value: userID},
-			"wallet_address": &types.AttributeValueMemberS{Value: walletAddress},
+	keyValueToItem := func(kvType KeyValueType, key string, value string) types.TransactWriteItem {
+		return types.TransactWriteItem{
+			Put: &types.Put{
+				TableName:           aws.String(tableName),
+				ConditionExpression: aws.String("attribute_not_exists(#key)"),
+				Item: map[string]types.AttributeValue{
+					"type":  &types.AttributeValueMemberS{Value: string(kvType)},
+					"key":   &types.AttributeValueMemberS{Value: key},
+					"value": &types.AttributeValueMemberS{Value: value},
+				},
+				ReturnValuesOnConditionCheckFailure: types.ReturnValuesOnConditionCheckFailureAllOld,
+				// NOTE: Need to define this to avoid collision with reserved words at `ConditionExpression`.
+				// See https://docs.aws.amazon.com/amazondynamodb/latest/developerguide/ReservedWords.html
+				ExpressionAttributeNames: map[string]string{
+					"#key": "key",
+				},
+			},
+		}
+	}
+
+	nonce, err := generateNonce()
+	if err != nil {
+		return err
+	}
+
+	_, err = c.TransactWriteItems(context.Background(), &dynamodb.TransactWriteItemsInput{
+		TransactItems: []types.TransactWriteItem{
+			keyValueToItem(userIDToWalletAddressType, userID, walletAddress),
+			keyValueToItem(userIDToNonceType, userID, nonce),
+			keyValueToItem(walletAddressToUserIDType, walletAddress, userID),
 		},
-		TableName: aws.String(userTableName),
 	})
+
+	// Parse transaction error.
+	// `TransactionCanceledException` contains an error for each action in the transaction.
+	var apiErr smithy.APIError
+	if errors.As(err, &apiErr) {
+		if canceledErr, ok := apiErr.(*types.TransactionCanceledException); ok {
+			for _, reason := range canceledErr.CancellationReasons {
+				if reason.Code == nil {
+					continue
+				}
+				if *reason.Code == "ConditionalCheckFailed" {
+					switch reason.Item["type"].(*types.AttributeValueMemberS).Value {
+					case string(userIDToWalletAddressType), string(userIDToNonceType):
+						return &smithy.GenericAPIError{
+							Code:    UserAlreadyHasWalletAddressCode,
+							Message: *reason.Message,
+							Fault:   smithy.FaultClient,
+						}
+					case string(walletAddressToUserIDType):
+						return &smithy.GenericAPIError{
+							Code:    WalletAddressAlreadyUsedCode,
+							Message: *reason.Message,
+							Fault:   smithy.FaultClient,
+						}
+					}
+				}
+			}
+		}
+	}
 	return err
 }
 
 func (c *DynamoDBClient) DeleteUserWalletByID(userID string) error {
-	_, err := c.DeleteItem(context.Background(), &dynamodb.DeleteItemInput{
-		TableName: aws.String(userTableName),
-		Key: map[string]types.AttributeValue{
-			"user_id": &types.AttributeValueMemberS{Value: userID},
+	walletAddress, err := c.GetAddressByID(userID)
+	if err != nil {
+		return err
+	}
+
+	keyToItem := func(kvType KeyValueType, key string) types.TransactWriteItem {
+		return types.TransactWriteItem{
+			Delete: &types.Delete{
+				TableName: aws.String(tableName),
+				Key: map[string]types.AttributeValue{
+					"type": &types.AttributeValueMemberS{Value: string(kvType)},
+					"key":  &types.AttributeValueMemberS{Value: key},
+				},
+			},
+		}
+	}
+
+	_, err = c.TransactWriteItems(context.Background(), &dynamodb.TransactWriteItemsInput{
+		TransactItems: []types.TransactWriteItem{
+			keyToItem(userIDToWalletAddressType, userID),
+			keyToItem(userIDToNonceType, userID),
+			keyToItem(walletAddressToUserIDType, walletAddress.String()),
 		},
 	})
 	return err
+}
+
+func (c *DynamoDBClient) getValue(kvType KeyValueType, key string) (string, error) {
+	res, err := c.GetItem(context.Background(), &dynamodb.GetItemInput{
+		TableName: aws.String(tableName),
+		Key: map[string]types.AttributeValue{
+			"type": &types.AttributeValueMemberS{Value: string(kvType)},
+			"key":  &types.AttributeValueMemberS{Value: key},
+		},
+		ProjectionExpression: aws.String("#value"),
+		ExpressionAttributeNames: map[string]string{
+			"#value": "value",
+		},
+		ConsistentRead: aws.Bool(true),
+	})
+	if err != nil {
+		return "", err
+	}
+	if res.Item == nil {
+		// Value not found
+		return "", &smithy.GenericAPIError{
+			Code:    ItemNotFoundCode,
+			Message: fmt.Sprintf("item for %s/%s not found", kvType, key),
+			Fault:   smithy.FaultClient,
+		}
+	}
+
+	if item, ok := res.Item["value"]; ok {
+		return item.(*types.AttributeValueMemberS).Value, nil
+	} else {
+		return "", &smithy.GenericAPIError{
+			Code:    ValueFieldNotFoundCode,
+			Message: fmt.Sprintf("`value` field for %s/%s not found", kvType, key),
+			Fault:   smithy.FaultServer,
+		}
+	}
+}
+
+func generateNonce() (string, error) {
+	nonceBytes := make([]byte, 32)
+	_, err := rand.Read(nonceBytes)
+	if err != nil {
+		return "", &smithy.GenericAPIError{
+			Code:    NonceGenerationFailedCode,
+			Message: err.Error(),
+			Fault:   smithy.FaultServer,
+		}
+	}
+	return fmt.Sprintf("%x", nonceBytes), nil
 }

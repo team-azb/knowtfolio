@@ -10,6 +10,6 @@ RUN apt-get update && \
     # Necessary packages for entrypoint.sh
     apt-get -y install gosu bash
 
-RUN go install goa.design/goa/v3/cmd/goa@v3
+RUN go install goa.design/goa/v3/cmd/goa@v3.11.1
 
 COPY go.mod go.sum /server/

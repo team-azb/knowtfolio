@@ -45,7 +45,7 @@ data "aws_iam_policy_document" "backend_test" {
       "dynamodb:*",
     ]
     resources = [
-      "${aws_dynamodb_table.user_to_wallet.arn}*",
+      "${aws_dynamodb_table.knowtfolio.arn}*",
     ]
   }
 }
@@ -77,7 +77,7 @@ data "aws_iam_policy_document" "read_wallet_table_policy" {
       "dynamodb:GetItem"
     ]
     resources = [
-      aws_dynamodb_table.user_to_wallet.arn
+      aws_dynamodb_table.knowtfolio.arn
     ]
   }
 }
@@ -106,8 +106,14 @@ resource "aws_iam_role_policy" "basic_lambda" {
   name     = "basic-lambda"
   role     = aws_iam_role.lambda[each.key].name
   policy = templatefile("${path.module}/templates/iam/basic_lambda_policy.json", {
-    user_to_wallet_table_arn = aws_dynamodb_table.user_to_wallet.arn
+    user_to_wallet_table_arn = aws_dynamodb_table.knowtfolio.arn
   })
+}
+
+resource "aws_iam_role_policy" "get_user-lambda" {
+  name   = "get-user-lambda"
+  role   = aws_iam_role.lambda["get_user"].name
+  policy = data.aws_iam_policy_document.get_cognito_user_as_admin_policy.json
 }
 
 resource "aws_iam_role_policy" "pre_sign_up_lambda" {
@@ -125,7 +131,18 @@ data "aws_iam_policy_document" "update_wallet_table_policy" {
       "dynamodb:PutItem"
     ]
     resources = [
-      aws_dynamodb_table.user_to_wallet.arn
+      aws_dynamodb_table.knowtfolio.arn
+    ]
+  }
+}
+
+data "aws_iam_policy_document" "get_cognito_user_as_admin_policy" {
+  statement {
+    actions = [
+      "cognito-idp:AdminGetUser"
+    ]
+    resources = [
+      aws_cognito_user_pool.knowtfolio.arn
     ]
   }
 }

@@ -87,7 +87,7 @@ export const signInToCognitoWithWallet = async (
 };
 
 export type SignUpForm = {
-  phone_number: string;
+  email: string;
   password: string;
   password_confirmation: string;
   username: string;
@@ -104,8 +104,8 @@ export const signUpToCognito = (form: SignUpForm) => {
   assertConfirmPassword(form.password, form.password_confirmation);
   const attributeList = [
     new CognitoUserAttribute({
-      Name: "phone_number",
-      Value: form.phone_number,
+      Name: "email",
+      Value: form.email,
     }),
   ];
 

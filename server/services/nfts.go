@@ -60,7 +60,7 @@ func (s nftsService) CreateForArticle(ctx context.Context, request *nfts.CreateN
 		if err != nil {
 			return err
 		}
-		if originalAuthorAddress.String() != request.Address {
+		if originalAuthorAddress == nil || originalAuthorAddress.String() != request.Address {
 			msg := fmt.Sprintf("Address %v is not the orignial owner of article %v.", request.Address, target.ID)
 			return nfts.MakeUnauthorized(errors.New(msg))
 		}
