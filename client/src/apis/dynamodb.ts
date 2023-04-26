@@ -48,5 +48,5 @@ export const fetchWalletAddress = async (
   };
   const command = new GetItemCommand(params);
   const resp = await client.send(command);
-  return resp.Item?.wallet_address.S;
+  return resp.Item?.value.S;
 };
