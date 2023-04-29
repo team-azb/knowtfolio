@@ -1,5 +1,6 @@
 import axios from "axios";
-import { SignUpFormKey } from "./cognito";
+import { sessionToHeader, SignUpFormKey } from "./cognito";
+import { CognitoUserSession } from "amazon-cognito-identity-js";
 
 export type SignUpErrorCode = "invalid_format" | "already_exists";
 type FieldError = {
@@ -30,12 +31,21 @@ type postWalletForm = {
   walletAddress: string;
   signature: string;
 };
-export const postWalletAddress = async (form: postWalletForm) => {
-  await axios.post("/api/wallet_address", {
-    user_id: form.userId,
-    wallet_address: form.walletAddress,
-    signature: form.signature,
-  });
+export const postWalletAddress = async (
+  form: postWalletForm,
+  session: CognitoUserSession
+) => {
+  await axios.post(
+    "/api/wallet_address",
+    {
+      user_id: form.userId,
+      wallet_address: form.walletAddress,
+      signature: form.signature,
+    },
+    {
+      headers: sessionToHeader(session),
+    }
+  );
 };
 
 export type UserInfo = {
