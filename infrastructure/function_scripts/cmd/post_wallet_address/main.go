@@ -9,12 +9,11 @@ import (
 	"github.com/aws/smithy-go"
 	"github.com/team-azb/knowtfolio/infrastructure/function_scripts/pkg/models"
 	"github.com/team-azb/knowtfolio/server/gateways/aws"
-	awsutil "github.com/team-azb/knowtfolio/server/gateways/aws"
 	"net/http"
 	"strings"
 )
 
-var cognitoClient = awsutil.NewCognitoClient()
+var cognitoClient = aws.NewCognitoClient()
 
 func handler(_ context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	fmt.Printf("Put Wallet Address: %+v\n", request)
