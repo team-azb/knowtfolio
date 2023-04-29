@@ -8,15 +8,15 @@ import (
 	"github.com/aws/aws-lambda-go/lambda"
 	"github.com/aws/smithy-go"
 	"github.com/team-azb/knowtfolio/infrastructure/function_scripts/pkg/models"
-	awsutil "github.com/team-azb/knowtfolio/server/gateways/aws"
 	"github.com/team-azb/knowtfolio/server/gateways/aws"
+	awsutil "github.com/team-azb/knowtfolio/server/gateways/aws"
 	"net/http"
 	"strings"
 )
 
 var cognitoClient = awsutil.NewCognitoClient()
 
-func handler(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+func handler(_ context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
 	fmt.Printf("Put Wallet Address: %+v\n", request)
 
 	authHeader, ok := request.Headers["authorization"]
