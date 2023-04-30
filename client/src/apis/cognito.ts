@@ -215,3 +215,9 @@ export const resetPassword = (form: ResetPasswordForm) => {
     });
   });
 };
+
+export const sessionToHeader = (session: CognitoUserSession) => {
+  return {
+    Authorization: `Bearer ${session.getIdToken().getJwtToken()}`,
+  };
+};

@@ -42,12 +42,13 @@ const NewArticleForm = () => {
 
   const handlePost = useCallback(async () => {
     try {
-      const idToken = session.getIdToken().getJwtToken();
-      const { id } = await postArticle({
-        title: titleInput,
-        content,
-        token: idToken,
-      });
+      const { id } = await postArticle(
+        {
+          title: titleInput,
+          content,
+        },
+        session
+      );
 
       assertMetamask(isConnectedToMetamask);
 
