@@ -71,10 +71,8 @@ export const fetchNonce = async (client: DynamoDBClient, userId: string) => {
   if (value) {
     return value;
   } else {
-    JSON.stringify(params);
-    console.log(
+    throw new Error(
       `value not found ${JSON.stringify(params)} ${JSON.stringify(resp)}`
     );
-    return "";
   }
 };
