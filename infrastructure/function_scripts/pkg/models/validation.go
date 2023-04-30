@@ -2,8 +2,6 @@ package models
 
 import (
 	"encoding/json"
-	"errors"
-	"fmt"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/team-azb/knowtfolio/server/gateways/aws"
 	"reflect"
@@ -21,10 +19,8 @@ func init() {
 		panic(err.(any))
 	}
 
-	err = requestValidator.RegisterValidation("eth_sign_addr", validateEthSignature)
-	if err != nil {
-		panic(err.(any))
-	}
+	var validatable EthSignatureValidatable
+	requestValidator.RegisterStructValidation(validateEthSignature, validatable)
 
 	requestValidator.RegisterTagNameFunc(func(field reflect.StructField) string {
 		return field.Tag.Get("json")
@@ -61,46 +57,37 @@ func validateCognitoPassword(fl validator.FieldLevel) bool {
 		isLengthInRange
 }
 
-var currentUserID *string
-
 var dynamoDB = aws.NewDynamoDBClient()
 
-func getNonceOfCurrentUser() (*common.Hash, error) {
-	if currentUserID == nil {
-		msg := "pkg/models.currentUserID is not set!"
-		fmt.Println(msg)
-		return nil, errors.New(msg)
-	} else {
-		return dynamoDB.GetAndReplaceNonceByID(*currentUserID)
-	}
+// EthSignatureValidationInfo is a container for information necessary for eth-signature validation.
+type EthSignatureValidationInfo struct {
+	Address            common.Address
+	Message            string
+	Nonce              *common.Hash
+	Signature          string
+	SignatureFieldName string
+}
+
+type EthSignatureValidatable interface {
+	ValidationInfo() (EthSignatureValidationInfo, error)
 }
 
 // validateEthSignature checks if the field value is a valid signature by the address specified in fl.Param().
-func validateEthSignature(fl validator.FieldLevel) bool {
-	sign := fl.Field().String()
-
-	addrVal, addrKind, _, isAddrFound := fl.GetStructFieldOK2()
-	if addrKind != reflect.String && !isAddrFound {
-		return false
+func validateEthSignature(sl validator.StructLevel) {
+	val, ok := sl.Current().Interface().(EthSignatureValidatable)
+	if !ok {
+		// This won't happen because `validateEthSignature` is registered only for `EthSignatureValidatable`.
+		panic("Do not register `validateEthSignature` for types other than `EthSignatureValidatable`.")
 	}
-	addr := addrVal.String()
 
-	var signData string
-	var nonce *common.Hash
-	var err error
-	switch fl.Parent().Type() {
-	case reflect.TypeOf(PostWalletAddressRequest{}):
-		// Nonce is not generated when the user doesn't have an address registered.
-		signData = "Register wallet address"
-	case reflect.TypeOf(SignUpForm{}):
-		signData = "Sign up with wallet address"
-		nonce, err = getNonceOfCurrentUser()
-	}
+	valInfo, err := val.ValidationInfo()
 	if err != nil {
-		return false
+		sl.ReportError(nil, "", "", "eth_sign_addr", "")
 	}
 
-	err = ethereum.VerifySignature(addr, sign, signData, nonce)
-
-	return err == nil
+	err = ethereum.VerifySignature(valInfo.Address.String(), valInfo.Signature, valInfo.Message, valInfo.Nonce)
+	if err != nil {
+		signatureField := reflect.ValueOf(val).FieldByName(valInfo.SignatureFieldName)
+		sl.ReportError(signatureField, valInfo.SignatureFieldName, valInfo.SignatureFieldName, "eth_sign_addr", "")
+	}
 }
