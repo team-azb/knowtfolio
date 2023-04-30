@@ -43,7 +43,7 @@ const RegisteredWalletAddressMessage = () => {
         </Grid>
         <Grid item xs={9.5}>
           <WalletAddressDisplay
-            address={userWalletAddress?}
+            address={userWalletAddress!}
             shouldTruncate={false}
           />
         </Grid>
