@@ -28,10 +28,10 @@ const NftInfoTable = ({ articleId }: nftInfoTableProps) => {
     if (tokenId) {
       return (
         <>
-          <Grid item>Token ID: {tokenId}</Grid>
+          <Grid item>NFT ID: {tokenId}</Grid>
           <Grid item>
             <NftLinkButton tokenId={tokenId}>
-              View Token on Mumbai Scan
+              View NFT on Mumbai Scan
             </NftLinkButton>
           </Grid>
         </>

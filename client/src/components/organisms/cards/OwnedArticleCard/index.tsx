@@ -44,7 +44,7 @@ const OwnedArticleCard = (props: ownedArticleCardProps) => {
             </Button>
             {tokenId && (
               <NftLinkButton tokenId={tokenId} style={{ marginLeft: "auto" }}>
-                token id: {tokenId}
+                NFT id: {tokenId}
               </NftLinkButton>
             )}
           </Grid>
