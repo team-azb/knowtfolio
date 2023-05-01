@@ -28,7 +28,7 @@ const NftInfoTable = ({ articleId }: nftInfoTableProps) => {
     if (tokenId) {
       return (
         <>
-          <Grid item>Token id: {tokenId}</Grid>
+          <Grid item>Token ID: {tokenId}</Grid>
           <Grid item>
             <NftLinkButton tokenId={tokenId}>
               View Token on Mumbai Scan
