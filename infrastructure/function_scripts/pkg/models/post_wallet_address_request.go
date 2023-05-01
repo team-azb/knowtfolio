@@ -11,15 +11,10 @@ type PostWalletAddressRequest struct {
 }
 
 func (p *PostWalletAddressRequest) ValidationInfo() (EthSignatureValidationInfo, error) {
-	nonce, err := dynamoDB.GetNonceByID(p.UserID)
-	if err != nil {
-		return EthSignatureValidationInfo{}, err
-	}
-
 	return EthSignatureValidationInfo{
 		Address:            common.HexToAddress(p.WalletAddress),
 		Message:            "Register wallet address",
-		Nonce:              nonce,
+		Nonce:              nil,
 		Signature:          p.Signature,
 		SignatureFieldName: "Signature",
 	}, nil
