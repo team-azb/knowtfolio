@@ -79,7 +79,7 @@ server/build/server: $(GOA_GEN_DIR) $(GO_ETH_BINDING_PATH)
 app: goa go-eth-binding $(CLIENT_NODE_MODULES_DIR) $(ARTICLE_PAGE_TEMPLATE)
 	docker compose up --build client server
 
-### BlockChain ###
+### Blockchain ###
 hardhat-bash:
 	docker-compose run hardhat bash
 
