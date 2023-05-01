@@ -22,18 +22,14 @@ export const generateLink = (tokenId: number) => {
  * @tokenId linkを作成するNFTのtokenId
  * @isExternal 外部リンクとして表示するか
  */
-const NftLinkButton = ({
-  tokenId,
-  isExternal = true,
-  ...buttonProps
-}: props) => {
+const NftLinkButton = ({ tokenId, ...buttonProps }: props) => {
   const nftLink = useMemo(() => {
     return generateLink(tokenId);
   }, [tokenId]);
   return (
     <Button
       onClick={() => {
-        isExternal ? window.open(nftLink) : window.location.replace(nftLink);
+        window.open(nftLink);
       }}
       {...buttonProps}
     >

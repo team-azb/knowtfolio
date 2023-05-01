@@ -30,7 +30,9 @@ const NftInfoTable = ({ articleId }: nftInfoTableProps) => {
         <>
           <Grid item>Token id: {tokenId}</Grid>
           <Grid item>
-            <NftLinkButton tokenId={tokenId}>View on Mumbai Scan</NftLinkButton>
+            <NftLinkButton tokenId={tokenId}>
+              View Token on Mumbai Scan
+            </NftLinkButton>
           </Grid>
         </>
       );
