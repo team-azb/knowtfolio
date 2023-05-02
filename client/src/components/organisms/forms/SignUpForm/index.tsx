@@ -193,14 +193,21 @@ const SignUpForm = () => {
             </Grid>
           </Grid>
         )}
-        <Grid item container justifyContent="center">
-          <p>
+        <Grid item container direction="column" spacing={1}>
+          <Grid item container justifyContent="center">
             すでにアカウントを持っている方は
             <Link to="/signin" style={{ color: "#000" }}>
               サインイン
             </Link>
             へ
-          </p>
+          </Grid>
+          <Grid item container justifyContent="center">
+            確認コードの再送信は
+            <Link to="/revalidation-code" style={{ color: "#000" }}>
+              こちら
+            </Link>
+            へ
+          </Grid>
         </Grid>
       </Grid>
     </Form>
