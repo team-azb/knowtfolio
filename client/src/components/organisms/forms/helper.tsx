@@ -47,7 +47,7 @@ const translateSignUpErrorCode = (
  * フィールドに表示するメッセージを作成するための関数
  * @param form サインアップフォーム
  */
-export const CreateFieldMessages = async <
+const createFieldMessages = async <
   T extends
     | SignUpForm
     | UpdatePasswordValidationForm
@@ -83,4 +83,28 @@ export const CreateFieldMessages = async <
     }, {} as fieldMessage);
 
   return { messages, isFormValid };
+};
+
+/**
+ * フォームを検証し、エラーメッセージと検証結果を返却する
+ * @param form 検証するフォーム
+ * @returns エラーメッセージと検証結果
+ */
+export const ValidateForm = async <
+  T extends
+    | SignUpForm
+    | UpdatePasswordValidationForm
+    | ResetPasswordValidationForm
+>(
+  form: T
+) => {
+  const { messages, isFormValid } = await createFieldMessages<T>(form);
+  const isAllFieldsFilled = Object.values(form).every(
+    (value) => value.length > 0
+  );
+
+  return {
+    fieldMessages: messages,
+    canSubmitForm: isFormValid && isAllFieldsFilled,
+  };
 };

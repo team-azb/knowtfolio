@@ -1,17 +1,16 @@
 import { Button, Grid } from "@mui/material";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import {
   resetPassword,
   ResetPasswordForm,
-  ResetPasswordValidationForm,
   sendPassswordResetVerificationCode,
 } from "~/apis/cognito";
 import Form from "~/components/atoms/authForm/Form";
 import Input from "~/components/atoms/authForm/Input";
 import Spacer from "~/components/atoms/Spacer";
-import { CreateFieldMessages } from "~/components/organisms/forms/helper";
+import { ValidateForm } from "~/components/organisms/forms/helper";
 
 type formFieldMessages = {
   [key in keyof ResetPasswordForm]?: JSX.Element;
@@ -28,16 +27,17 @@ const ResetPasswordForm = () => {
     verification_code: "",
   });
   const [fieldMessages, setFieldMessages] = useState<formFieldMessages>({});
+  const [canSubmitForm, setCanSubmitForm] = useState(false);
   const [hasSentCode, setHasSentCode] = useState(false);
-  const [isFormValid, setIsFormValid] = useState(false);
   const navigate = useNavigate();
 
-  const canSubmitForm = useMemo(() => {
-    const isAllFieldsFilled = Object.values(form).every(
-      (value) => value.length > 0
-    );
-    return isFormValid && isAllFieldsFilled;
-  }, [form, isFormValid]);
+  useEffect(() => {
+    (async () => {
+      const { fieldMessages, canSubmitForm } = await ValidateForm(form);
+      setFieldMessages(fieldMessages);
+      setCanSubmitForm(canSubmitForm);
+    })();
+  }, [form]);
 
   const handleChangeForm = useCallback<
     React.ChangeEventHandler<HTMLInputElement>
@@ -58,18 +58,6 @@ const ResetPasswordForm = () => {
         break;
     }
   }, []);
-
-  useEffect(() => {
-    (async () => {
-      const { messages, isFormValid } =
-        await CreateFieldMessages<ResetPasswordValidationForm>({
-          password: form.password,
-          password_confirmation: form.password_confirmation,
-        });
-      setFieldMessages(messages);
-      setIsFormValid(isFormValid);
-    })();
-  }, [form]);
 
   const handleSubmitUsername = useCallback(async () => {
     try {

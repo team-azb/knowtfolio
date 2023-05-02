@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   signUpToCognito,
   SignUpForm,
@@ -12,9 +12,9 @@ import Form from "~/components/atoms/authForm/Form";
 import Spacer from "~/components/atoms/Spacer";
 import { toast } from "react-toastify";
 import { Link, useNavigate } from "react-router-dom";
-import { CreateFieldMessages } from "~/components/organisms/forms/helper";
+import { ValidateForm } from "~/components/organisms/forms/helper";
 
-type formFieldMessages = {
+export type formFieldMessages = {
   [key in SignUpFormKey]?: JSX.Element;
 };
 
@@ -29,17 +29,18 @@ const SignUpForm = () => {
     username: "",
   });
   const [fieldMessages, setFieldMessages] = useState<formFieldMessages>({});
-  const [isFormValid, setIsFormValid] = useState(false);
+  const [canSubmitForm, setCanSubmitForm] = useState(false);
   const [hasSignedUp, setHasSignedUp] = useState(false);
   const [code, setCode] = useState("");
   const navigate = useNavigate();
 
-  const canSubmitForm = useMemo(() => {
-    const isAllFieldsFilled = Object.values(form).every(
-      (value) => value.length > 0
-    );
-    return isFormValid && isAllFieldsFilled;
-  }, [form, isFormValid]);
+  useEffect(() => {
+    (async () => {
+      const { fieldMessages, canSubmitForm } = await ValidateForm(form);
+      setFieldMessages(fieldMessages);
+      setCanSubmitForm(canSubmitForm);
+    })();
+  }, [form]);
 
   const onChangeForm = useCallback<React.ChangeEventHandler<HTMLInputElement>>(
     (event) => {
@@ -58,16 +59,6 @@ const SignUpForm = () => {
     },
     []
   );
-
-  useEffect(() => {
-    (async () => {
-      const { messages, isFormValid } = await CreateFieldMessages<SignUpForm>(
-        form
-      );
-      setIsFormValid(isFormValid);
-      setFieldMessages(messages);
-    })();
-  }, [form]);
 
   const submitForm = useCallback<React.MouseEventHandler<HTMLButtonElement>>(
     async (event) => {

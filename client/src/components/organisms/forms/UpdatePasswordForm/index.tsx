@@ -1,12 +1,12 @@
 import { Button, Grid } from "@mui/material";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import Form from "~/components/atoms/authForm/Form";
 import Input from "~/components/atoms/authForm/Input";
 import Spacer from "~/components/atoms/Spacer";
 import { useAuthContext } from "~/components/organisms/providers/AuthProvider";
-import { CreateFieldMessages } from "~/components/organisms/forms/helper";
+import { ValidateForm } from "~/components/organisms/forms/helper";
 
 export type UpdatePasswordForm = {
   old_password: string;
@@ -33,17 +33,21 @@ const UpdatePasswordForm = () => {
       password: "",
       password_confirmation: "",
     });
-  const [fieldMessages, setFieldMessages] = useState<formFieldMessages>({});
-  const [isFormValid, setIsFormValid] = useState(false);
   const { user } = useAuthContext();
   const navigate = useNavigate();
+  const [fieldMessages, setFieldMessages] = useState<formFieldMessages>({});
+  const [canSubmitForm, setCanSubmitForm] = useState(false);
 
-  const canSubmitForm = useMemo(() => {
-    const isAllFieldsFilled = Object.values(updatePasswordForm).every(
-      (value) => value.length > 0
-    );
-    return isFormValid && isAllFieldsFilled;
-  }, [updatePasswordForm, isFormValid]);
+  useEffect(() => {
+    (async () => {
+      const { fieldMessages, canSubmitForm } = await ValidateForm({
+        password: updatePasswordForm.password,
+        password_confirmation: updatePasswordForm.password_confirmation,
+      });
+      setFieldMessages(fieldMessages);
+      setCanSubmitForm(canSubmitForm);
+    })();
+  }, [updatePasswordForm]);
 
   const handleSubmitForm = useCallback(() => {
     user.changePassword(
@@ -78,18 +82,6 @@ const UpdatePasswordForm = () => {
         break;
     }
   }, []);
-
-  useEffect(() => {
-    (async () => {
-      const { messages, isFormValid } =
-        await CreateFieldMessages<UpdatePasswordValidationForm>({
-          password: updatePasswordForm.password,
-          password_confirmation: updatePasswordForm.password_confirmation,
-        });
-      setIsFormValid(isFormValid);
-      setFieldMessages(messages);
-    })();
-  }, [updatePasswordForm]);
 
   return (
     <Form>
