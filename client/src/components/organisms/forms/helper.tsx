@@ -1,4 +1,8 @@
-import { ResetPasswordForm, SignUpForm, SignUpFormKey } from "~/apis/cognito";
+import {
+  ResetPasswordValidationForm,
+  SignUpForm,
+  SignUpFormKey,
+} from "~/apis/cognito";
 import { SignUpErrorCode, validateSignUpForm } from "~/apis/lambda";
 import { UpdatePasswordForm } from "~/components/organisms/forms/UpdatePasswordForm";
 
@@ -44,7 +48,7 @@ const translateSignUpErrorCode = (
  * @param form サインアップフォーム
  */
 export const CreateFieldMessages = async <
-  T extends SignUpForm | UpdatePasswordForm | ResetPasswordForm
+  T extends SignUpForm | UpdatePasswordForm | ResetPasswordValidationForm
 >(
   form: T
 ) => {

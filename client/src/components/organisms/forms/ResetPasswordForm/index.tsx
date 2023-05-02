@@ -1,10 +1,11 @@
 import { Button, Grid } from "@mui/material";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import {
   resetPassword,
   ResetPasswordForm,
+  ResetPasswordValidationForm,
   sendPassswordResetVerificationCode,
 } from "~/apis/cognito";
 import Form from "~/components/atoms/authForm/Form";
@@ -28,7 +29,15 @@ const ResetPasswordForm = () => {
   });
   const [fieldMessages, setFieldMessages] = useState<formFieldMessages>({});
   const [hasSentCode, setHasSentCode] = useState(false);
+  const [isFormValid, setIsFormValid] = useState(false);
   const navigate = useNavigate();
+
+  const canSubmitForm = useMemo(() => {
+    const isAllFieldsFilled = Object.values(form).every(
+      (value) => value.length > 0
+    );
+    return isFormValid && isAllFieldsFilled;
+  }, [form, isFormValid]);
 
   const handleChangeForm = useCallback<
     React.ChangeEventHandler<HTMLInputElement>
@@ -52,8 +61,13 @@ const ResetPasswordForm = () => {
 
   useEffect(() => {
     (async () => {
-      const { messages } = await CreateFieldMessages<ResetPasswordForm>(form);
+      const { messages, isFormValid } =
+        await CreateFieldMessages<ResetPasswordValidationForm>({
+          password: form.password,
+          password_confirmation: form.password_confirmation,
+        });
       setFieldMessages(messages);
+      setIsFormValid(isFormValid);
     })();
   }, [form]);
 
@@ -142,7 +156,7 @@ const ResetPasswordForm = () => {
             <Grid item container justifyContent="center" spacing={2}>
               <Button
                 variant="outlined"
-                disabled={!hasSentCode}
+                disabled={!canSubmitForm || !hasSentCode}
                 onClick={handleSubmitPasswordResetForm}
                 style={{ fontSize: "1.4rem" }}
               >
