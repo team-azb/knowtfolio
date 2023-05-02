@@ -41,10 +41,10 @@ const RevalidationCodeForm = () => {
       event.preventDefault();
       try {
         await confirmSigningUpToCognito(username, confirmationCode);
-        toast.success("認証コードの検証に成功しました。");
+        toast.success("確認コードの検証に成功しました。");
         navigate("/signin");
       } catch (error) {
-        toast.error("認証コードの検証に失敗しました。");
+        toast.error("確認コードの検証に失敗しました。");
         return;
       }
     },

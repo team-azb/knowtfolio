@@ -64,7 +64,7 @@ const SignUpForm = () => {
       try {
         await signUpToCognito(form);
         setHasSignedUp(true);
-        toast.success("登録したEmailにコードを送信しました。");
+        toast.success("登録したEmailに確認コードを送信しました。");
       } catch (error) {
         // TODO: Display user friendly error.
         toast.error(`sign up failed: ${error}`);
@@ -84,9 +84,9 @@ const SignUpForm = () => {
       event.preventDefault();
       try {
         await confirmSigningUpToCognito(form.username, code);
-        toast.success("認証コードの検証に成功しました。");
+        toast.success("確認コードの検証に成功しました。");
       } catch (error) {
-        toast.error("認証コードの検証に失敗しました。");
+        toast.error("確認コードの検証に失敗しました。");
         return;
       }
 
