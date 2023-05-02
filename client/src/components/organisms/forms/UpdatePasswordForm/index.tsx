@@ -27,7 +27,7 @@ type formFieldMessages = {
  * 現在のパスワードを使用してパスワードを更新するためのフォーム
  */
 const UpdatePasswordForm = () => {
-  const [UpdatePasswordForm, setUpdatePasswordForm] =
+  const [updatePasswordForm, setUpdatePasswordForm] =
     useState<UpdatePasswordForm>({
       old_password: "",
       password: "",
@@ -39,16 +39,16 @@ const UpdatePasswordForm = () => {
   const navigate = useNavigate();
 
   const canSubmitForm = useMemo(() => {
-    const isAllFieldsFilled = Object.values(UpdatePasswordForm).every(
+    const isAllFieldsFilled = Object.values(updatePasswordForm).every(
       (value) => value.length > 0
     );
     return isFormValid && isAllFieldsFilled;
-  }, [UpdatePasswordForm, isFormValid]);
+  }, [updatePasswordForm, isFormValid]);
 
   const handleSubmitForm = useCallback(() => {
     user.changePassword(
-      UpdatePasswordForm.old_password,
-      UpdatePasswordForm.password,
+      updatePasswordForm.old_password,
+      updatePasswordForm.password,
       (err) => {
         if (err) {
           console.error(err.message);
@@ -58,7 +58,7 @@ const UpdatePasswordForm = () => {
         toast.success("パスワードを更新しました。");
       }
     );
-  }, [UpdatePasswordForm.password, UpdatePasswordForm.old_password, user]);
+  }, [updatePasswordForm.password, updatePasswordForm.old_password, user]);
 
   const handleChangeForm = useCallback<
     React.ChangeEventHandler<HTMLInputElement>
@@ -83,13 +83,13 @@ const UpdatePasswordForm = () => {
     (async () => {
       const { messages, isFormValid } =
         await CreateFieldMessages<UpdatePasswordValidationForm>({
-          password: UpdatePasswordForm.password,
-          password_confirmation: UpdatePasswordForm.password_confirmation,
+          password: updatePasswordForm.password,
+          password_confirmation: updatePasswordForm.password_confirmation,
         });
       setIsFormValid(isFormValid);
       setFieldMessages(messages);
     })();
-  }, [UpdatePasswordForm]);
+  }, [updatePasswordForm]);
 
   return (
     <Form>
@@ -101,7 +101,7 @@ const UpdatePasswordForm = () => {
           name="old_password"
           id="old_password"
           onChange={handleChangeForm}
-          value={UpdatePasswordForm.old_password}
+          value={updatePasswordForm.old_password}
           label="現在のパスワード"
           placeholder="現在使用しているパスワードを入力"
           type="password"
@@ -110,7 +110,7 @@ const UpdatePasswordForm = () => {
           name="password"
           id="password"
           onChange={handleChangeForm}
-          value={UpdatePasswordForm.password}
+          value={updatePasswordForm.password}
           label="新しいパスワード"
           placeholder="新しく設定するパスワードを入力"
           type="password"
@@ -120,7 +120,7 @@ const UpdatePasswordForm = () => {
           name="password_confirmation"
           id="password_confirmation"
           onChange={handleChangeForm}
-          value={UpdatePasswordForm.password_confirmation}
+          value={updatePasswordForm.password_confirmation}
           label="新しいパスワード（確認用）"
           placeholder="新しく設定するパスワードを再度入力"
           type="password"
