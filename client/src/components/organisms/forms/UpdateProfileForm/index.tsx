@@ -49,7 +49,7 @@ const descriptionMaxLength = 160;
 /**
  * プロフィールを編集するフォーム
  */
-const ResetProfileForm = () => {
+const UpdateProfileForm = () => {
   const {
     user,
     attributes: { email, website, description, picture },
@@ -266,4 +266,4 @@ const ResetProfileForm = () => {
   );
 };
 
-export default ResetProfileForm;
+export default UpdateProfileForm;
