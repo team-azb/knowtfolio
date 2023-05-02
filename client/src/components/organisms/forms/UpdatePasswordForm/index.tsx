@@ -1,5 +1,5 @@
 import { Button, Grid } from "@mui/material";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import Form from "~/components/atoms/authForm/Form";
@@ -13,6 +13,11 @@ export type UpdatePasswordForm = {
   password: string;
   password_confirmation: string;
 };
+
+export type UpdatePasswordValidationForm = Omit<
+  UpdatePasswordForm,
+  "old_password"
+>;
 
 type formFieldMessages = {
   [key in keyof UpdatePasswordForm]?: JSX.Element;
@@ -29,8 +34,16 @@ const UpdatePasswordForm = () => {
       password_confirmation: "",
     });
   const [fieldMessages, setFieldMessages] = useState<formFieldMessages>({});
+  const [isFormValid, setIsFormValid] = useState(false);
   const { user } = useAuthContext();
   const navigate = useNavigate();
+
+  const canSubmitForm = useMemo(() => {
+    const isAllFieldsFilled = Object.values(UpdatePasswordForm).every(
+      (value) => value.length > 0
+    );
+    return isFormValid && isAllFieldsFilled;
+  }, [UpdatePasswordForm, isFormValid]);
 
   const handleSubmitForm = useCallback(() => {
     user.changePassword(
@@ -68,9 +81,12 @@ const UpdatePasswordForm = () => {
 
   useEffect(() => {
     (async () => {
-      const { messages } = await CreateFieldMessages<UpdatePasswordForm>(
-        UpdatePasswordForm
-      );
+      const { messages, isFormValid } =
+        await CreateFieldMessages<UpdatePasswordValidationForm>({
+          password: UpdatePasswordForm.password,
+          password_confirmation: UpdatePasswordForm.password_confirmation,
+        });
+      setIsFormValid(isFormValid);
       setFieldMessages(messages);
     })();
   }, [UpdatePasswordForm]);
@@ -115,6 +131,7 @@ const UpdatePasswordForm = () => {
             <Button
               variant="outlined"
               onClick={handleSubmitForm}
+              disabled={!canSubmitForm}
               style={{ fontSize: "1.4rem" }}
             >
               Submit
