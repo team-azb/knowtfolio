@@ -14,7 +14,7 @@ import { toast } from "react-toastify";
 import { Link, useNavigate } from "react-router-dom";
 import { ValidateForm } from "~/components/organisms/forms/helper";
 
-export type formFieldMessages = {
+type formFieldMessages = {
   [key in SignUpFormKey]?: JSX.Element;
 };
 
