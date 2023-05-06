@@ -2,7 +2,6 @@ package aws
 
 import (
 	"context"
-	"crypto/rand"
 	"errors"
 	"fmt"
 	"github.com/aws/aws-sdk-go-v2/aws"
@@ -10,6 +9,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
 	"github.com/aws/smithy-go"
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/team-azb/knowtfolio/server/gateways/ethereum"
 )
 
 const tableName = "knowtfolio"
@@ -50,8 +50,47 @@ func (c *DynamoDBClient) GetAddressByID(userID string) (*common.Address, error) 
 	return &addr, nil
 }
 
-func (c *DynamoDBClient) GetNonceByID(userID string) (string, error) {
-	return c.getValue(userIDToNonceType, userID)
+func (c *DynamoDBClient) GetNonceByID(userID string) (*common.Hash, error) {
+	addrStr, err := c.getValue(userIDToNonceType, userID)
+	if err != nil {
+		return nil, err
+	}
+	nonce := common.HexToHash(addrStr)
+	return &nonce, nil
+}
+
+// GetAndReplaceNonceByID gets the current nonce and then replace it with a newly generated one.
+// This can be done by a single PutItem call with ReturnValues set to ALL_OLD.
+func (c *DynamoDBClient) GetAndReplaceNonceByID(userID string) (*common.Hash, error) {
+	nonce, err := ethereum.GenerateNonce()
+	if err != nil {
+		return nil, &smithy.GenericAPIError{
+			Code:    NonceGenerationFailedCode,
+			Message: err.Error(),
+			Fault:   smithy.FaultServer,
+		}
+	}
+
+	res, err := c.PutItem(context.Background(), &dynamodb.PutItemInput{
+		TableName: aws.String(tableName),
+		Item: map[string]types.AttributeValue{
+			"type":  &types.AttributeValueMemberS{Value: string(userIDToNonceType)},
+			"key":   &types.AttributeValueMemberS{Value: userID},
+			"value": &types.AttributeValueMemberS{Value: nonce.Hex()},
+		},
+		ReturnValues: types.ReturnValueAllOld,
+	})
+
+	if val, ok := res.Attributes["value"]; ok {
+		oldNonce := common.HexToHash(val.(*types.AttributeValueMemberS).Value)
+		return &oldNonce, nil
+	} else {
+		return nil, &smithy.GenericAPIError{
+			Code:    ValueFieldNotFoundCode,
+			Message: fmt.Sprintf("`value` field for %s/%s not found", userIDToNonceType, userID),
+			Fault:   smithy.FaultServer,
+		}
+	}
 }
 
 func (c *DynamoDBClient) GetIDByAddress(walletAddress common.Address) (string, error) {
@@ -59,9 +98,13 @@ func (c *DynamoDBClient) GetIDByAddress(walletAddress common.Address) (string, e
 }
 
 func (c *DynamoDBClient) GenerateAndPutNonce(userID string) error {
-	nonce, err := generateNonce()
+	nonce, err := ethereum.GenerateNonce()
 	if err != nil {
-		return err
+		return &smithy.GenericAPIError{
+			Code:    NonceGenerationFailedCode,
+			Message: err.Error(),
+			Fault:   smithy.FaultServer,
+		}
 	}
 
 	_, err = c.PutItem(context.Background(), &dynamodb.PutItemInput{
@@ -69,8 +112,9 @@ func (c *DynamoDBClient) GenerateAndPutNonce(userID string) error {
 		Item: map[string]types.AttributeValue{
 			"type":  &types.AttributeValueMemberS{Value: string(userIDToNonceType)},
 			"key":   &types.AttributeValueMemberS{Value: userID},
-			"value": &types.AttributeValueMemberS{Value: nonce},
+			"value": &types.AttributeValueMemberS{Value: nonce.Hex()},
 		},
+		ReturnValues: types.ReturnValueAllOld,
 	})
 	return err
 }
@@ -96,15 +140,19 @@ func (c *DynamoDBClient) PutUserWallet(userID string, walletAddress string) erro
 		}
 	}
 
-	nonce, err := generateNonce()
+	nonce, err := ethereum.GenerateNonce()
 	if err != nil {
-		return err
+		return &smithy.GenericAPIError{
+			Code:    NonceGenerationFailedCode,
+			Message: err.Error(),
+			Fault:   smithy.FaultServer,
+		}
 	}
 
 	_, err = c.TransactWriteItems(context.Background(), &dynamodb.TransactWriteItemsInput{
 		TransactItems: []types.TransactWriteItem{
 			keyValueToItem(userIDToWalletAddressType, userID, walletAddress),
-			keyValueToItem(userIDToNonceType, userID, nonce),
+			keyValueToItem(userIDToNonceType, userID, nonce.Hex()),
 			keyValueToItem(walletAddressToUserIDType, walletAddress, userID),
 		},
 	})
@@ -202,17 +250,4 @@ func (c *DynamoDBClient) getValue(kvType KeyValueType, key string) (string, erro
 			Fault:   smithy.FaultServer,
 		}
 	}
-}
-
-func generateNonce() (string, error) {
-	nonceBytes := make([]byte, 32)
-	_, err := rand.Read(nonceBytes)
-	if err != nil {
-		return "", &smithy.GenericAPIError{
-			Code:    NonceGenerationFailedCode,
-			Message: err.Error(),
-			Fault:   smithy.FaultServer,
-		}
-	}
-	return fmt.Sprintf("%x", nonceBytes), nil
 }

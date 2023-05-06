@@ -13,6 +13,7 @@ import { postWalletAddress } from "~/apis/lambda";
 import { noteOnWalletAddress } from "~/components/organisms/forms/SignUpForm";
 import RequireWeb3Wrapper from "~/components/organisms/RequireWeb3Wrapper";
 import { toast } from "react-toastify";
+import { initDynamodbClient } from "~/apis/dynamodb";
 
 /**
  * wallet addressがすでに登録されていた場合に表示するメッセージ
@@ -42,7 +43,7 @@ const RegisteredWalletAddressMessage = () => {
         </Grid>
         <Grid item xs={9.5}>
           <WalletAddressDisplay
-            address={userWalletAddress}
+            address={userWalletAddress!}
             shouldTruncate={false}
           />
         </Grid>
@@ -70,9 +71,13 @@ const RegisterWalletFormContent = () => {
   const { isConnectedToMetamask, account, web3 } = useWeb3Context();
   const navigate = useNavigate();
 
+  const dynamodbClient = initDynamodbClient(session.getIdToken().getJwtToken());
+
   const registerWalletAddress = useCallback(async () => {
     assertMetamask(isConnectedToMetamask);
     const signature = await web3.eth.personal.sign(
+      // Since the user doesn't have nonce at this point, there will be no nonce added to the message.
+      // Nonce is generated as a result of this post_wallet_address call.
       "Register wallet address",
       account,
       ""

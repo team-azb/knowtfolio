@@ -1,14 +1,30 @@
 package ethereum
 
 import (
+	"crypto/rand"
 	"errors"
+	"fmt"
 	"github.com/ethereum/go-ethereum/accounts"
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/crypto"
 )
 
+func GenerateNonce() (common.Hash, error) {
+	nonceBytes := make([]byte, 32)
+	_, err := rand.Read(nonceBytes)
+	if err != nil {
+		return common.Hash{}, err
+	}
+	return common.BytesToHash(nonceBytes), nil
+}
+
+func GenerateSignData(message string, nonce common.Hash) string {
+	return fmt.Sprintf("%s\n(nonce: %s)", message, nonce.Hex())
+}
+
 // VerifySignature checks if `sign` is a signature that is signed by `addr` using `signedData`.
-func VerifySignature(addr string, sign string, signedData string) error {
+func VerifySignature(addr string, sign string, message string, nonce *common.Hash) error {
 	decodedSign, err := hexutil.Decode(sign)
 	if err != nil {
 		return err
@@ -18,6 +34,13 @@ func VerifySignature(addr string, sign string, signedData string) error {
 	// ref) https://github.com/ethereum/go-ethereum/issues/19751#issuecomment-504900739
 	if decodedSign[crypto.RecoveryIDOffset] >= 27 {
 		decodedSign[crypto.RecoveryIDOffset] -= 27
+	}
+
+	var signedData string
+	if nonce != nil {
+		signedData = GenerateSignData(message, *nonce)
+	} else {
+		signedData = message
 	}
 
 	hash := accounts.TextHash([]byte(signedData))
