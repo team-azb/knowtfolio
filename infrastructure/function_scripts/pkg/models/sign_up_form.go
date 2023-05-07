@@ -8,7 +8,7 @@ import (
 )
 
 type SignUpForm struct {
-	UserName string `json:"username" validate:"required"`
+	UserName string `json:"username" validate:"required,cognito_username"`
 	Password string `json:"password" validate:"required,cognito_password"`
 	Email    string `json:"email" validate:"required,email"`
 }

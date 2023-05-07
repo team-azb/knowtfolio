@@ -3,9 +3,9 @@ package models
 import (
 	"encoding/json"
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/team-azb/knowtfolio/server/gateways/aws"
 	"reflect"
 	"regexp"
+	"strings"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/team-azb/knowtfolio/server/gateways/ethereum"
@@ -14,7 +14,12 @@ import (
 var requestValidator = validator.New()
 
 func init() {
-	err := requestValidator.RegisterValidation("cognito_password", validateCognitoPassword)
+	err := requestValidator.RegisterValidation("cognito_username", validateCognitoUserName)
+	if err != nil {
+		panic(err.(any))
+	}
+
+	err = requestValidator.RegisterValidation("cognito_password", validateCognitoPassword)
 	if err != nil {
 		panic(err.(any))
 	}
@@ -38,6 +43,19 @@ func ValidateJSONRequest(srcJSON []byte, distStruct interface{}) error {
 	return err
 }
 
+func validateCognitoUserName(fl validator.FieldLevel) bool {
+	val := fl.Field().String()
+	containsValidCharactersOnly, _ := regexp.MatchString("^[0-9a-z\\-]+$", val)
+	doesNotStartWithHyphen := !strings.HasPrefix(val, "-")
+	doesNotEndWithHyphen := !strings.HasSuffix(val, "-")
+	isLengthInRange := 1 <= len(val) && len(val) < 40
+
+	return containsValidCharactersOnly &&
+		doesNotStartWithHyphen &&
+		doesNotEndWithHyphen &&
+		isLengthInRange
+}
+
 // validateCognitoPassword checks if the given field matches the cognito password policies:
 // https://docs.aws.amazon.com/cognito/latest/developerguide/user-pool-settings-policies.html#user-pool-settings-password-policies
 func validateCognitoPassword(fl validator.FieldLevel) bool {
@@ -56,8 +74,6 @@ func validateCognitoPassword(fl validator.FieldLevel) bool {
 		containsValidCharactersOnly &&
 		isLengthInRange
 }
-
-var dynamoDB = aws.NewDynamoDBClient()
 
 // EthSignatureValidationInfo is a container for information necessary for eth-signature validation.
 type EthSignatureValidationInfo struct {
