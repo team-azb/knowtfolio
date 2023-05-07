@@ -38,7 +38,15 @@ func NewNftsService(db *gorm.DB, contract *ethereum.ContractClient, s3Client *s3
 }
 
 func (s nftsService) CreateForArticle(ctx context.Context, request *nfts.CreateNftForArticleRequest) (res *nfts.CreateNftForArticleResult, err error) {
-	err = ethereum.VerifySignature(request.Address, request.Signature, config.SignData["CreateNFT"])
+	userID, err := s.DynamoDBClient.GetIDByAddress(common.HexToAddress(request.Address))
+	if err != nil {
+		return nil, nfts.MakeUnauthenticated(err)
+	}
+	nonce, err := s.DynamoDBClient.GetAndReplaceNonceByID(userID)
+	if err != nil {
+		return nil, nfts.MakeUnauthenticated(err)
+	}
+	err = ethereum.VerifySignature(request.Address, request.Signature, config.SignData["CreateNFT"], nonce)
 	if err != nil {
 		return nil, nfts.MakeUnauthenticated(err)
 	}

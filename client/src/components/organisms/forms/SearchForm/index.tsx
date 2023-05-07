@@ -1,5 +1,5 @@
 import { Grid } from "@mui/material";
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 
 /**
@@ -8,6 +8,9 @@ import { useSearchParams } from "react-router-dom";
  */
 const SearchForm = () => {
   const [searchParams, setSearchParams] = useSearchParams();
+  const keywords = useMemo(() => {
+    return searchParams.get("q") || "";
+  }, [searchParams]);
 
   const onChangeKeywords = useCallback<
     React.ChangeEventHandler<HTMLInputElement>
@@ -40,6 +43,7 @@ const SearchForm = () => {
           type="text"
           placeholder="Keywords"
           onChange={onChangeKeywords}
+          value={keywords}
         />
       </Grid>
     </Grid>

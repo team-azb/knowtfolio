@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/team-azb/knowtfolio/server/gateways/aws"
 	"github.com/team-azb/knowtfolio/server/gateways/ethereum"
 
@@ -21,9 +22,11 @@ func handler(_ context.Context, event *events.CognitoEventUserPoolsVerifyAuthCha
 	}
 
 	sign := event.Request.ChallengeAnswer.(string)
-	signedData := event.Request.PrivateChallengeParameters["sign_message"]
+	message := event.Request.PrivateChallengeParameters["message"]
+	nonceStr := event.Request.PrivateChallengeParameters["nonce"]
 
-	err = ethereum.VerifySignature(address.String(), sign, signedData)
+	nonce := common.HexToHash(nonceStr)
+	err = ethereum.VerifySignature(address.String(), sign, message, &nonce)
 	if err == nil {
 		event.Response = events.CognitoEventUserPoolsVerifyAuthChallengeResponse{AnswerCorrect: true}
 	}

@@ -76,7 +76,7 @@ func TestReadArticle(t *testing.T) {
 		assert.Equal(t, article0.ID, result.ID)
 		assert.Equal(t, article0.Document.Title, result.Title)
 		assert.Equal(t, testUsers[0].ID, result.OwnerID)
-		assert.Equal(t, testUsers[0].Address, *result.OwnerAddress)
+		assert.Equal(t, testUsers[0].Address(), *result.OwnerAddress)
 		assert.Equal(t, string(article0.Document.Content), result.Content)
 	})
 
@@ -85,7 +85,7 @@ func TestReadArticle(t *testing.T) {
 
 		// Article0 here is created by user0 and currently owned by user1.
 		service.DB.Create(&tokenizedArticle0)
-		mintNFTOfArticle0AndWait(t, service.Contract, testUsers[1].Address)
+		mintNFTOfArticle0AndWait(t, service.Contract, testUsers[1].Address())
 
 		result, err := service.Read(context.Background(), &articles.ArticleReadRequest{ID: tokenizedArticle0.ID})
 
@@ -94,7 +94,7 @@ func TestReadArticle(t *testing.T) {
 		assert.Equal(t, tokenizedArticle0.ID, result.ID)
 		assert.Equal(t, tokenizedArticle0.Document.Title, result.Title)
 		assert.Equal(t, testUsers[1].ID, result.OwnerID)
-		assert.Equal(t, testUsers[1].Address, *result.OwnerAddress)
+		assert.Equal(t, testUsers[1].Address(), *result.OwnerAddress)
 		assert.Equal(t, string(tokenizedArticle0.Document.Content), result.Content)
 	})
 }
@@ -120,7 +120,7 @@ func TestUpdateArticle(t *testing.T) {
 
 		// Create article and the corresponding NFT.
 		service.DB.Create(&tokenizedArticle0)
-		mintNFTOfArticle0AndWait(t, service.Contract, testUsers[0].Address)
+		mintNFTOfArticle0AndWait(t, service.Contract, testUsers[0].Address())
 
 		// Send update request
 		result, err := service.Update(testUsers[0].GetUserIDContext(), &updateRequestByUser0)
@@ -162,7 +162,7 @@ func TestUpdateArticle(t *testing.T) {
 
 		// Create article and the corresponding NFT.
 		service.DB.Create(&tokenizedArticle0)
-		mintNFTOfArticle0AndWait(t, service.Contract, testUsers[0].Address)
+		mintNFTOfArticle0AndWait(t, service.Contract, testUsers[0].Address())
 
 		// Send update request
 		_, err := service.Update(testUsers[1].GetUserIDContext(), &updateRequestByUser1)

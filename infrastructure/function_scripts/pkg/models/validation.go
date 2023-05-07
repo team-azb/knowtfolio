@@ -2,6 +2,8 @@ package models
 
 import (
 	"encoding/json"
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/team-azb/knowtfolio/server/gateways/aws"
 	"reflect"
 	"regexp"
 
@@ -17,10 +19,8 @@ func init() {
 		panic(err.(any))
 	}
 
-	err = requestValidator.RegisterValidation("eth_sign_addr", validateEthSignature)
-	if err != nil {
-		panic(err.(any))
-	}
+	var validatable EthSignatureValidatable
+	requestValidator.RegisterStructValidation(validateEthSignature, validatable)
 
 	requestValidator.RegisterTagNameFunc(func(field reflect.StructField) string {
 		return field.Tag.Get("json")
@@ -57,22 +57,37 @@ func validateCognitoPassword(fl validator.FieldLevel) bool {
 		isLengthInRange
 }
 
-var signData = map[reflect.Type]string{
-	reflect.TypeOf(SignUpForm{}):               "Sign up with wallet address",
-	reflect.TypeOf(PostWalletAddressRequest{}): "Register wallet address",
+var dynamoDB = aws.NewDynamoDBClient()
+
+// EthSignatureValidationInfo is a container for information necessary for eth-signature validation.
+type EthSignatureValidationInfo struct {
+	Address            common.Address
+	Message            string
+	Nonce              *common.Hash
+	Signature          string
+	SignatureFieldName string
+}
+
+type EthSignatureValidatable interface {
+	ValidationInfo() (EthSignatureValidationInfo, error)
 }
 
 // validateEthSignature checks if the field value is a valid signature by the address specified in fl.Param().
-func validateEthSignature(fl validator.FieldLevel) bool {
-	sign := fl.Field().String()
-
-	addrVal, addrKind, _, isAddrFound := fl.GetStructFieldOK2()
-	if addrKind != reflect.String && !isAddrFound {
-		return false
+func validateEthSignature(sl validator.StructLevel) {
+	val, ok := sl.Current().Interface().(EthSignatureValidatable)
+	if !ok {
+		// This won't happen because `validateEthSignature` is registered only for `EthSignatureValidatable`.
+		panic("Do not register `validateEthSignature` for types other than `EthSignatureValidatable`.")
 	}
-	addr := addrVal.String()
 
-	err := ethereum.VerifySignature(addr, sign, signData[fl.Parent().Type()])
+	valInfo, err := val.ValidationInfo()
+	if err != nil {
+		sl.ReportError(nil, "", "", "eth_sign_addr", "")
+	}
 
-	return err == nil
+	err = ethereum.VerifySignature(valInfo.Address.String(), valInfo.Signature, valInfo.Message, valInfo.Nonce)
+	if err != nil {
+		signatureField := reflect.ValueOf(val).FieldByName(valInfo.SignatureFieldName)
+		sl.ReportError(signatureField, valInfo.SignatureFieldName, valInfo.SignatureFieldName, "eth_sign_addr", "")
+	}
 }

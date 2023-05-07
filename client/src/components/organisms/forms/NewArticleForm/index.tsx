@@ -1,6 +1,10 @@
 import { Editor as TinyMCEEditor } from "tinymce";
 import { useCallback, useState } from "react";
-import { mintArticleNft, postArticle } from "~/apis/knowtfolio";
+import {
+  generateSignData,
+  mintArticleNft,
+  postArticle,
+} from "~/apis/knowtfolio";
 import { useNavigate } from "react-router-dom";
 import {
   assertMetamask,
@@ -12,6 +16,7 @@ import ArrowBackIosNewRoundedIcon from "@mui/icons-material/ArrowBackIosNewRound
 import { toast } from "react-toastify";
 import RequireWeb3Wrapper from "~/components/organisms/RequireWeb3Wrapper";
 import { useAuthContext } from "~/components/organisms/providers/AuthProvider";
+import { fetchNonce, initDynamodbClient } from "~/apis/dynamodb";
 
 /**
  * 記事の新規作成用のフォーム
@@ -27,6 +32,7 @@ const NewArticleForm = () => {
     setContent(value);
   }, []);
   const navigate = useNavigate();
+  const dynamodbClient = initDynamodbClient(session.getIdToken().getJwtToken());
 
   const onChangeTitleInput = useCallback<
     React.ChangeEventHandler<HTMLInputElement>
@@ -36,16 +42,19 @@ const NewArticleForm = () => {
 
   const handlePost = useCallback(async () => {
     try {
-      const idToken = session.getIdToken().getJwtToken();
-      const { id } = await postArticle({
-        title: titleInput,
-        content,
-        token: idToken,
-      });
+      const { id } = await postArticle(
+        {
+          title: titleInput,
+          content,
+        },
+        session
+      );
 
       assertMetamask(isConnectedToMetamask);
+
+      const nonce = await fetchNonce(dynamodbClient, user.getUsername());
       const signatureForMint = await web3.eth.personal.sign(
-        "Mint NFT",
+        generateSignData("Mint NFT", nonce),
         account,
         ""
       );

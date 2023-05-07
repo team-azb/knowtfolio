@@ -1,9 +1,10 @@
 import axios from "axios";
+import { CognitoUserSession } from "amazon-cognito-identity-js";
+import { sessionToHeader } from "~/apis/cognito";
 
 export type postArticleForm = {
   content: string;
   title: string;
-  token: string;
 };
 
 type postArticleResponse = {
@@ -11,7 +12,10 @@ type postArticleResponse = {
   id: string;
   title: string;
 };
-export const postArticle = async (form: postArticleForm) => {
+export const postArticle = async (
+  form: postArticleForm,
+  session: CognitoUserSession
+) => {
   const { data } = await axios.post<postArticleResponse>(
     "/api/articles",
     {
@@ -19,9 +23,7 @@ export const postArticle = async (form: postArticleForm) => {
       title: form.title,
     },
     {
-      headers: {
-        Authorization: `Bearer ${form.token}`,
-      },
+      headers: sessionToHeader(session),
     }
   );
   return data;
@@ -30,7 +32,10 @@ export const postArticle = async (form: postArticleForm) => {
 export type updateArticleForm = {
   articleId: string;
 } & postArticleForm;
-export const putArticle = async (form: updateArticleForm) => {
+export const putArticle = async (
+  form: updateArticleForm,
+  session: CognitoUserSession
+) => {
   await axios.put(
     `/api/articles/${form.articleId}`,
     {
@@ -38,9 +43,7 @@ export const putArticle = async (form: updateArticleForm) => {
       title: form.title,
     },
     {
-      headers: {
-        Authorization: `Bearer ${form.token}`,
-      },
+      headers: sessionToHeader(session),
     }
   );
 };
@@ -93,4 +96,8 @@ export const searchArticles = async (queryParams: searchQuery = {}) => {
     params: queryParams,
   });
   return data;
+};
+
+export const generateSignData = (message: string, nonce: string) => {
+  return `${message}\n(nonce: ${nonce})`;
 };

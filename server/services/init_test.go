@@ -2,7 +2,11 @@ package services
 
 import (
 	"context"
+	"crypto/ecdsa"
 	"fmt"
+	"github.com/ethereum/go-ethereum/accounts"
+	"github.com/ethereum/go-ethereum/common/hexutil"
+	"github.com/ethereum/go-ethereum/crypto"
 	"os"
 	"strings"
 	"sync"
@@ -22,19 +26,21 @@ import (
 var (
 	adminAddr = "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC"
 	testUsers = []testUser{
+		// NOTE: These two private keys are from hardhat default accounts, and are publicly available here:
+		// https://hardhat.org/hardhat-network/docs/overview
 		{
-			ID:       "test-user0",
-			Password: "Password#0",
-			Email:    "user0@example.com",
-			Address:  "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+			ID:            "test-user0",
+			Password:      "Password#0",
+			Email:         "user0@example.com",
+			PrivateKeyHex: "ac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80",
 		}, {
-			ID:       "test-user1",
-			Password: "Password#1",
-			Email:    "user1@sample.com",
-			Address:  "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
+			ID:            "test-user1",
+			Password:      "Password#1",
+			Email:         "user1@sample.com",
+			PrivateKeyHex: "59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d",
 		},
 	}
-	transactionLock = map[string]*sync.Mutex{testUsers[0].Address: {}, testUsers[1].Address: {}, adminAddr: {}}
+	transactionLock = map[string]*sync.Mutex{testUsers[0].Address(): {}, testUsers[1].Address(): {}, adminAddr: {}}
 	cognitoClient   = aws.NewCognitoClient()
 	dynamodbClient  = aws.NewDynamoDBClient()
 )
@@ -116,15 +122,49 @@ func initTestContractClient(t *testing.T) *ethereum.ContractClient {
 }
 
 type testUser struct {
-	ID       string
-	Password string
-	Email    string
-	Address  string
-	IDToken  string
+	ID            string
+	Password      string
+	Email         string
+	PrivateKeyHex string
+	IDToken       string
+}
+
+func (u *testUser) privateKey() *ecdsa.PrivateKey {
+	privateKey, err := crypto.HexToECDSA(u.PrivateKeyHex)
+	if err != nil {
+		panic(err)
+	}
+	return privateKey
+}
+
+func (u *testUser) Address() string {
+	publicKey, ok := u.privateKey().Public().(*ecdsa.PublicKey)
+	if !ok {
+		panic("error casting public key to ECDSA")
+	}
+
+	address := crypto.PubkeyToAddress(*publicKey)
+	return address.Hex()
 }
 
 func (u *testUser) GetUserIDContext() context.Context {
 	return context.WithValue(context.Background(), UserIDCtxKey, u.ID)
+}
+
+func (u *testUser) GenerateSignature(message string) string {
+	nonce, err := dynamodbClient.GetNonceByID(u.ID)
+	if err != nil {
+		panic(err)
+	}
+
+	data := ethereum.GenerateSignData(message, *nonce)
+	hash := accounts.TextHash([]byte(data))
+
+	signature, err := crypto.Sign(hash, u.privateKey())
+	if err != nil {
+		panic(err)
+	}
+	return hexutil.Encode(signature)
 }
 
 func (u *testUser) registerToAWS() error {
@@ -133,7 +173,7 @@ func (u *testUser) registerToAWS() error {
 		return err
 	}
 
-	err = dynamodbClient.PutUserWallet(u.ID, u.Address)
+	err = dynamodbClient.PutUserWallet(u.ID, u.Address())
 	if err != nil {
 		return err
 	}
