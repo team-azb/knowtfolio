@@ -25,7 +25,7 @@ runs:
         touch server/.env
         echo ENV="${{inputs.ENV}}" >> server/.env
         echo ADMIN_PRIVATE_KEY=${{inputs.ADMIN_WALLET_PRIVATE_KEY}} >> server/.env
-        echo CONTRACT_ADDRESS=0xd08db6d8Fb163182722e0D17fa8146f26a79BB6A >> server/.env
+        echo CONTRACT_ADDRESS=0xE4b876CCB7d2812C2a4121C315DDba68772B183A >> server/.env
         echo NETWORK_URI=https://polygon-mumbai.g.alchemy.com/v2/ZRG81-lcDf9T69OmxipvuoO-FMMFAOoH >> server/.env
         echo CHAIN_ID=80001 >> server/.env
         echo AWS_ACCESS_KEY=${{inputs.AWS_KNOWTFOLIO_ADMIN_ACCESS_KEY}} >> server/.env
@@ -44,4 +44,4 @@ runs:
         echo ARTICLE_RESOURCES_S3_BUCKET=dev-knowtfolio-article-resources >> client/.env
         echo CLOUD_FRONT_DISTRIBUTION_ID=E1QMJWEALLWNHF >> client/.env
         echo TINY_MCE_API_KEY=${{inputs.TINY_MCE_API_KEY}} >> client/.env
-        echo CONTRACT_ADDRESS=0xd08db6d8Fb163182722e0D17fa8146f26a79BB6A >> client/.env
+        echo CONTRACT_ADDRESS=0xE4b876CCB7d2812C2a4121C315DDba68772B183A >> client/.env

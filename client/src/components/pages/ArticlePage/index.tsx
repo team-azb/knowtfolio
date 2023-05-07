@@ -5,6 +5,7 @@ import HeaderLayout from "~/components/organisms/layouts/HeaderLayout";
 import Spacer from "~/components/atoms/Spacer";
 import { Grid } from "@mui/material";
 import ArticleOwnerInfoTable from "~/components/organisms/tables/ArticleOwnerInfoTable";
+import NftInfoTable from "~/components/organisms/tables/NftInfoTable";
 
 /**
  * サーバサイドレンダリングされる可能性のある変数の初期値を取得する
@@ -58,12 +59,21 @@ function ArticlePage() {
               id="content"
             />
           </Grid>
-          {ownerId && (
-            <Grid item xs={3}>
-              <ArticleOwnerInfoTable ownerId={ownerId} />
-              <hr />
-            </Grid>
-          )}
+
+          <Grid item xs={3}>
+            {ownerId && (
+              <>
+                <ArticleOwnerInfoTable ownerId={ownerId} />
+                <hr />
+              </>
+            )}
+            {articleId && (
+              <>
+                <NftInfoTable articleId={articleId} />
+                <hr />
+              </>
+            )}
+          </Grid>
         </Grid>
       </div>
     </HeaderLayout>

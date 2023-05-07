@@ -73,12 +73,15 @@ $(ARTICLE_PAGE_TEMPLATE): ./client/webpack.config.js $(CLIENT_SRC_DIR) $(CLIENT_
 server/build/server: $(GOA_GEN_DIR) $(GO_ETH_BINDING_PATH)
 	docker compose run --rm server go build -o build/server
 
-.PHONY: app client server goa test-sv checkfmt-sv go-eth-binding \
+.PHONY: app hardhat-bash client server goa test-sv checkfmt-sv go-eth-binding \
 	init-tf fmt-tf checkfmt-tf plan-tf apply-tf clean
 
 app: goa go-eth-binding $(CLIENT_NODE_MODULES_DIR) $(ARTICLE_PAGE_TEMPLATE)
 	docker compose up --build client server
 
+### Blockchain ###
+hardhat-bash:
+	docker-compose run hardhat bash
 
 ### Client ###
 
