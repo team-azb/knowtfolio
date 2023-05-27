@@ -20,10 +20,12 @@ const AcountInfo = () => {
       style={{ fontSize: "1.4rem", flexDirection: "column" }}
     >
       {user.getUsername()}
-      <WalletAddressDisplay
-        address={userWalletAddress}
-        style={{ fontSize: "1rem" }}
-      />
+      <p>
+        <WalletAddressDisplay
+          address={userWalletAddress}
+          style={{ fontSize: "1rem" }}
+        />
+      </p>
     </Button>
   );
 };
