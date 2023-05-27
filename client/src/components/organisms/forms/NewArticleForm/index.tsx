@@ -73,6 +73,7 @@ const NewArticleForm = () => {
   }, [
     account,
     content,
+    dynamodbClient,
     isConnectedToMetamask,
     navigate,
     session,
