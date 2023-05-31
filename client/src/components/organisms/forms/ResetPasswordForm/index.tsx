@@ -10,7 +10,7 @@ import {
 import Form from "~/components/atoms/authForm/Form";
 import Input from "~/components/atoms/authForm/Input";
 import Spacer from "~/components/atoms/Spacer";
-import { CreateFieldMessages } from "~/components/organisms/forms/helper";
+import { ValidateForm } from "~/components/organisms/forms/helper";
 
 type formFieldMessages = {
   [key in keyof ResetPasswordForm]?: JSX.Element;
@@ -27,8 +27,17 @@ const ResetPasswordForm = () => {
     verification_code: "",
   });
   const [fieldMessages, setFieldMessages] = useState<formFieldMessages>({});
+  const [canSubmitForm, setCanSubmitForm] = useState(false);
   const [hasSentCode, setHasSentCode] = useState(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    (async () => {
+      const { fieldMessages, canSubmitForm } = await ValidateForm(form);
+      setFieldMessages(fieldMessages);
+      setCanSubmitForm(canSubmitForm);
+    })();
+  }, [form]);
 
   const handleChangeForm = useCallback<
     React.ChangeEventHandler<HTMLInputElement>
@@ -49,13 +58,6 @@ const ResetPasswordForm = () => {
         break;
     }
   }, []);
-
-  useEffect(() => {
-    (async () => {
-      const fieldMessages = await CreateFieldMessages<ResetPasswordForm>(form);
-      setFieldMessages(fieldMessages);
-    })();
-  }, [form]);
 
   const handleSubmitUsername = useCallback(async () => {
     try {
@@ -142,7 +144,7 @@ const ResetPasswordForm = () => {
             <Grid item container justifyContent="center" spacing={2}>
               <Button
                 variant="outlined"
-                disabled={!hasSentCode}
+                disabled={!canSubmitForm || !hasSentCode}
                 onClick={handleSubmitPasswordResetForm}
                 style={{ fontSize: "1.4rem" }}
               >

@@ -12,7 +12,7 @@ import Form from "~/components/atoms/authForm/Form";
 import Spacer from "~/components/atoms/Spacer";
 import { toast } from "react-toastify";
 import { Link, useNavigate } from "react-router-dom";
-import { CreateFieldMessages } from "~/components/organisms/forms/helper";
+import { ValidateForm } from "~/components/organisms/forms/helper";
 
 type formFieldMessages = {
   [key in SignUpFormKey]?: JSX.Element;
@@ -29,9 +29,18 @@ const SignUpForm = () => {
     username: "",
   });
   const [fieldMessages, setFieldMessages] = useState<formFieldMessages>({});
+  const [canSubmitForm, setCanSubmitForm] = useState(false);
   const [hasSignedUp, setHasSignedUp] = useState(false);
   const [code, setCode] = useState("");
   const navigate = useNavigate();
+
+  useEffect(() => {
+    (async () => {
+      const { fieldMessages, canSubmitForm } = await ValidateForm(form);
+      setFieldMessages(fieldMessages);
+      setCanSubmitForm(canSubmitForm);
+    })();
+  }, [form]);
 
   const onChangeForm = useCallback<React.ChangeEventHandler<HTMLInputElement>>(
     (event) => {
@@ -50,13 +59,6 @@ const SignUpForm = () => {
     },
     []
   );
-
-  useEffect(() => {
-    (async () => {
-      const fieldMessages = await CreateFieldMessages<SignUpForm>(form);
-      setFieldMessages(fieldMessages);
-    })();
-  }, [form]);
 
   const submitForm = useCallback<React.MouseEventHandler<HTMLButtonElement>>(
     async (event) => {
@@ -157,7 +159,7 @@ const SignUpForm = () => {
         <Grid item container justifyContent="center">
           <Button
             variant="outlined"
-            disabled={hasSignedUp}
+            disabled={!canSubmitForm || hasSignedUp}
             onClick={submitForm}
             style={{ fontSize: "1.4rem" }}
           >

@@ -15,6 +15,7 @@ import { ARTICLE_RESOURCES_S3_BUCKET } from "~/configs/s3";
 import { useS3Client } from "~/apis/s3";
 import IconImage from "~/components/atoms/IconImage";
 import imageCompression from "browser-image-compression";
+import validator from "validator";
 
 type profileForm = {
   website?: string;
@@ -48,7 +49,7 @@ const descriptionMaxLength = 160;
 /**
  * プロフィールを編集するフォーム
  */
-const ResetProfileForm = () => {
+const UpdateProfileForm = () => {
   const {
     user,
     attributes: { email, website, description, picture },
@@ -63,6 +64,16 @@ const ResetProfileForm = () => {
   const navigate = useNavigate();
   const [imageForm, setImageForm] = useState<imageForm | null>(null);
   const s3Client = useS3Client();
+  const { isValidForm, isValidBio, isValidURL } = useMemo(() => {
+    const isValidBio = descriptionLength <= descriptionMaxLength;
+    const isValidURL = profileForm.website
+      ? validator.isURL(profileForm.website, {
+          require_protocol: true,
+          protocols: ["http", "https"],
+        })
+      : true;
+    return { isValidForm: isValidBio && isValidURL, isValidBio, isValidURL };
+  }, [descriptionLength, profileForm.website]);
 
   const handleSubmitForm = useCallback(async () => {
     let form = { ...profileForm };
@@ -141,6 +152,16 @@ const ResetProfileForm = () => {
     }
   }, []);
 
+  const websiteMessage = useMemo(() => {
+    if (!profileForm.website) {
+      return undefined;
+    } else if (isValidURL) {
+      return <p style={{ color: "green" }}>有効なURLです。</p>;
+    } else {
+      return <p style={{ color: "red" }}>無効なURLです。</p>;
+    }
+  }, [isValidURL, profileForm.website]);
+
   return (
     <Form>
       <h2>プロフィールを編集</h2>
@@ -180,6 +201,7 @@ const ResetProfileForm = () => {
               placeholder="プロフィールがわかるウェブサイトを入力"
               value={profileForm.website}
               onChange={handleChangeForm}
+              message={websiteMessage}
             />
             <Grid item container direction="column">
               <Label htmlFor="description">Biography</Label>
@@ -200,17 +222,14 @@ const ResetProfileForm = () => {
               />
               <Grid item container>
                 <p style={{ color: "red" }}>
-                  {descriptionLength > descriptionMaxLength &&
-                    "自己紹介の文字数は160文字以内にしてください"}
+                  {!isValidBio &&
+                    `自己紹介の文字数は${descriptionMaxLength}文字以内にしてください`}
                 </p>
                 <Grid
                   item
                   flexGrow={1}
                   style={{
-                    color:
-                      descriptionLength > descriptionMaxLength
-                        ? "red"
-                        : "green",
+                    color: isValidBio ? "green" : "red",
                   }}
                 >
                   <Grid container direction="row-reverse">
@@ -224,6 +243,7 @@ const ResetProfileForm = () => {
                 <Button
                   variant="outlined"
                   style={{ fontSize: "1.4rem" }}
+                  disabled={!isValidForm}
                   onClick={handleSubmitForm}
                 >
                   update
@@ -246,4 +266,4 @@ const ResetProfileForm = () => {
   );
 };
 
-export default ResetProfileForm;
+export default UpdateProfileForm;

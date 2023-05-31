@@ -215,6 +215,10 @@ export const resetPassword = (form: ResetPasswordForm) => {
     });
   });
 };
+export type ResetPasswordValidationForm = Omit<
+  ResetPasswordForm,
+  "username" | "verification_code"
+>;
 
 export const sessionToHeader = (session: CognitoUserSession) => {
   return {

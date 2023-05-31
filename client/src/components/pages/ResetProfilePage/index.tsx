@@ -1,5 +1,5 @@
 import { Grid } from "@mui/material";
-import ResetProfileForm from "~/components/organisms/forms/ResetProfileForm";
+import UpdateProfileForm from "~/components/organisms/forms/UpdateProfileForm";
 import HeaderLayout from "~/components/organisms/layouts/HeaderLayout";
 
 /**
@@ -9,7 +9,7 @@ const ResetProfilePage = () => {
   return (
     <HeaderLayout>
       <Grid style={{ padding: "100px 400px" }}>
-        <ResetProfileForm />
+        <UpdateProfileForm />
       </Grid>
     </HeaderLayout>
   );

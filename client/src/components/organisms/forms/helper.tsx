@@ -1,6 +1,10 @@
-import { ResetPasswordForm, SignUpForm, SignUpFormKey } from "~/apis/cognito";
+import {
+  ResetPasswordValidationForm,
+  SignUpForm,
+  SignUpFormKey,
+} from "~/apis/cognito";
 import { SignUpErrorCode, validateSignUpForm } from "~/apis/lambda";
-import { UpdatePasswordForm } from "~/components/organisms/forms/UpdatePasswordForm";
+import { UpdatePasswordValidationForm } from "~/components/organisms/forms/UpdatePasswordForm";
 
 /**
  * invalid_formだった場合のエラー表示文
@@ -42,11 +46,15 @@ const translateSignUpErrorCode = (
 };
 
 /**
- * フィールドに表示するメッセージを作成するための関数
- * @param form サインアップフォーム
+ * フォームを検証し、エラーメッセージと検証結果を返却する
+ * @param form 検証するフォーム
+ * @returns エラーメッセージと検証結果
  */
-export const CreateFieldMessages = async <
-  T extends SignUpForm | UpdatePasswordForm | ResetPasswordForm
+export const ValidateForm = async <
+  T extends
+    | SignUpForm
+    | UpdatePasswordValidationForm
+    | ResetPasswordValidationForm
 >(
   form: T
 ) => {
@@ -59,19 +67,30 @@ export const CreateFieldMessages = async <
     <span style={{ color: "green" }}>有効な値です。</span>
   );
 
+  let isFormValid = true;
   const messages = keys
     .filter((key) => form[key]) //入力のない項目についてはメッセージを表示しない
     .reduce((msgs, key) => {
       const fieldErr = fieldErrors.find((err) => err.field_name == key);
-      msgs[key] = fieldErr
-        ? translateSignUpErrorCode(
-            fieldErr.field_name,
-            fieldErr.code,
-            String(form[key])
-          )
-        : validFieldMessage;
+      if (fieldErr) {
+        msgs[key] = translateSignUpErrorCode(
+          fieldErr.field_name,
+          fieldErr.code,
+          String(form[key])
+        );
+        isFormValid = false;
+      } else {
+        msgs[key] = validFieldMessage;
+      }
       return msgs;
     }, {} as fieldMessage);
 
-  return messages;
+  const isAllFieldsFilled = Object.values(form).every(
+    (value) => value.length > 0
+  );
+
+  return {
+    fieldMessages: messages,
+    canSubmitForm: isFormValid && isAllFieldsFilled,
+  };
 };
