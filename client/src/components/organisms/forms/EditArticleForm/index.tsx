@@ -1,6 +1,11 @@
 import { Editor as TinyMCEEditor } from "tinymce";
 import { useCallback, useEffect, useState } from "react";
-import { getArticle, putArticle } from "~/apis/knowtfolio";
+import {
+  generateSignData,
+  getArticle,
+  mintArticleNft,
+  putArticle,
+} from "~/apis/knowtfolio";
 import {
   assertMetamask,
   useWeb3Context,
@@ -11,6 +16,9 @@ import ArrowBackIosNewRoundedIcon from "@mui/icons-material/ArrowBackIosNewRound
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { useAuthContext } from "~/components/organisms/providers/AuthProvider";
+import Switch from "@mui/material/Switch";
+import { fetchNonce, initDynamodbClient } from "~/apis/dynamodb";
+import RequireWeb3Wrapper from "../../RequireWeb3Wrapper";
 
 type editArticleFormProps = {
   articleId: string;
@@ -23,13 +31,16 @@ type editArticleFormProps = {
 const EditArticleForm = ({ articleId }: editArticleFormProps) => {
   const [content, setContent] = useState("");
   const [title, setTitle] = useState("");
+  const [shouldMint, setShouldMint] = useState(false);
+  const [isMintable, setIsMintable] = useState(false);
   const handleEditorChange = useCallback<
     (value: string, editor: TinyMCEEditor) => void
   >((value) => {
     setContent(value);
   }, []);
   const { user, session } = useAuthContext();
-  const { isConnectedToMetamask } = useWeb3Context();
+  const { isConnectedToMetamask, web3, contract, account } = useWeb3Context();
+  const dynamodbClient = initDynamodbClient(session.getIdToken().getJwtToken());
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -39,17 +50,20 @@ const EditArticleForm = ({ articleId }: editArticleFormProps) => {
           const { title, content } = await getArticle(articleId);
           setTitle(title);
           setContent(content);
+          if (contract) {
+            const tokenId = await contract.methods.getTokenId(articleId).call();
+            setIsMintable(Number(tokenId) === 0);
+          }
         }
       } catch (error) {
         console.error(error);
         toast.error("記事の取得に失敗しました。");
       }
     })();
-  }, [articleId]);
+  }, [articleId, contract]);
 
   const handleUpdate = useCallback(async () => {
     try {
-      assertMetamask(isConnectedToMetamask);
       await putArticle(
         {
           articleId: articleId || "",
@@ -58,6 +72,20 @@ const EditArticleForm = ({ articleId }: editArticleFormProps) => {
         },
         session
       );
+      if (shouldMint) {
+        assertMetamask(isConnectedToMetamask);
+        const nonce = await fetchNonce(dynamodbClient, user.getUsername());
+        const signatureForMint = await web3.eth.personal.sign(
+          generateSignData("Mint NFT", nonce),
+          account,
+          ""
+        );
+        await mintArticleNft({
+          articleId: articleId,
+          address: account,
+          signature: signatureForMint,
+        });
+      }
       navigate(`/users/${user.getUsername()}`);
       toast.success("記事が更新されました。");
     } catch (error) {
@@ -65,13 +93,17 @@ const EditArticleForm = ({ articleId }: editArticleFormProps) => {
       toast.error("記事の更新に失敗しました。");
     }
   }, [
+    account,
     articleId,
     content,
+    dynamodbClient,
     isConnectedToMetamask,
     navigate,
     session,
+    shouldMint,
     title,
     user,
+    web3,
   ]);
 
   const onChangeTitleInput = useCallback<
@@ -79,6 +111,13 @@ const EditArticleForm = ({ articleId }: editArticleFormProps) => {
   >((event) => {
     setTitle(event.target.value);
   }, []);
+
+  const onChangeNFTSwitch = useCallback(
+    (_event: React.ChangeEvent<HTMLInputElement>, checked: boolean) => {
+      setShouldMint(checked);
+    },
+    []
+  );
 
   return (
     <div
@@ -112,14 +151,42 @@ const EditArticleForm = ({ articleId }: editArticleFormProps) => {
             />
           </Grid>
         </Grid>
-        <Grid item xs={9} container direction="row-reverse">
-          <Button
-            variant="contained"
-            onClick={handleUpdate}
-            style={{ fontSize: "1.4rem" }}
-          >
-            update article
-          </Button>
+        <Grid item xs={9} container direction="row-reverse" alignItems="center">
+          <Grid item>
+            {shouldMint ? (
+              <RequireWeb3Wrapper isConnectedToMetamask={isConnectedToMetamask}>
+                <Button
+                  variant="contained"
+                  onClick={handleUpdate}
+                  style={{ fontSize: "1.4rem" }}
+                >
+                  update article
+                </Button>
+              </RequireWeb3Wrapper>
+            ) : (
+              <Button
+                variant="contained"
+                onClick={handleUpdate}
+                style={{ fontSize: "1.4rem" }}
+              >
+                update article
+              </Button>
+            )}
+          </Grid>
+          {isMintable && (
+            <Grid item>
+              <Grid container alignItems="center">
+                <label htmlFor="mint">Mint NFT</label>
+                <Switch
+                  id="mint"
+                  checked={shouldMint}
+                  disabled={!isMintable}
+                  onChange={onChangeNFTSwitch}
+                  inputProps={{ "aria-label": "controlled" }}
+                />
+              </Grid>
+            </Grid>
+          )}
         </Grid>
       </Grid>
       <Grid flexGrow={1}>
