@@ -11,7 +11,7 @@ import {
   useWeb3Context,
 } from "~/components/organisms/providers/Web3Provider";
 import ArticleEditor from "~/components/organisms/ArticleEditor";
-import { Button, Grid } from "@mui/material";
+import { Button, Grid, Switch } from "@mui/material";
 import ArrowBackIosNewRoundedIcon from "@mui/icons-material/ArrowBackIosNewRounded";
 import { toast } from "react-toastify";
 import RequireWeb3Wrapper from "~/components/organisms/RequireWeb3Wrapper";
@@ -24,6 +24,7 @@ import { fetchNonce, initDynamodbClient } from "~/apis/dynamodb";
 const NewArticleForm = () => {
   const [content, setContent] = useState("");
   const [titleInput, setTitleInput] = useState("");
+  const [shouldMint, setShouldMint] = useState(false);
   const { user, session } = useAuthContext();
   const { isConnectedToMetamask, web3, account } = useWeb3Context();
   const handleEditorChange = useCallback<
@@ -50,20 +51,21 @@ const NewArticleForm = () => {
         session
       );
 
-      assertMetamask(isConnectedToMetamask);
+      if (shouldMint) {
+        assertMetamask(isConnectedToMetamask);
 
-      const nonce = await fetchNonce(dynamodbClient, user.getUsername());
-      const signatureForMint = await web3.eth.personal.sign(
-        generateSignData("Mint NFT", nonce),
-        account,
-        ""
-      );
-      // TODO: Make this optional
-      await mintArticleNft({
-        articleId: id,
-        address: account,
-        signature: signatureForMint,
-      });
+        const nonce = await fetchNonce(dynamodbClient, user.getUsername());
+        const signatureForMint = await web3.eth.personal.sign(
+          generateSignData("Mint NFT", nonce),
+          account,
+          ""
+        );
+        await mintArticleNft({
+          articleId: id,
+          address: account,
+          signature: signatureForMint,
+        });
+      }
       navigate(`/users/${user.getUsername()}`);
       toast.success("記事を作成しました。");
     } catch (error) {
@@ -77,10 +79,19 @@ const NewArticleForm = () => {
     isConnectedToMetamask,
     navigate,
     session,
+    shouldMint,
     titleInput,
     user,
     web3,
   ]);
+
+  const onChangeNFTSwitch = useCallback(
+    (_event: React.ChangeEvent<HTMLInputElement>, checked: boolean) => {
+      setShouldMint(checked);
+    },
+    []
+  );
+
   return (
     <div
       style={{
@@ -113,16 +124,41 @@ const NewArticleForm = () => {
             />
           </Grid>
         </Grid>
-        <Grid item xs={9} container direction="row-reverse">
-          <RequireWeb3Wrapper isConnectedToMetamask={isConnectedToMetamask}>
-            <Button
-              variant="contained"
-              onClick={handlePost}
-              style={{ fontSize: "1.4rem" }}
-            >
-              create article
-            </Button>
-          </RequireWeb3Wrapper>
+        <Grid item xs={9} container direction="row-reverse" alignItems="center">
+          <Grid item>
+            {shouldMint ? (
+              <RequireWeb3Wrapper isConnectedToMetamask={isConnectedToMetamask}>
+                <Button
+                  variant="contained"
+                  onClick={handlePost}
+                  style={{ fontSize: "1.4rem" }}
+                >
+                  create article
+                </Button>
+              </RequireWeb3Wrapper>
+            ) : (
+              <Button
+                variant="contained"
+                onClick={handlePost}
+                style={{ fontSize: "1.4rem" }}
+              >
+                create article
+              </Button>
+            )}
+          </Grid>
+          {isConnectedToMetamask && (
+            <Grid item>
+              <Grid container alignItems="center">
+                <label htmlFor="mint">Mint NFT</label>
+                <Switch
+                  id="mint"
+                  checked={shouldMint}
+                  onChange={onChangeNFTSwitch}
+                  inputProps={{ "aria-label": "controlled" }}
+                />
+              </Grid>
+            </Grid>
+          )}
         </Grid>
       </Grid>
       <Grid flexGrow={1}>
