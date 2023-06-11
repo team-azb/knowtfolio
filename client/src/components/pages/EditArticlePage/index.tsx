@@ -1,12 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
+import { getArticle } from "~/apis/knowtfolio";
 import LoadingDisplay from "~/components/atoms/LoadingDisplay";
 import EditArticleForm from "~/components/organisms/forms/EditArticleForm";
 import { useAuthContext } from "~/components/organisms/providers/AuthProvider";
-import {
-  assertMetamask,
-  useWeb3Context,
-} from "~/components/organisms/providers/Web3Provider";
+import { useWeb3Context } from "~/components/organisms/providers/Web3Provider";
 
 const ContentOnEditable = ({ articleId }: { articleId: string }) => {
   return <EditArticleForm articleId={articleId} />;
@@ -33,15 +31,15 @@ const ContentOnNotEditable = () => {
 const EditArticlePage = () => {
   const { articleId } = useParams();
   const { isConnectedToMetamask, contract } = useWeb3Context();
-  const { userWalletAddress } = useAuthContext();
+  const { user } = useAuthContext();
   const [ownerIdOfArticle, setOwnerIdOfArticle] = useState<null | string>(null);
 
   const isAuthorized = useMemo(() => {
-    return ownerIdOfArticle === userWalletAddress;
-  }, [ownerIdOfArticle, userWalletAddress]);
+    return ownerIdOfArticle === user.getUsername();
+  }, [ownerIdOfArticle, user]);
 
   const content = useMemo(() => {
-    if (isConnectedToMetamask && ownerIdOfArticle === null) {
+    if (ownerIdOfArticle === null) {
       return (
         <div style={{ padding: "100px 400px" }}>
           <LoadingDisplay message="編集権限を検証中" />
@@ -56,16 +54,12 @@ const EditArticlePage = () => {
     } else {
       return <ContentOnNotEditable />;
     }
-  }, [articleId, isAuthorized, isConnectedToMetamask, ownerIdOfArticle]);
+  }, [articleId, isAuthorized, ownerIdOfArticle]);
 
   useEffect(() => {
     (async () => {
-      assertMetamask(isConnectedToMetamask);
-      // TODO: コントラクトではなくバックエンド経由で取得する
-      const ownerIdOfArticle = await contract.methods
-        .getOwnerOfArticle(articleId)
-        .call();
-      setOwnerIdOfArticle(ownerIdOfArticle);
+      const resp = await getArticle(articleId || "");
+      setOwnerIdOfArticle(resp.owner_id || null);
     })();
   }, [articleId, contract, isConnectedToMetamask]);
 
