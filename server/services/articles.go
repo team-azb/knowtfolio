@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-
+	"github.com/aws/smithy-go"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/team-azb/knowtfolio/server/gateways/api/gen/articles"
@@ -74,7 +74,12 @@ func (a articleService) Read(_ context.Context, request *articles.ArticleReadReq
 	} else {
 		originalAuthorAddr, err := a.DynamoDBClient.GetAddressByID(target.OriginalAuthorID)
 		if err != nil {
-			return nil, err
+			var apiErr smithy.APIError
+			if errors.As(err, &apiErr) && apiErr.ErrorCode() == aws.ItemNotFoundCode {
+				originalAuthorAddr = nil
+			} else {
+				return nil, err
+			}
 		}
 		return articleToResult(&target, withOwnerInfo(target.OriginalAuthorID, originalAuthorAddr)), nil
 	}
