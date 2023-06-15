@@ -25,7 +25,7 @@ const NewArticleForm = () => {
   const [content, setContent] = useState("");
   const [titleInput, setTitleInput] = useState("");
   const [shouldMint, setShouldMint] = useState(false);
-  const { user, session } = useAuthContext();
+  const { user, session, userWalletAddress } = useAuthContext();
   const { isConnectedToMetamask, web3, account } = useWeb3Context();
   const handleEditorChange = useCallback<
     (value: string, editor: TinyMCEEditor) => void
@@ -146,7 +146,7 @@ const NewArticleForm = () => {
               </Button>
             )}
           </Grid>
-          {isConnectedToMetamask && (
+          {isConnectedToMetamask && userWalletAddress && (
             <Grid item>
               <Grid container alignItems="center">
                 <label htmlFor="mint">Mint NFT</label>
