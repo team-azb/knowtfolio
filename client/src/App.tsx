@@ -20,7 +20,7 @@ import { theme } from "~/configs/theme";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import "~/global.css";
-import RevalidationCodePage from "./components/pages/RevalidationCodePage";
+import RetryConfirmationPage from "./components/pages/RetryConfirmationPage";
 
 const App = () => {
   return (
@@ -31,7 +31,10 @@ const App = () => {
           <Route path="/signup" element={<SignUpPage />} />
           <Route path="/signin" element={<SignInPage />} />
           <Route path="/reset-password" element={<ResetPasswordPage />} />
-          <Route path="/revalidation-code" element={<RevalidationCodePage />} />
+          <Route
+            path="/retry-confirmation"
+            element={<RetryConfirmationPage />}
+          />
           <Route path="/settings">
             <Route
               path="wallet"

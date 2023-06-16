@@ -203,7 +203,7 @@ const SignUpForm = () => {
           </Grid>
           <Grid item container justifyContent="center">
             確認コードの再送信は
-            <Link to="/revalidation-code" style={{ color: "#000" }}>
+            <Link to="/retry-confirmation" style={{ color: "#000" }}>
               こちら
             </Link>
             へ

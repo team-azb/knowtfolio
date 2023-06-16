@@ -10,7 +10,7 @@ import Spacer from "~/components/atoms/Spacer";
 import Form from "~/components/atoms/authForm/Form";
 import Input from "~/components/atoms/authForm/Input";
 
-const RevalidationCodeForm = () => {
+const RetryConfirmationForm = () => {
   const [username, setUsername] = useState("");
   const [hasSentCode, setHasSentCode] = useState(false);
   const [confirmationCode, setConfirmationCode] = useState("");
@@ -24,7 +24,7 @@ const RevalidationCodeForm = () => {
     } catch (error) {
       if (error instanceof Error) {
         if (error.name === "UserNotFoundException") {
-          toast.error("ご指定のユーザーは存在しません。");
+          toast.error("指定のユーザーは存在しません。");
           return;
         }
         if (error.name === "LimitExceededException") {
@@ -115,4 +115,4 @@ const RevalidationCodeForm = () => {
   );
 };
 
-export default RevalidationCodeForm;
+export default RetryConfirmationForm;
