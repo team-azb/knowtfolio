@@ -91,7 +91,7 @@ func (a articleService) Update(ctx context.Context, request *articles.ArticleUpd
 			return result.Error
 		}
 
-		err = a.AuthorizeEdit(userID, target, true)
+		err = a.AuthorizeEdit(userID, target, false)
 		if err != nil {
 			return err
 		}
