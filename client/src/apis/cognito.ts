@@ -220,6 +220,22 @@ export type ResetPasswordValidationForm = Omit<
   "username" | "verification_code"
 >;
 
+export const resendConfirmationCode = (username: string) => {
+  const userData = {
+    Username: username,
+    Pool: userPool,
+  };
+  const cognitoUser = new AmazonCognitoIdentity.CognitoUser(userData);
+  return new Promise<void>((resolve, reject) => {
+    cognitoUser.resendConfirmationCode((err) => {
+      if (err) {
+        reject(err);
+      }
+      resolve();
+    });
+  });
+};
+
 export const sessionToHeader = (session: CognitoUserSession) => {
   return {
     Authorization: `Bearer ${session.getIdToken().getJwtToken()}`,

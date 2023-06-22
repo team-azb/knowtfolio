@@ -66,7 +66,7 @@ const SignUpForm = () => {
       try {
         await signUpToCognito(form);
         setHasSignedUp(true);
-        toast.success("登録したEmailにコードを送信しました。");
+        toast.success("登録したEmailに確認コードを送信しました。");
       } catch (error) {
         // TODO: Display user friendly error.
         toast.error(`sign up failed: ${error}`);
@@ -86,9 +86,9 @@ const SignUpForm = () => {
       event.preventDefault();
       try {
         await confirmSigningUpToCognito(form.username, code);
-        toast.success("認証コードの検証に成功しました。");
+        toast.success("確認コードの検証に成功しました。");
       } catch (error) {
-        toast.error("認証コードの検証に失敗しました。");
+        toast.error("確認コードの検証に失敗しました。");
         return;
       }
 
@@ -195,14 +195,21 @@ const SignUpForm = () => {
             </Grid>
           </Grid>
         )}
-        <Grid item container justifyContent="center">
-          <p>
+        <Grid item container direction="column" spacing={1}>
+          <Grid item container justifyContent="center">
             すでにアカウントを持っている方は
             <Link to="/signin" style={{ color: "#000" }}>
               サインイン
             </Link>
             へ
-          </p>
+          </Grid>
+          <Grid item container justifyContent="center">
+            確認コードの再送信は
+            <Link to="/retry-confirmation" style={{ color: "#000" }}>
+              こちら
+            </Link>
+            へ
+          </Grid>
         </Grid>
       </Grid>
     </Form>

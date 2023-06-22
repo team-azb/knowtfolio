@@ -63,10 +63,10 @@ const ResetPasswordForm = () => {
     try {
       await sendPassswordResetVerificationCode(form.username);
       setHasSentCode(true);
-      toast.success("認証コードを送信しました。");
+      toast.success("検証コードを送信しました。");
     } catch (error) {
       console.error(error);
-      toast.error("認証コードの送信に失敗しました。");
+      toast.error("検証コードの送信に失敗しました。");
     }
   }, [form.username]);
 
@@ -104,7 +104,7 @@ const ResetPasswordForm = () => {
             onClick={handleSubmitUsername}
             style={{ fontSize: "1.4rem" }}
           >
-            確認コードを送信
+            検証コードを送信
           </Button>
         </Grid>
         {hasSentCode && (
@@ -114,8 +114,8 @@ const ResetPasswordForm = () => {
               id="verification_code"
               onChange={handleChangeForm}
               value={form.verification_code}
-              label="確認用コード"
-              placeholder="送信した確認用コード"
+              label="検証コード"
+              placeholder="送信した検証コード"
               type="text"
               disabled={!hasSentCode}
             />
