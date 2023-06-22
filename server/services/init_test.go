@@ -25,22 +25,29 @@ import (
 
 var (
 	adminAddr = "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC"
-	testUsers = []testUser{
-		// NOTE: These two private keys are from hardhat default accounts, and are publicly available here:
-		// https://hardhat.org/hardhat-network/docs/overview
+	// NOTE: These two private keys are from hardhat default accounts, and are publicly available here:
+	// https://hardhat.org/hardhat-network/docs/overview
+	user0PrivateKeyHex = "ac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80"
+	user1PrivateKeyHex = "59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d"
+	testUsers          = []testUser{
 		{
 			ID:            "test-user0",
 			Password:      "Password#0",
 			Email:         "user0@example.com",
-			PrivateKeyHex: "ac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80",
+			PrivateKeyHex: &user0PrivateKeyHex,
 		}, {
 			ID:            "test-user1",
 			Password:      "Password#1",
 			Email:         "user1@sample.com",
-			PrivateKeyHex: "59c6995e998f97a5a0044966f0945389dc9e86dae88c7a8412f4603b6b78690d",
+			PrivateKeyHex: &user1PrivateKeyHex,
+		}, {
+			ID:            "test-user2",
+			Password:      "Password#2",
+			Email:         "user2@sample.com",
+			PrivateKeyHex: nil,
 		},
 	}
-	transactionLock = map[string]*sync.Mutex{testUsers[0].Address(): {}, testUsers[1].Address(): {}, adminAddr: {}}
+	transactionLock = map[string]*sync.Mutex{*testUsers[0].Address(): {}, *testUsers[1].Address(): {}, adminAddr: {}}
 	cognitoClient   = aws.NewCognitoClient()
 	dynamodbClient  = aws.NewDynamoDBClient()
 )
@@ -60,7 +67,7 @@ func initTestDB(t *testing.T) (db *gorm.DB) {
 	fatalfIfError(t, err, "DB Connection failed")
 
 	// Create temporary database dedicated to this test call.
-	dbName := fmt.Sprintf("knowtfolio-db-test-%v", strings.ReplaceAll(t.Name(), "/", "_"))
+	dbName := fmt.Sprintf("knowtfolio-%v", strings.ReplaceAll(t.Name(), "/", "_"))
 	res := setupDB.Exec(fmt.Sprintf("CREATE DATABASE `%v`", dbName))
 	if res.Error != nil {
 		t.Fatalf("DB Creation failed: %v", res.Error)
@@ -125,26 +132,33 @@ type testUser struct {
 	ID            string
 	Password      string
 	Email         string
-	PrivateKeyHex string
+	PrivateKeyHex *string
 	IDToken       string
 }
 
 func (u *testUser) privateKey() *ecdsa.PrivateKey {
-	privateKey, err := crypto.HexToECDSA(u.PrivateKeyHex)
+	if u.PrivateKeyHex == nil {
+		return nil
+	}
+	privateKey, err := crypto.HexToECDSA(*u.PrivateKeyHex)
 	if err != nil {
 		panic(err)
 	}
 	return privateKey
 }
 
-func (u *testUser) Address() string {
+func (u *testUser) Address() *string {
+	if u.PrivateKeyHex == nil {
+		return nil
+	}
+
 	publicKey, ok := u.privateKey().Public().(*ecdsa.PublicKey)
 	if !ok {
 		panic("error casting public key to ECDSA")
 	}
 
-	address := crypto.PubkeyToAddress(*publicKey)
-	return address.Hex()
+	address := crypto.PubkeyToAddress(*publicKey).Hex()
+	return &address
 }
 
 func (u *testUser) GetUserIDContext() context.Context {
@@ -173,9 +187,11 @@ func (u *testUser) registerToAWS() error {
 		return err
 	}
 
-	err = dynamodbClient.PutUserWallet(u.ID, u.Address())
-	if err != nil {
-		return err
+	if u.Address() != nil {
+		err = dynamodbClient.PutUserWallet(u.ID, *u.Address())
+		if err != nil {
+			return err
+		}
 	}
 
 	u.IDToken, err = cognitoClient.GetIDTokenOfUser(u.ID, u.Password)
@@ -188,7 +204,9 @@ func (u *testUser) deleteFromAWS() error {
 		return err
 	}
 
-	err = dynamodbClient.DeleteUserWalletByID(u.ID)
+	if u.Address() != nil {
+		err = dynamodbClient.DeleteUserWalletByID(u.ID)
+	}
 	return err
 }
 

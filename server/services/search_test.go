@@ -23,8 +23,7 @@ var (
 
 var (
 	createEntry = func(article *models.Article, owner *testUser) search.SearchResultEntry {
-		ownerAddress := owner.Address()
-		return search.SearchResultEntry{ID: article.ID, Title: article.Document.Title, OwnerID: owner.ID, OwnerAddress: &ownerAddress}
+		return search.SearchResultEntry{ID: article.ID, Title: article.Document.Title, OwnerID: owner.ID, OwnerAddress: owner.Address()}
 	}
 	goEntry = createEntry(goArticle, &testUsers[0])
 	rsEntry = createEntry(rsArticle, &testUsers[1])
@@ -59,10 +58,10 @@ func prepareSearchService(t *testing.T) searchService {
 	}
 
 	// Mint NFTs for the target articles.
-	err0 := tokenizeTestTargetArticle(service.Contract, goArticle, testUsers[0].Address())
-	err1 := tokenizeTestTargetArticle(service.Contract, rsArticle, testUsers[1].Address())
-	err2 := tokenizeTestTargetArticle(service.Contract, ktArticle, testUsers[1].Address())
-	err3 := tokenizeTestTargetArticle(service.Contract, jsArticle, testUsers[0].Address())
+	err0 := tokenizeTestTargetArticle(service.Contract, goArticle, *testUsers[0].Address())
+	err1 := tokenizeTestTargetArticle(service.Contract, rsArticle, *testUsers[1].Address())
+	err2 := tokenizeTestTargetArticle(service.Contract, ktArticle, *testUsers[1].Address())
+	err3 := tokenizeTestTargetArticle(service.Contract, jsArticle, *testUsers[0].Address())
 	err := multierr.Combine(err0, err1, err2, err3)
 	if err != nil {
 		t.Fatal(err)

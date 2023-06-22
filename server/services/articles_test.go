@@ -29,6 +29,7 @@ func prepareArticlesService(t *testing.T) articleService {
 var (
 	article0          = *models.NewArticle("Article0", []byte("<h1> content0 </h1>"), testUsers[0].ID)
 	article1          = *models.NewArticle("Article1", []byte("<div> content1 </div>"), testUsers[0].ID)
+	article2          = *models.NewArticle("Article2", []byte("<div> content2 </div>"), testUsers[2].ID)
 	tokenizedArticle0 = models.Article{
 		ID:               article0.ID,
 		Document:         article0.Document,
@@ -65,19 +66,37 @@ func TestCreateArticle(t *testing.T) {
 
 func TestReadArticle(t *testing.T) {
 	t.Run("WithoutNFT", func(t *testing.T) {
-		service := prepareArticlesService(t)
+		t.Run("OwnerHasWallet", func(t *testing.T) {
+			service := prepareArticlesService(t)
 
-		service.DB.Create(&article0)
+			service.DB.Create(&article0)
 
-		result, err := service.Read(context.Background(), &articles.ArticleReadRequest{ID: article0.ID})
+			result, err := service.Read(context.Background(), &articles.ArticleReadRequest{ID: article0.ID})
 
-		// Assert request body.
-		assert.NoError(t, err)
-		assert.Equal(t, article0.ID, result.ID)
-		assert.Equal(t, article0.Document.Title, result.Title)
-		assert.Equal(t, testUsers[0].ID, result.OwnerID)
-		assert.Equal(t, testUsers[0].Address(), *result.OwnerAddress)
-		assert.Equal(t, string(article0.Document.Content), result.Content)
+			// Assert request body.
+			assert.NoError(t, err)
+			assert.Equal(t, article0.ID, result.ID)
+			assert.Equal(t, article0.Document.Title, result.Title)
+			assert.Equal(t, testUsers[0].ID, result.OwnerID)
+			assert.Equal(t, *testUsers[0].Address(), *result.OwnerAddress)
+			assert.Equal(t, string(article0.Document.Content), result.Content)
+		})
+
+		t.Run("OwnerDoesntHaveWallet", func(t *testing.T) {
+			service := prepareArticlesService(t)
+
+			service.DB.Create(&article2)
+
+			result, err := service.Read(context.Background(), &articles.ArticleReadRequest{ID: article2.ID})
+
+			// Assert request body.
+			assert.NoError(t, err)
+			assert.Equal(t, article2.ID, result.ID)
+			assert.Equal(t, article2.Document.Title, result.Title)
+			assert.Equal(t, testUsers[2].ID, result.OwnerID)
+			assert.Nil(t, result.OwnerAddress)
+			assert.Equal(t, string(article2.Document.Content), result.Content)
+		})
 	})
 
 	t.Run("WithNFT", func(t *testing.T) {
@@ -85,7 +104,7 @@ func TestReadArticle(t *testing.T) {
 
 		// Article0 here is created by user0 and currently owned by user1.
 		service.DB.Create(&tokenizedArticle0)
-		mintNFTOfArticle0AndWait(t, service.Contract, testUsers[1].Address())
+		mintNFTOfArticle0AndWait(t, service.Contract, *testUsers[1].Address())
 
 		result, err := service.Read(context.Background(), &articles.ArticleReadRequest{ID: tokenizedArticle0.ID})
 
@@ -94,7 +113,7 @@ func TestReadArticle(t *testing.T) {
 		assert.Equal(t, tokenizedArticle0.ID, result.ID)
 		assert.Equal(t, tokenizedArticle0.Document.Title, result.Title)
 		assert.Equal(t, testUsers[1].ID, result.OwnerID)
-		assert.Equal(t, testUsers[1].Address(), *result.OwnerAddress)
+		assert.Equal(t, *testUsers[1].Address(), *result.OwnerAddress)
 		assert.Equal(t, string(tokenizedArticle0.Document.Content), result.Content)
 	})
 }
@@ -120,7 +139,7 @@ func TestUpdateArticle(t *testing.T) {
 
 		// Create article and the corresponding NFT.
 		service.DB.Create(&tokenizedArticle0)
-		mintNFTOfArticle0AndWait(t, service.Contract, testUsers[0].Address())
+		mintNFTOfArticle0AndWait(t, service.Contract, *testUsers[0].Address())
 
 		// Send update request
 		result, err := service.Update(testUsers[0].GetUserIDContext(), &updateRequestByUser0)
@@ -162,7 +181,7 @@ func TestUpdateArticle(t *testing.T) {
 
 		// Create article and the corresponding NFT.
 		service.DB.Create(&tokenizedArticle0)
-		mintNFTOfArticle0AndWait(t, service.Contract, testUsers[0].Address())
+		mintNFTOfArticle0AndWait(t, service.Contract, *testUsers[0].Address())
 
 		// Send update request
 		_, err := service.Update(testUsers[1].GetUserIDContext(), &updateRequestByUser1)

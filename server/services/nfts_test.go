@@ -39,18 +39,22 @@ func prepareNftsService(t *testing.T) nftsService {
 	return service
 }
 
+var (
+	user0MintNFTSign = "0xae7675c53b24e2612b9dce083901989ed5485b77d16f7852013757c7f034c76807d7348655db3783a58319c04d1bf958d21c3cb849922abe4cc2c2badfac4b1b00"
+)
+
 func TestCreateNFTForArticle(t *testing.T) {
 	service := prepareNftsService(t)
 
 	service.DB.Create(&article0)
 
-	transactionLock[testUsers[0].Address()].Lock()
+	transactionLock[*testUsers[0].Address()].Lock()
 	result, err := service.CreateForArticle(context.Background(), &nfts.CreateNftForArticleRequest{
 		ArticleID: article0.ID,
-		Address:   testUsers[0].Address(),
+		Address:   *testUsers[0].Address(),
 		Signature: testUsers[0].GenerateSignature(config.SignData["CreateNFT"]),
 	})
-	transactionLock[testUsers[0].Address()].Unlock()
+	transactionLock[*testUsers[0].Address()].Unlock()
 	assert.NoError(t, err)
 
 	// Remove s3 object after the test is done.
@@ -68,7 +72,7 @@ func TestCreateNFTForArticle(t *testing.T) {
 	actualOwner, err := service.Contract.GetOwnerOfArticle(&bind.CallOpts{}, article0.ID)
 	assert.True(t, nftMinted)
 	assert.NoError(t, err)
-	assert.Equal(t, testUsers[0].Address(), actualOwner.String())
+	assert.Equal(t, *testUsers[0].Address(), actualOwner.String())
 
 	// Assert metadata existence.
 	getObjOutput, reqErr := service.S3Client.GetObject(context.Background(), &s3.GetObjectInput{
