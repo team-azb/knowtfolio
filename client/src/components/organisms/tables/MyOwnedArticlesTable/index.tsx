@@ -1,9 +1,10 @@
-import { Grid, Pagination } from "@mui/material";
+import { Button, Grid, Pagination } from "@mui/material";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { searchArticles, SearchResultEntry } from "~/apis/knowtfolio";
 import OwnedArticleCard from "~/components/organisms/cards/OwnedArticleCard";
 import { useAuthContext } from "~/components/organisms/providers/AuthProvider";
+import RefreshIcon from "@mui/icons-material/Refresh";
 
 const pageSize = 12;
 
@@ -45,7 +46,19 @@ const OwnedArticlesTable = () => {
   return (
     <Grid item container direction="column" spacing={2}>
       <Grid item>
-        <h2>Article collection</h2>
+        <Grid container alignItems="center" spacing={1}>
+          <Grid item>
+            <h2>Article collection</h2>
+          </Grid>
+          <Grid item>
+            <Button
+              onClick={() => window.location.reload()}
+              startIcon={<RefreshIcon fontSize="large" />}
+            >
+              refresh
+            </Button>
+          </Grid>
+        </Grid>
         <hr />
       </Grid>
       <Grid item container spacing={2}>
