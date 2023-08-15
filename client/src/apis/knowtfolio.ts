@@ -1,6 +1,9 @@
 import axios from "axios";
 import { CognitoUserSession } from "amazon-cognito-identity-js";
 import { sessionToHeader } from "~/apis/cognito";
+import { fetchNonce } from "./dynamodb";
+import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
+import Web3 from "web3";
 
 export type postArticleForm = {
   content: string;
@@ -64,13 +67,23 @@ export const getArticle = async (articleId: string) => {
 
 type mintArticleNftForm = {
   articleId: string;
-  address: string;
-  signature: string;
+  username: string;
+  account: string;
 };
-export const mintArticleNft = async (form: mintArticleNftForm) => {
+export const mintArticleNft = async (
+  dynamodbClient: DynamoDBClient,
+  web3: Web3,
+  form: mintArticleNftForm
+) => {
+  const nonce = await fetchNonce(dynamodbClient, form.username);
+  const signatureForMint = await web3.eth.personal.sign(
+    generateSignData("Mint NFT", nonce),
+    form.account,
+    ""
+  );
   await axios.post(`/api/nfts/${form.articleId}`, {
-    address: form.address,
-    signature: form.signature,
+    address: form.account,
+    signature: signatureForMint,
   });
 };
 
@@ -98,6 +111,6 @@ export const searchArticles = async (queryParams: searchQuery = {}) => {
   return data;
 };
 
-export const generateSignData = (message: string, nonce: string) => {
+const generateSignData = (message: string, nonce: string) => {
   return `${message}\n(nonce: ${nonce})`;
 };

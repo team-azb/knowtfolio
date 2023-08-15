@@ -1,11 +1,6 @@
 import { Editor as TinyMCEEditor } from "tinymce";
 import { useCallback, useEffect, useState } from "react";
-import {
-  generateSignData,
-  getArticle,
-  mintArticleNft,
-  putArticle,
-} from "~/apis/knowtfolio";
+import { getArticle, mintArticleNft, putArticle } from "~/apis/knowtfolio";
 import {
   assertMetamask,
   useWeb3Context,
@@ -17,7 +12,7 @@ import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
 import { useAuthContext } from "~/components/organisms/providers/AuthProvider";
 import Switch from "@mui/material/Switch";
-import { fetchNonce, initDynamodbClient } from "~/apis/dynamodb";
+import { initDynamodbClient } from "~/apis/dynamodb";
 import RequireWeb3Wrapper from "../../RequireWeb3Wrapper";
 
 type editArticleFormProps = {
@@ -74,16 +69,10 @@ const EditArticleForm = ({ articleId }: editArticleFormProps) => {
       );
       if (mintSwitchChecked) {
         assertMetamask(isConnectedToMetamask);
-        const nonce = await fetchNonce(dynamodbClient, user.getUsername());
-        const signatureForMint = await web3.eth.personal.sign(
-          generateSignData("Mint NFT", nonce),
+        await mintArticleNft(dynamodbClient, web3, {
+          username: user.getUsername(),
+          articleId,
           account,
-          ""
-        );
-        await mintArticleNft({
-          articleId: articleId,
-          address: account,
-          signature: signatureForMint,
         });
       }
       navigate(`/users/${user.getUsername()}`);

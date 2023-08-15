@@ -1,10 +1,6 @@
 import { Editor as TinyMCEEditor } from "tinymce";
 import { useCallback, useState } from "react";
-import {
-  generateSignData,
-  mintArticleNft,
-  postArticle,
-} from "~/apis/knowtfolio";
+import { mintArticleNft, postArticle } from "~/apis/knowtfolio";
 import { useNavigate } from "react-router-dom";
 import {
   assertMetamask,
@@ -16,7 +12,7 @@ import ArrowBackIosNewRoundedIcon from "@mui/icons-material/ArrowBackIosNewRound
 import { toast } from "react-toastify";
 import RequireWeb3Wrapper from "~/components/organisms/RequireWeb3Wrapper";
 import { useAuthContext } from "~/components/organisms/providers/AuthProvider";
-import { fetchNonce, initDynamodbClient } from "~/apis/dynamodb";
+import { initDynamodbClient } from "~/apis/dynamodb";
 
 /**
  * 記事の新規作成用のフォーム
@@ -53,17 +49,10 @@ const NewArticleForm = () => {
 
       if (mintSwitchChecked) {
         assertMetamask(isConnectedToMetamask);
-
-        const nonce = await fetchNonce(dynamodbClient, user.getUsername());
-        const signatureForMint = await web3.eth.personal.sign(
-          generateSignData("Mint NFT", nonce),
-          account,
-          ""
-        );
-        await mintArticleNft({
+        await mintArticleNft(dynamodbClient, web3, {
           articleId: id,
-          address: account,
-          signature: signatureForMint,
+          account,
+          username: user.getUsername(),
         });
       }
       navigate(`/users/${user.getUsername()}`);
