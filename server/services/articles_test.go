@@ -145,7 +145,7 @@ func TestUpdateArticle(t *testing.T) {
 		assert.Equal(t, []byte(expected.Content), target.Document.Content)
 	})
 
-	t.Run("SuccessWithoutNFT", func(t *testing.T) {
+	t.Run("SuccessWithoutNFTAsOwner", func(t *testing.T) {
 		service := prepareArticlesService(t)
 
 		service.DB.Create(&article0)
@@ -153,7 +153,7 @@ func TestUpdateArticle(t *testing.T) {
 		// Send update request
 		result, err := service.Update(testUsers[0].GetUserIDContext(), &updateRequestByUser0)
 		expected := articles.ArticleResult{
-			ID:      tokenizedArticle0.ID,
+			ID:      article0.ID,
 			Title:   newTitle,
 			Content: newContentStr,
 		}
@@ -178,6 +178,21 @@ func TestUpdateArticle(t *testing.T) {
 		// Create article and the corresponding NFT.
 		service.DB.Create(&tokenizedArticle0)
 		mintNFTOfArticle0AndWait(t, service.Contract, testUsers[0].Address())
+
+		// Send update request
+		_, err := service.Update(testUsers[1].GetUserIDContext(), &updateRequestByUser1)
+
+		// Assert request error.
+		var namer server.ErrorNamer
+		assert.ErrorAs(t, err, &namer)
+		assert.Equal(t, "unauthorized", namer.ErrorName())
+	})
+
+	t.Run("FailWithoutNFTAsNonOwner", func(t *testing.T) {
+		service := prepareArticlesService(t)
+
+		// Create article
+		service.DB.Create(&article0)
 
 		// Send update request
 		_, err := service.Update(testUsers[1].GetUserIDContext(), &updateRequestByUser1)
