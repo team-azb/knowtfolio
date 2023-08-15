@@ -31,8 +31,8 @@ type editArticleFormProps = {
 const EditArticleForm = ({ articleId }: editArticleFormProps) => {
   const [content, setContent] = useState("");
   const [title, setTitle] = useState("");
-  const [shouldMint, setShouldMint] = useState(false);
-  const [isMintable, setIsMintable] = useState(false);
+  const [mintSwitchChecked, setMintSwitchChecked] = useState(false);
+  const [hasNFT, setHasNFT] = useState(false);
   const handleEditorChange = useCallback<
     (value: string, editor: TinyMCEEditor) => void
   >((value) => {
@@ -52,7 +52,7 @@ const EditArticleForm = ({ articleId }: editArticleFormProps) => {
           setContent(content);
           if (contract) {
             const tokenId = await contract.methods.getTokenId(articleId).call();
-            setIsMintable(Number(tokenId) === 0);
+            setHasNFT(Number(tokenId) !== 0);
           }
         }
       } catch (error) {
@@ -72,7 +72,7 @@ const EditArticleForm = ({ articleId }: editArticleFormProps) => {
         },
         session
       );
-      if (shouldMint) {
+      if (mintSwitchChecked) {
         assertMetamask(isConnectedToMetamask);
         const nonce = await fetchNonce(dynamodbClient, user.getUsername());
         const signatureForMint = await web3.eth.personal.sign(
@@ -100,7 +100,7 @@ const EditArticleForm = ({ articleId }: editArticleFormProps) => {
     isConnectedToMetamask,
     navigate,
     session,
-    shouldMint,
+    mintSwitchChecked,
     title,
     user,
     web3,
@@ -114,7 +114,7 @@ const EditArticleForm = ({ articleId }: editArticleFormProps) => {
 
   const onChangeNFTSwitch = useCallback(
     (_event: React.ChangeEvent<HTMLInputElement>, checked: boolean) => {
-      setShouldMint(checked);
+      setMintSwitchChecked(checked);
     },
     []
   );
@@ -153,7 +153,7 @@ const EditArticleForm = ({ articleId }: editArticleFormProps) => {
         </Grid>
         <Grid item xs={9} container direction="row-reverse" alignItems="center">
           <Grid item>
-            {shouldMint ? (
+            {mintSwitchChecked ? (
               <RequireWeb3Wrapper isConnectedToMetamask={isConnectedToMetamask}>
                 <Button
                   variant="contained"
@@ -173,14 +173,14 @@ const EditArticleForm = ({ articleId }: editArticleFormProps) => {
               </Button>
             )}
           </Grid>
-          {isMintable && (
+          {!hasNFT && (
             <Grid item>
               <Grid container alignItems="center">
                 <label htmlFor="mint">Mint NFT</label>
                 <Switch
                   id="mint"
-                  checked={shouldMint}
-                  disabled={!isMintable}
+                  checked={mintSwitchChecked}
+                  disabled={hasNFT}
                   onChange={onChangeNFTSwitch}
                   inputProps={{ "aria-label": "controlled" }}
                 />
