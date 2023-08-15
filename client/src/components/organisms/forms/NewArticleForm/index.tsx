@@ -24,7 +24,7 @@ import { fetchNonce, initDynamodbClient } from "~/apis/dynamodb";
 const NewArticleForm = () => {
   const [content, setContent] = useState("");
   const [titleInput, setTitleInput] = useState("");
-  const [shouldMint, setShouldMint] = useState(false);
+  const [mintSwitchChecked, setMintSwitchChecked] = useState(false);
   const { user, session, userWalletAddress } = useAuthContext();
   const { isConnectedToMetamask, web3, account } = useWeb3Context();
   const handleEditorChange = useCallback<
@@ -51,7 +51,7 @@ const NewArticleForm = () => {
         session
       );
 
-      if (shouldMint) {
+      if (mintSwitchChecked) {
         assertMetamask(isConnectedToMetamask);
 
         const nonce = await fetchNonce(dynamodbClient, user.getUsername());
@@ -79,7 +79,7 @@ const NewArticleForm = () => {
     isConnectedToMetamask,
     navigate,
     session,
-    shouldMint,
+    mintSwitchChecked,
     titleInput,
     user,
     web3,
@@ -87,7 +87,7 @@ const NewArticleForm = () => {
 
   const onChangeNFTSwitch = useCallback(
     (_event: React.ChangeEvent<HTMLInputElement>, checked: boolean) => {
-      setShouldMint(checked);
+      setMintSwitchChecked(checked);
     },
     []
   );
@@ -126,7 +126,7 @@ const NewArticleForm = () => {
         </Grid>
         <Grid item xs={9} container direction="row-reverse" alignItems="center">
           <Grid item>
-            {shouldMint ? (
+            {mintSwitchChecked ? (
               <RequireWeb3Wrapper isConnectedToMetamask={isConnectedToMetamask}>
                 <Button
                   variant="contained"
@@ -152,7 +152,7 @@ const NewArticleForm = () => {
                 <label htmlFor="mint">Mint NFT</label>
                 <Switch
                   id="mint"
-                  checked={shouldMint}
+                  checked={mintSwitchChecked}
                   onChange={onChangeNFTSwitch}
                   inputProps={{ "aria-label": "controlled" }}
                 />
