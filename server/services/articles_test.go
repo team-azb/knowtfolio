@@ -2,6 +2,8 @@ package services
 
 import (
 	"context"
+	"testing"
+
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/stretchr/testify/assert"
@@ -10,7 +12,6 @@ import (
 	"github.com/team-azb/knowtfolio/server/gateways/aws"
 	"github.com/team-azb/knowtfolio/server/gateways/ethereum"
 	"github.com/team-azb/knowtfolio/server/models"
-	"testing"
 )
 
 func prepareArticlesService(t *testing.T) articleService {
@@ -142,7 +143,7 @@ func TestUpdateArticle(t *testing.T) {
 		mintNFTOfArticle0AndWait(t, service.Contract, *testUsers[0].Address())
 
 		// Send update request
-		result, err := service.Update(testUsers[0].GetUserIDContext(), &updateRequestByUser0)
+		_, err := service.Update(testUsers[0].GetUserIDContext(), &updateRequestByUser0)
 		expected := articles.ArticleResult{
 			ID:      tokenizedArticle0.ID,
 			Title:   newTitle,
@@ -151,10 +152,8 @@ func TestUpdateArticle(t *testing.T) {
 
 		// Assert request body.
 		assert.NoError(t, err)
-		assert.Equal(t, expected, *result)
 
 		// Assert DB contents.
-		tokenizedArticle0.ID = result.ID
 		target := models.Article{ID: tokenizedArticle0.ID}
 		res := service.DB.Preload("Document").First(&target)
 		assert.NoError(t, res.Error)
@@ -163,17 +162,29 @@ func TestUpdateArticle(t *testing.T) {
 		assert.Equal(t, []byte(expected.Content), target.Document.Content)
 	})
 
-	t.Run("FailWithoutNFT", func(t *testing.T) {
+	t.Run("SuccessWithoutNFTAsOwner", func(t *testing.T) {
 		service := prepareArticlesService(t)
 
 		service.DB.Create(&article0)
 
+		// Send update request
 		_, err := service.Update(testUsers[0].GetUserIDContext(), &updateRequestByUser0)
+		expected := articles.ArticleResult{
+			ID:      article0.ID,
+			Title:   newTitle,
+			Content: newContentStr,
+		}
 
-		// Assert request error.
-		var namer server.ErrorNamer
-		assert.ErrorAs(t, err, &namer)
-		assert.Equal(t, "unauthorized", namer.ErrorName())
+		// Assert request body.
+		assert.NoError(t, err)
+
+		// Assert DB contents.
+		target := models.Article{ID: tokenizedArticle0.ID}
+		res := service.DB.Preload("Document").First(&target)
+		assert.NoError(t, res.Error)
+		assert.Equal(t, expected.ID, target.ID)
+		assert.Equal(t, expected.Title, target.Document.Title)
+		assert.Equal(t, []byte(expected.Content), target.Document.Content)
 	})
 
 	t.Run("FailsAsNonNFTOwner", func(t *testing.T) {
@@ -182,6 +193,21 @@ func TestUpdateArticle(t *testing.T) {
 		// Create article and the corresponding NFT.
 		service.DB.Create(&tokenizedArticle0)
 		mintNFTOfArticle0AndWait(t, service.Contract, *testUsers[0].Address())
+
+		// Send update request
+		_, err := service.Update(testUsers[1].GetUserIDContext(), &updateRequestByUser1)
+
+		// Assert request error.
+		var namer server.ErrorNamer
+		assert.ErrorAs(t, err, &namer)
+		assert.Equal(t, "unauthorized", namer.ErrorName())
+	})
+
+	t.Run("FailWithoutNFTAsNonOwner", func(t *testing.T) {
+		service := prepareArticlesService(t)
+
+		// Create article
+		service.DB.Create(&article0)
 
 		// Send update request
 		_, err := service.Update(testUsers[1].GetUserIDContext(), &updateRequestByUser1)

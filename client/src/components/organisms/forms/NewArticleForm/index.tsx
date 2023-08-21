@@ -1,22 +1,18 @@
 import { Editor as TinyMCEEditor } from "tinymce";
 import { useCallback, useState } from "react";
-import {
-  generateSignData,
-  mintArticleNft,
-  postArticle,
-} from "~/apis/knowtfolio";
+import { mintArticleNft, postArticle } from "~/apis/knowtfolio";
 import { useNavigate } from "react-router-dom";
 import {
   assertMetamask,
   useWeb3Context,
 } from "~/components/organisms/providers/Web3Provider";
 import ArticleEditor from "~/components/organisms/ArticleEditor";
-import { Button, Grid } from "@mui/material";
+import { Button, Grid, Switch } from "@mui/material";
 import ArrowBackIosNewRoundedIcon from "@mui/icons-material/ArrowBackIosNewRounded";
 import { toast } from "react-toastify";
 import RequireWeb3Wrapper from "~/components/organisms/RequireWeb3Wrapper";
 import { useAuthContext } from "~/components/organisms/providers/AuthProvider";
-import { fetchNonce, initDynamodbClient } from "~/apis/dynamodb";
+import { initDynamodbClient } from "~/apis/dynamodb";
 
 /**
  * 記事の新規作成用のフォーム
@@ -24,7 +20,8 @@ import { fetchNonce, initDynamodbClient } from "~/apis/dynamodb";
 const NewArticleForm = () => {
   const [content, setContent] = useState("");
   const [titleInput, setTitleInput] = useState("");
-  const { user, session } = useAuthContext();
+  const [mintSwitchChecked, setMintSwitchChecked] = useState(false);
+  const { user, session, userWalletAddress } = useAuthContext();
   const { isConnectedToMetamask, web3, account } = useWeb3Context();
   const handleEditorChange = useCallback<
     (value: string, editor: TinyMCEEditor) => void
@@ -50,20 +47,14 @@ const NewArticleForm = () => {
         session
       );
 
-      assertMetamask(isConnectedToMetamask);
-
-      const nonce = await fetchNonce(dynamodbClient, user.getUsername());
-      const signatureForMint = await web3.eth.personal.sign(
-        generateSignData("Mint NFT", nonce),
-        account,
-        ""
-      );
-      // TODO: Make this optional
-      await mintArticleNft({
-        articleId: id,
-        address: account,
-        signature: signatureForMint,
-      });
+      if (mintSwitchChecked) {
+        assertMetamask(isConnectedToMetamask);
+        await mintArticleNft(dynamodbClient, web3, {
+          articleId: id,
+          account,
+          username: user.getUsername(),
+        });
+      }
       navigate(`/users/${user.getUsername()}`);
       toast.success("記事を作成しました。");
     } catch (error) {
@@ -73,13 +64,23 @@ const NewArticleForm = () => {
   }, [
     account,
     content,
+    dynamodbClient,
     isConnectedToMetamask,
     navigate,
     session,
+    mintSwitchChecked,
     titleInput,
     user,
     web3,
   ]);
+
+  const onChangeNFTSwitch = useCallback(
+    (_event: React.ChangeEvent<HTMLInputElement>, checked: boolean) => {
+      setMintSwitchChecked(checked);
+    },
+    []
+  );
+
   return (
     <div
       style={{
@@ -112,16 +113,41 @@ const NewArticleForm = () => {
             />
           </Grid>
         </Grid>
-        <Grid item xs={9} container direction="row-reverse">
-          <RequireWeb3Wrapper isConnectedToMetamask={isConnectedToMetamask}>
-            <Button
-              variant="contained"
-              onClick={handlePost}
-              style={{ fontSize: "1.4rem" }}
-            >
-              create article
-            </Button>
-          </RequireWeb3Wrapper>
+        <Grid item xs={9} container direction="row-reverse" alignItems="center">
+          <Grid item>
+            {mintSwitchChecked ? (
+              <RequireWeb3Wrapper isConnectedToMetamask={isConnectedToMetamask}>
+                <Button
+                  variant="contained"
+                  onClick={handlePost}
+                  style={{ fontSize: "1.4rem" }}
+                >
+                  create article
+                </Button>
+              </RequireWeb3Wrapper>
+            ) : (
+              <Button
+                variant="contained"
+                onClick={handlePost}
+                style={{ fontSize: "1.4rem" }}
+              >
+                create article
+              </Button>
+            )}
+          </Grid>
+          {isConnectedToMetamask && userWalletAddress && (
+            <Grid item>
+              <Grid container alignItems="center">
+                <label htmlFor="mint">Mint NFT</label>
+                <Switch
+                  id="mint"
+                  checked={mintSwitchChecked}
+                  onChange={onChangeNFTSwitch}
+                  inputProps={{ "aria-label": "controlled" }}
+                />
+              </Grid>
+            </Grid>
+          )}
         </Grid>
       </Grid>
       <Grid flexGrow={1}>
